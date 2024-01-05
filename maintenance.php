@@ -33,7 +33,7 @@ if (isset($_POST['quantity'])) {
         echo "$stockQuantity";
         exit();
     } elseif ($submittedQuantity <= 0) {
-        echo "Kuantitas yang dimasukkan harus lebih besar dari 0";
+        echo "Kuantitas yang dimasukkan harus lebih besar dari";
         exit();
     }
 
