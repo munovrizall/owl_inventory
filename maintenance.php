@@ -10,7 +10,7 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-$stockQuantity = 0; // Default value, replace it with the actual stock quantity based on the selected item from the database
+$stockQuantity = ""; // Default value, replace it with the actual stock quantity based on the selected item from the database
 
 if (isset($_POST['quantity'])) {
     $selectedItemId = $_POST['selectedItem'];
@@ -27,7 +27,13 @@ if (isset($_POST['quantity'])) {
     $submittedQuantity = $_POST['quantity'];
     if ($submittedQuantity > $stockQuantity) {
         // Quantity exceeds available stock, handle accordingly (e.g., show an error message)
-        echo "Error: Quantity exceeds available stock.";
+        echo "Stok bahan tidak mencukupi.";
+        exit();
+    } elseif ($submittedQuantity == "") {
+        echo "$stockQuantity";
+        exit();
+    } elseif ($submittedQuantity <= 0) {
+        echo "Kuantitas yang dimasukkan harus lebih besar dari 0";
         exit();
     }
 
@@ -164,7 +170,7 @@ if (isset($_POST['quantity'])) {
                                     <label for="quantity">Kuantitas :</label>
                                     <div class="input-group">
                                         <!-- Input untuk kuantitas -->
-                                        <input type="number" class="form-control" id="quantity" name="quantity" min="0" value="0">
+                                        <input type="number" class="form-control" id="quantity" name="quantity" min="0" value="">
                                         <!-- Tombol-tombol untuk menambah dan mengurangi kuantitas -->
                                         <div class="input-group-append">
                                             <button type="button" class="btn btn-block btn-danger" onclick="decreaseQuantity()">-</button>
