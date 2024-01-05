@@ -24,7 +24,7 @@ function insertData($conn, $table, $params) {
 }
 
 function updateStokBahan($conn, $stokId, $quantity, $pengguna, $activity) {
-    $operation = ($activity === 'restock') ? '+' : '-';
+    $operation = ($activity === 'Restock') ? '+' : '-';
 
     // Get the current quantity
     $sqlGetQuantity = "SELECT quantity FROM stokbahan WHERE stok_id = ?";
@@ -138,7 +138,7 @@ function updateDampakProduksi($conn, $stokId, $quantity, $pengguna) {
             'pengguna' => $pengguna,  // Replace with actual user information
             'waktu' => $timestamp,
             'quantity' => -$quantity,
-            'activity' => 'produksi',
+            'activity' => 'Produksi',
         ];
 
         insertData($conn, 'historis', $historisParams);
@@ -178,8 +178,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'stok_id' => $stokId,
             'quantity' => $quantity,
         ];
-        insertData($conn, 'produksi', $produksiParams);
-    } elseif ($activity === 'produksi') {
+        insertData($conn, 'Produksi', $produksiParams);
+    } elseif ($activity === 'Produksi') {
         $produk = $_POST["produk"];
         $pengguna = $_POST["pengguna"];
         
@@ -203,7 +203,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         $stmtProduksi->close();
-    } elseif ($activity === 'restock' || $activity === 'prototype') {
+    } elseif ($activity === 'Restock' || $activity === 'Maintenance') {
         $stokId = $_POST["stok_id"]; // APAKAH PERLU?
         $quantity = $_POST["quantity"];
         $pengguna = $_POST["pengguna"];  // Harusnya nama user pas awal masuk, gatau gmn
