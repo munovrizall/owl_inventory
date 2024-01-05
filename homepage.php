@@ -1,3 +1,19 @@
+<?php
+$serverName = "localhost";
+$userName = "root";
+$password = "";
+$dbName = "databaseinventory";
+
+$conn = new mysqli($serverName, $userName, $password, $dbName);
+
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+
+$query = "SELECT * FROM historis ORDER BY waktu DESC LIMIT 20";
+$result = mysqli_query($conn, $query);
+
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -199,33 +215,21 @@
                     </thead>
                     <tbody>
                       <tr>
-                        <td>Rijal</td>
-                        <td>Fingerprint</td>
-                        <td>1</td>
-                        <td><span class="badge bg-info">Produksi</span></td>
-                        <td>5/1/2024 14:00</td>
+                      <?php
+
+                      while($row = mysqli_fetch_assoc($result))
+                      {
+                      ?>
+                        <td><?php echo $row["pengguna"]; ?></td>
+                        <td><?php echo $row["stok_id"]; ?></td>
+                        <td><?php echo $row["quantity"]; ?></td>
+                        <td><?php echo $row["activity"]; ?></td>
+                        <td><?php echo $row["waktu"]; ?></td>
+
                       </tr>
-                      <tr>
-                        <td>Rijal</td>
-                        <td>Transistor</td>
-                        <td>10</td>
-                        <td><span class="badge bg-warning">Restock</span></td>
-                        <td>5/1/2024 12:30</td>
-                      </tr>
-                      <tr>
-                        <td>Ryan</td>
-                        <td>Kapasitor</td>
-                        <td>-50</td>
-                        <td><span class="badge bg-success">Maintenance</span></td>
-                        <td>5/1/2024 10:00</td>
-                      </tr>
-                      <tr>
-                        <td>Rijal</td>
-                        <td>Resistor</td>
-                        <td>20</td>
-                        <td><span class="badge bg-warning">Restock</span></td>
-                        <td>5/1/2024 9:30</td>
-                      </tr>
+                      <?php
+                        }
+                      ?>
                     </tbody>
                   </table>
                 </div>
