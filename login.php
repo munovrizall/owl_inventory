@@ -1,72 +1,81 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
-  <!-- Required meta tags -->
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  
-  <link rel="stylesheet" href="fonts/icomoon/style.css">
-
-  <link rel="stylesheet" href="assets/bootstrap/css/owl.carousel.min.css">
-
-  <!-- Bootstrap CSS -->
-  <link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css">
-
-  <!-- Style -->
-  <link rel="stylesheet" href="assets/bootstrap/css/style.css">
-
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Login</title>
+
+  <link rel="icon" href="assets/adminlte/dist/img/OWLlogo.png" type="image/x-icon">
+  <!-- Google Font: Source Sans Pro -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="assets/adminlte/plugins/fontawesome-free/css/all.min.css">
+  <!-- icheck bootstrap -->
+  <link rel="stylesheet" href="assets/adminlte/plugins/icheck-bootstrap/icheck-bootstrap.min.css">
+  <!-- Theme style -->
+  <link rel="stylesheet" href="assets/adminlte/dist/css/adminlte.min.css">
 </head>
 
-<body>
+<body class="hold-transition login-page">
+  <div class="login-box">
+    <!-- /.login-logo -->
+    <div class="card card-outline card-primary">
+      <div class="card-header text-center">
+        <a href="login.php" class="h1">
+          <img src="assets/adminlte/dist/img/OWLlogo.png" alt="OWL Inventory" class="brand-image img-circle elevation-3" style="background-color: black; padding: 8px; opacity: .8; height: 50px; width: 50px;">
+          <b>OWL</b> Inventory
+        </a>
+      </div>
+      <div class="card-body">
+        <p class="login-box-msg">Silahkan login terlebih dahulu</p>
 
-
-
-  <div class="content">
-    <div class="container">
-      <div class="row">
-        <div class="col-md-6 order-md-2">
-          <img src="images/undraw_file_sync_ot38.svg" alt="Image" class="img-fluid">
-        </div>
-        <div class="col-md-6 contents">
-          <div class="row justify-content-center">
-            <div class="col-md-8">
-              <div class="mb-4">
-                <h3>Sign In to <strong>OWL Inventory</strong></h3>
+        <form action="homepage.php" method="post">
+          <div class="input-group mb-3">
+            <input type="text" class="form-control" placeholder="Username">
+            <div class="input-group-append">
+              <div class="input-group-text">
+                <span class="fas fa-user"></span>
               </div>
-              <form action="homepage.php" method="post">
-                <div class="form-group first">
-                  <label for="username">Username</label>
-                  <input type="text" class="form-control" id="username">
-
-                </div>
-                <div class="form-group last mb-4">
-                  <label for="password">Password</label>
-                  <input type="password" class="form-control" id="password">
-                </div>
-                <div class="d-flex mb-5 align-items-center">
-                  <label class="control control--checkbox mb-0"><span class="caption">Remember me</span>
-                    <input type="checkbox" checked="checked" />
-                    <div class="control__indicator"></div>
-                  </label>
-                  <span class="ml-auto"><a href="#" class="forgot-pass">Forgot Password</a></span>
-                </div>
-                <input type="submit" value="Log In" class="btn text-white btn-block btn-primary">
-              </form>
             </div>
           </div>
-
-        </div>
-
+          <div class="input-group mb-3">
+            <input type="password" class="form-control" placeholder="Password">
+            <div class="input-group-append">
+              <div class="input-group-text">
+                <span class="fas fa-lock"></span>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-8">
+              <div class="icheck-primary">
+                <input type="checkbox" id="remember">
+                <label for="remember">
+                  Ingat Saya
+                </label>
+              </div>
+            </div>
+            <!-- /.col -->
+            <div class="col-4">
+              <button type="submit" class="btn btn-primary btn-block">Sign In</button>
+            </div>
+            <!-- /.col -->
+          </div>
+        </form>
       </div>
+      <!-- /.card-body -->
     </div>
+    <!-- /.card -->
   </div>
+  <!-- /.login-box -->
 
-  <script src="js/jquery-3.3.1.min.js"></script>
-  <script src="js/popper.min.js"></script>
-  <script src="js/bootstrap.min.js"></script>
-  <script src="js/main.js"></script>
+  <!-- jQuery -->
+  <script src="assets/adminlte/plugins/jquery/jquery.min.js"></script>
+  <!-- Bootstrap 4 -->
+  <script src="assets/adminlte/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <!-- AdminLTE App -->
+  <script src="assets/adminlte/dist/js/adminlte.min.js"></script>
 </body>
 
 </html>
