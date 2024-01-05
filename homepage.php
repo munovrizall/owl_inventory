@@ -7,7 +7,7 @@ $dbName = "databaseinventory";
 $conn = new mysqli($serverName, $userName, $password, $dbName);
 
 if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
+  die("Connection failed: " . $conn->connect_error);
 }
 
 $query = "SELECT * FROM historis ORDER BY waktu DESC LIMIT 20";
@@ -214,23 +214,39 @@ $result = mysqli_query($conn, $query);
                       </tr>
                     </thead>
                     <tbody>
-                      <tr>
                       <?php
-
-                      while($row = mysqli_fetch_assoc($result))
-                      {
-                      ?>
-                        <td><?php echo $row["pengguna"]; ?></td>
-                        <td><?php echo $row["stok_id"]; ?></td>
-                        <td><?php echo $row["quantity"]; ?></td>
-                        <td><?php echo $row["activity"]; ?></td>
-                        <td><?php echo $row["waktu"]; ?></td>
-
-                      </tr>
-                      <?php
+                      while ($row = mysqli_fetch_assoc($result)) {
+                        // Tentukan kelas badge berdasarkan nilai activity
+                        $badgeClass = "";
+                        switch ($row["activity"]) {
+                          case "Produksi":
+                            $badgeClass = "badge bg-info";
+                            break;
+                          case "Restock":
+                            $badgeClass = "badge bg-warning";
+                            break;
+                          case "Maintenance":
+                            $badgeClass = "badge bg-success";
+                            break;
+                          default:
+                            // Set kelas default jika nilai activity tidak sesuai dengan kasus di atas
+                            $badgeClass = "badge bg-secondary";
+                            break;
                         }
                       ?>
+                        <tr>
+                          <td><?php echo $row["pengguna"]; ?></td>
+                          <td><?php echo $row["stok_id"]; ?></td>
+                          <td><?php echo $row["quantity"]; ?></td>
+                          <!-- Tambahkan span dengan kelas badge sesuai dengan nilai activity -->
+                          <td><span class="<?php echo $badgeClass; ?>"><?php echo $row["activity"]; ?></span></td>
+                          <td><?php echo $row["waktu"]; ?></td>
+                        </tr>
+                      <?php
+                      }
+                      ?>
                     </tbody>
+
                   </table>
                 </div>
                 <!-- /.card-body -->
