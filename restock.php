@@ -94,7 +94,7 @@
                         <div class="col-sm-6">
                             <ol class="breadcrumb float-sm-right">
                                 <li class="breadcrumb-item"><a href="homepage.php">Home</a></li>
-                                <li class="breadcrumb-item active">Maintenance</li>
+                                <li class="breadcrumb-item active">Restock</li>
                             </ol>
                         </div>
                     </div>
@@ -116,7 +116,7 @@
                             <div class="card-body">
                                 <div class="form-group">
                                     <label for="exampleSelectBorderWidth2">Pilih Bahan :</label>
-                                    <select class="custom-select form-control-border border-width-2" id="pilihBahanMaintenance">
+                                    <select class="custom-select form-control-border border-width-2" id="pilihBahanRestock">
                                         <option>Value 1</option>
                                         <option>Value 2</option>
                                         <option>Value 3</option>
