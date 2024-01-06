@@ -1,3 +1,48 @@
+<?php
+$serverName = "localhost";
+$userName = "root";
+$password = "";
+$dbName = "databaseinventory";
+
+$conn = new mysqli($serverName, $userName, $password, $dbName);
+
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+
+$stockQuantity = ""; // Default value, replace it with the actual stock quantity based on the selected item from the database
+
+if (isset($_POST['quantity'])) {
+    $selectedItemId = $_POST['selectedItem'];
+    // Fetch the stock quantity from the database based on the selected item
+    $query = "SELECT quantity FROM stokbahan WHERE stok_id = ?";
+    $stmt = $conn->prepare($query);
+    $stmt->bind_param("i", $selectedItemId);
+    $stmt->execute();
+    $stmt->bind_result($stockQuantity);
+    $stmt->fetch();
+    $stmt->close();
+
+    // Check if the submitted quantity is greater than the available stock
+    $submittedQuantity = $_POST['quantity'];
+    if ($submittedQuantity > $stockQuantity) {
+        // Quantity exceeds available stock, handle accordingly (e.g., show an error message)
+        echo "Stok bahan tidak mencukupi.";
+        exit();
+    } elseif ($submittedQuantity == "") {
+        echo "$stockQuantity";
+        exit();
+    } elseif ($submittedQuantity <= 0) {
+        echo "Kuantitas yang dimasukkan harus lebih besar dari";
+        exit();
+    }
+
+    // Return the updated stock quantity
+    echo $stockQuantity;
+    exit();
+}
+
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -111,21 +156,21 @@
                         </div>
                         <!-- /.card-header -->
                         <!-- form start -->
-                        <form>
+                        <form id="maintenanceForm">
                             <div class="card-body">
                                 <div class="form-group">
                                     <label for="exampleSelectBorderWidth2">Pilih Bahan :</label>
-                                    <select class="custom-select form-control-border border-width-2" id="pilihBahanMaintenance">
-                                        <option>Value 1</option>
-                                        <option>Value 2</option>
-                                        <option>Value 3</option>
+                                    <select class="custom-select form-control-border border-width-2" id="pilihBahanMaintenance" name="selectedItem">
+                                        <option value="1">U101</option>
+                                        <option value="10">R102</option>
+                                        <option value="11">L203</option>
                                     </select>
                                 </div>
                                 <div class="form-group">
                                     <label for="quantity">Kuantitas :</label>
                                     <div class="input-group">
                                         <!-- Input untuk kuantitas -->
-                                        <input type="number" class="form-control" id="quantity" name="quantity" min="0" value="0">
+                                        <input type="number" class="form-control" id="quantity" name="quantity" min="0" value="">
                                         <!-- Tombol-tombol untuk menambah dan mengurangi kuantitas -->
                                         <div class="input-group-append">
                                             <button type="button" class="btn btn-block btn-danger" onclick="decreaseQuantity()">-</button>
@@ -133,11 +178,11 @@
                                         </div>
                                     </div>
                                 </div>
-                                <p id="stockMessage">Stok Bahan Tersisa: 100</p>
+                                <p id="stockMessage">Stok Bahan Tersisa: <?php echo $stockQuantity; ?></p>
                             </div>
                             <!-- /.card-body -->
                             <div class="card-footer">
-                                <button type="submit" class="btn btn-primary">Submit</button>
+                                <button type="button" class="btn btn-primary" onclick="validateAndFetchStock()">Submit</button>
                             </div>
                         </form>
                     </div>
@@ -171,7 +216,53 @@
     <script>
         $(function() {
             bsCustomFileInput.init();
+
+            // Add an event listener to the select element
+            $("#pilihBahanMaintenance").change(function() {
+                validateAndFetchStock();
+            });
         });
+
+        function decreaseQuantity() {
+            var quantityInput = document.getElementById("quantity");
+            if (quantityInput.value > 0) {
+                quantityInput.value--;
+                updateStockMessage();
+            }
+        }
+
+        function increaseQuantity() {
+            var quantityInput = document.getElementById("quantity");
+            quantityInput.value++;
+            updateStockMessage();
+        }
+
+        function updateStockMessage() {
+            var stockMessage = document.getElementById("stockMessage");
+            var selectedQuantity = parseInt(document.getElementById("quantity").value, 10);
+
+            // Update stock message dynamically based on the selected item's stock quantity
+            stockMessage.innerText = "Stok Bahan Tersisa: " + (<?php echo $stockQuantity; ?> - selectedQuantity);
+        }
+
+        function validateAndFetchStock() {
+            // Get the form data
+            var formData = $("#maintenanceForm").serialize();
+
+            // Use AJAX to submit the form data and fetch the updated stock quantity
+            $.ajax({
+                type: "POST",
+                url: "maintenance.php",
+                data: formData,
+                success: function(response) {
+                    // Update the stock message with the fetched quantity
+                    document.getElementById("stockMessage").innerText = "Stok Bahan Tersisa: " + response;
+                },
+                error: function(error) {
+                    alert("Error fetching stock quantity.");
+                }
+            });
+        }
     </script>
 </body>
 
