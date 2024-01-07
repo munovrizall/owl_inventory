@@ -23,7 +23,6 @@ if (isset($_POST['quantity'])) {
     $stmt->fetch();
     $stmt->close();
 
-    // Check if the submitted quantity is greater than the available stock
     $submittedQuantity = $_POST['quantity'];
     if ($submittedQuantity == "") {
         echo "$stockQuantity";
@@ -32,6 +31,25 @@ if (isset($_POST['quantity'])) {
         echo "Kuantitas yang dimasukkan harus lebih besar dari 0";
         exit();
     }
+
+    // Update the database with the new stock quantity
+    $newStockQuantity = $stockQuantity + $submittedQuantity;
+    $updateQueryStock = "UPDATE stokbahan SET quantity = ? WHERE stok_id = ?";
+    $updateStmt = $conn->prepare($updateQueryStock);
+    $updateStmt->bind_param("ii", $newStockQuantity, $selectedItemId);
+    $updateStmt->execute();
+    $updateStmt->close();
+
+     // Insert a new record into the 'historis' table
+     $insertQueryHistoris = "INSERT INTO historis (pengguna, stok_id, waktu, quantity, activity) VALUES (?, ?, NOW(), ?, 'Restock')";
+     $insertStmt = $conn->prepare($insertQueryHistoris);
+     $insertStmt->bind_param("sii", $pengguna, $selectedItemId, $submittedQuantity);
+ 
+     // Replace 'your_username' with the actual username or identifier of the user performing the restock
+     $pengguna = 'your_username';
+ 
+     $insertStmt->execute();
+     $insertStmt->close();
 
     // Return the updated stock quantity
     echo $stockQuantity;
@@ -175,10 +193,11 @@ if (isset($_POST['quantity'])) {
                                     </div>
                                 </div>
                                 <p id="stockMessage">Stok Bahan Tersisa: <?php echo $stockQuantity; ?></p>
-                            </div>
+                                <p id="successMessage" style="display: none; color: green;">Stok berhasil ditambahkan</p>
+                              </div>
                             <!-- /.card-body -->
                             <div class="card-footer">
-                                <button type="button" class="btn btn-primary" onclick="validateAndFetchStock()">Submit</button>
+                                <button type="button" class="btn btn-primary" onclick="validateSuccess()">Submit</button>
                             </div>
                         </form>
                     </div>
@@ -215,7 +234,7 @@ if (isset($_POST['quantity'])) {
 
             // Add an event listener to the select element
             $("#pilihBahanRestock").change(function() {
-                validateAndFetchStock();
+                validateCurrentStock();
             });
         });
 
@@ -241,7 +260,7 @@ if (isset($_POST['quantity'])) {
             stockMessage.innerText = "Stok Bahan Tersisa: " + (<?php echo $stockQuantity; ?> + selectedQuantity);
         }
 
-        function validateAndFetchStock() {
+        function validateCurrentStock() {
             // Get the form data
             var formData = $("#restockForm").serialize();
 
@@ -251,8 +270,31 @@ if (isset($_POST['quantity'])) {
                 url: "restock.php",
                 data: formData,
                 success: function(response) {
+                    // Hide the stock message
+                    document.getElementById("successMessage").style.display = "none";
                     // Update the stock message with the fetched quantity
                     document.getElementById("stockMessage").innerText = "Stok Bahan Tersisa: " + response;
+                },
+                error: function(error) {
+                    alert("Error fetching stock quantity.");
+                }
+            });
+        }
+
+        function validateSuccess() {
+            // Get the form data
+            var formData = $("#restockForm").serialize();
+
+            // Use AJAX to submit the form data and fetch the updated stock quantity
+            $.ajax({
+                type: "POST",
+                url: "restock.php",
+                data: formData,
+                success: function(response) {
+                    // Hide the stock message
+                    document.getElementById("stockMessage").style.display = "none";
+                    // Update the stock message with the fetched quantity
+                    document.getElementById("successMessage").style.display = "block";
                 },
                 error: function(error) {
                     alert("Error fetching stock quantity.");
