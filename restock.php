@@ -293,7 +293,7 @@ if (isset($_POST['quantity'])) {
                 success: function(response) {
                     // Hide the stock message
                     document.getElementById("stockMessage").style.display = "none";
-                    // Update the stock message with the fetched quantity
+                    // Update the stock message with success message
                     document.getElementById("successMessage").style.display = "block";
                 },
                 error: function(error) {
