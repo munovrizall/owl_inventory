@@ -1,10 +1,14 @@
 <?php
+// Check if the user is logged in
+session_start();
+$username = $_SESSION['username'];
+
 $serverName = "localhost";
-$userName = "root";
+$userNameDb = "root";
 $password = "";
 $dbName = "databaseinventory";
 
-$conn = new mysqli($serverName, $userName, $password, $dbName);
+$conn = new mysqli($serverName, $userNameDb, $password, $dbName);
 
 if ($conn->connect_error) {
   die("Connection failed: " . $conn->connect_error);
@@ -119,7 +123,7 @@ $result = mysqli_query($conn, $query);
         <div class="container-fluid">
           <div class="row mb-2">
             <div class="col-sm-6">
-              <h1 class="m-0">Halo User!</h1>
+              <h1 class="m-0">Halo <?php echo $username; ?>!</h1>
             </div><!-- /.col -->
             <div class="col-sm-6">
               <ol class="breadcrumb float-sm-right">
