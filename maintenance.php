@@ -1,4 +1,6 @@
 <?php
+session_start();
+
 $serverName = "localhost";
 $userName = "root";
 $password = "";
@@ -9,13 +11,18 @@ $conn = new mysqli($serverName, $userName, $password, $dbName);
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
-
 $stockQuantity = ""; // Default value, replace it with the actual stock quantity based on the selected item from the database
+$newStockQuantity = "";
 
 if (isset($_POST['quantity'])) {
     $selectedItemId = $_POST['selectedItem'];
+
+    // Fetch the username from the POST data
+    $pengguna = isset($_SESSION['username']) ? $_SESSION['username'] : '';
+
+
     // Fetch the stock quantity from the database based on the selected item
-    $query = "SELECT quantity FROM stokbahan WHERE stok_id = ?";
+    $query = "SELECT quantity FROM masterbahan WHERE stok_id = ?";
     $stmt = $conn->prepare($query);
     $stmt->bind_param("i", $selectedItemId);
     $stmt->execute();
@@ -23,22 +30,33 @@ if (isset($_POST['quantity'])) {
     $stmt->fetch();
     $stmt->close();
 
-    // Check if the submitted quantity is greater than the available stock
     $submittedQuantity = $_POST['quantity'];
-    if ($submittedQuantity > $stockQuantity) {
-        // Quantity exceeds available stock, handle accordingly (e.g., show an error message)
-        echo "Stok bahan tidak mencukupi.";
-        exit();
-    } elseif ($submittedQuantity == "") {
-        echo "$stockQuantity";
+    if ($submittedQuantity == "") {
+        echo json_encode(array('currentStock' => $stockQuantity, 'newStock' => $newStockQuantity));
         exit();
     } elseif ($submittedQuantity <= 0) {
-        echo "Kuantitas yang dimasukkan harus lebih besar dari";
+        echo "Kuantitas yang dimasukkan harus lebih besar dari 0";
         exit();
     }
 
+    // Update the database with the new stock quantity
+    $newStockQuantity = $stockQuantity - $submittedQuantity;
+    $updateQueryStock = "UPDATE masterbahan SET quantity = ? WHERE stok_id = ?";
+    $updateStmt = $conn->prepare($updateQueryStock);
+    $updateStmt->bind_param("ii", $newStockQuantity, $selectedItemId);
+    $updateStmt->execute();
+    $updateStmt->close();
+
+    // Insert a new record into the 'historis' table
+    $insertQueryHistoris = "INSERT INTO historis (pengguna, stok_id, waktu, quantity, activity) VALUES (?, ?, NOW(), ?, 'Maintenance')";
+    $insertStmt = $conn->prepare($insertQueryHistoris);
+    $insertStmt->bind_param("sii", $pengguna, $selectedItemId, $submittedQuantity);
+
+    $insertStmt->execute();
+    $insertStmt->close();
+
     // Return the updated stock quantity
-    echo $stockQuantity;
+    echo json_encode(array('currentStock' => $stockQuantity, 'newStock' => $newStockQuantity));
     exit();
 }
 
@@ -58,9 +76,19 @@ if (isset($_POST['quantity'])) {
     <link rel="stylesheet" href="assets/adminlte/plugins/fontawesome-free/css/all.min.css">
     <!-- Theme style -->
     <link rel="stylesheet" href="assets/adminlte/dist/css/adminlte.min.css">
+
+    <!-- Sweetalert2 -->
+    <link rel="stylesheet" href="assets/adminlte/plugins/sweetalert2-theme-bootstrap-4/bootstrap-4.min.css">
     <!-- Ionicons -->
     <link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
 
+    <style>
+        #successMessage {
+            display: none;
+            /* Hide the success message initially */
+        }
+    </style>
+  
 </head>
 
 <body class="hold-transition sidebar-mini">
@@ -191,9 +219,9 @@ if (isset($_POST['quantity'])) {
                                 <div class="form-group">
                                     <label for="exampleSelectBorderWidth2">Pilih Bahan :</label>
                                     <select class="custom-select form-control-border border-width-2" id="pilihBahanMaintenance" name="selectedItem">
-                                        <option value="1">U101</option>
-                                        <option value="10">R102</option>
-                                        <option value="11">L203</option>
+                                        <option value="1">R0608</option>
+                                        <option value="10">I8712</option>
+                                        <option value="11">I9090</option>
                                     </select>
                                 </div>
                                 <div class="form-group">
@@ -209,10 +237,12 @@ if (isset($_POST['quantity'])) {
                                     </div>
                                 </div>
                                 <p id="stockMessage">Stok Bahan Tersisa: <?php echo $stockQuantity; ?></p>
+                                <p id="successMessage">Stok Bahan Terkini: <?php echo $newStockQuantity; ?></p>
                             </div>
+
                             <!-- /.card-body -->
                             <div class="card-footer">
-                                <button type="button" class="btn btn-primary" onclick="validateAndFetchStock()">Submit</button>
+                                <button type="button" class="btn btn-primary" onclick="validateSuccess()">Submit</button>
                             </div>
                         </form>
                     </div>
@@ -242,6 +272,8 @@ if (isset($_POST['quantity'])) {
     <script src="assets/adminlte/plugins/bs-custom-file-input/bs-custom-file-input.min.js"></script>
     <!-- AdminLTE App -->
     <script src="assets/adminlte/dist/js/adminlte.min.js"></script>
+    <!-- SweetAlert2 Toast -->
+    <script src="assets/adminlte/plugins/sweetalert2/sweetalert2.min.js"></script>
     <!-- Page specific script -->
     <script>
         $(function() {
@@ -249,7 +281,7 @@ if (isset($_POST['quantity'])) {
 
             // Add an event listener to the select element
             $("#pilihBahanMaintenance").change(function() {
-                validateAndFetchStock();
+                validateCurrentStock();
             });
         });
 
@@ -275,7 +307,7 @@ if (isset($_POST['quantity'])) {
             stockMessage.innerText = "Stok Bahan Tersisa: " + (<?php echo $stockQuantity; ?> - selectedQuantity);
         }
 
-        function validateAndFetchStock() {
+        function validateCurrentStock() {
             // Get the form data
             var formData = $("#maintenanceForm").serialize();
 
@@ -284,12 +316,48 @@ if (isset($_POST['quantity'])) {
                 type: "POST",
                 url: "maintenance.php",
                 data: formData,
+                dataType: "json",
                 success: function(response) {
+                    // Hide the stock message
+                    document.getElementById("successMessage").style.display = "none";
                     // Update the stock message with the fetched quantity
-                    document.getElementById("stockMessage").innerText = "Stok Bahan Tersisa: " + response;
+                    document.getElementById("stockMessage").innerText = "Stok Bahan Tersisa: " + response.currentStock;
                 },
                 error: function(error) {
                     alert("Error fetching stock quantity.");
+                }
+            });
+        }
+
+        function validateSuccess() {
+            // Get the form data
+            var formData = $("#maintenanceForm").serialize();
+
+            // Use AJAX to submit the form data and fetch the updated stock quantity
+            $.ajax({
+                type: "POST",
+                url: "maintenance.php",
+                data: formData,
+                dataType: "json",
+                success: function(response) {
+                    // Hide the stock message
+                    document.getElementById("stockMessage").style.display = "none";
+                    // Update the stock message with success message
+                    document.getElementById("successMessage").style.display = "block";
+                    document.getElementById("successMessage").innerText = "Stok Bahan Terkini: " + response.newStock;
+
+                    Swal.fire({
+                        toast: true,
+                        position: 'top-end',
+                        icon: 'success',
+                        title: 'Stok berhasil diambil!',
+                        showConfirmButton: false,
+                        timer: 3000
+                    });
+
+                },
+                error: function(error) {
+                    alert("Error fetching new stock quantity.");
                 }
             });
         }
