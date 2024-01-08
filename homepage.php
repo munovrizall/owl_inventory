@@ -152,7 +152,7 @@ $result = mysqli_query($conn, $query);
             <!-- ./col -->
             <div class="col-lg-3 col-6">
               <!-- small box -->
-              <div class="small-box bg-success">
+              <div class="small-box bg-danger">
                 <div class="inner">
                   <h3><sup style="font-size: 24px">Maintenance</sup></h3>
                   <p>Maintenance device</p>
@@ -166,7 +166,7 @@ $result = mysqli_query($conn, $query);
             <!-- ./col -->
             <div class="col-lg-3 col-6">
               <!-- small box -->
-              <div class="small-box bg-warning">
+              <div class="small-box bg-success">
                 <div class="inner">
                   <h3><sup style="font-size: 24px">Restock</sup></h3>
                   <p>Restock bahan</p>
@@ -180,7 +180,7 @@ $result = mysqli_query($conn, $query);
             <!-- ./col -->
             <div class="col-lg-3 col-6">
               <!-- small box -->
-              <div class="small-box bg-danger">
+              <div class="small-box bg-warning">
                 <div class="inner">
                   <h3><sup style="font-size: 24px">Laporan Stok</sup></h3>
                   <p>Cek ketersediaan stok bahan</p>
@@ -223,10 +223,10 @@ $result = mysqli_query($conn, $query);
                             $badgeClass = "badge bg-info";
                             break;
                           case "Restock":
-                            $badgeClass = "badge bg-warning";
+                            $badgeClass = "badge bg-success";
                             break;
                           case "Maintenance":
-                            $badgeClass = "badge bg-success";
+                            $badgeClass = "badge bg-danger";
                             break;
                           default:
                             // Set kelas default jika nilai activity tidak sesuai dengan kasus di atas
