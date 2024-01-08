@@ -216,7 +216,7 @@ if (isset($_POST['quantity'])) {
                         <form id="restockForm">
                             <div class="card-body">
                                 <div class="form-group">
-                                    <label for="exampleSelectBorderWidth2">Pilih Bahan :</label>
+                                    <label for="exampleSelectBorderWidth2">Pilih Bahan <span style="color: red;">*</span> :</label>
                                     <select class="custom-select form-control-border border-width-2" id="pilihBahanRestock" name="selectedItem" searchable="Search here...">
                                         <option value="" selected disabled>Pilih Bahan</option>
                                         <option value="1">R0608</option>
@@ -225,7 +225,7 @@ if (isset($_POST['quantity'])) {
                                     </select>
                                 </div>
                                 <div class="form-group">
-                                    <label for="quantity">Kuantitas :</label>
+                                    <label for="quantity">Kuantitas <span style="color: red;">*</span> :</label>
                                     <div class="input-group">
                                         <!-- Input untuk kuantitas -->
                                         <input type="number" class="form-control" id="quantity" name="quantity" min="0" value="">
@@ -240,7 +240,7 @@ if (isset($_POST['quantity'])) {
                             </div>
                             <!-- /.card-body -->
                             <div class="card-footer">
-                                <button type="button" class="btn btn-primary" onclick="validateSuccess()">Submit</button>
+                                <button type="button" class="btn btn-primary" onclick="if(validateForm()) { validateSuccess(); resetForm(); }">Submit</button>
                             </div>
                         </form>
                     </div>
@@ -282,6 +282,22 @@ if (isset($_POST['quantity'])) {
                 validateCurrentStock();
             });
         });
+
+        function validateForm() {
+            var selectedItem = document.getElementById("pilihBahanRestock").value;
+            var quantity = document.getElementById("quantity").value;
+
+            if (selectedItem === "" || quantity === "") {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: 'Harap lengkapi semua formulir!',
+                });
+                return false;
+            }
+
+            return true;
+        }
 
         function updateStockMessage() {
             var stockMessage = document.getElementById("stockMessage");
@@ -344,6 +360,10 @@ if (isset($_POST['quantity'])) {
                     alert("Error fetching new stock quantity.");
                 }
             });
+        }
+
+        function resetForm() {
+            document.getElementById("maintenanceForm").reset();
         }
     </script>
 </body>

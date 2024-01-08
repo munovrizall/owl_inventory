@@ -145,6 +145,7 @@
                 <div class="form-group">
                   <label for="exampleSelectBorderWidth2">Pilih Device :</label>
                   <select class="custom-select form-control-border border-width-2" id="pilihProduksiDevice">
+                    <option value="" selected disabled>Pilih Produk</option>
                     <option>Value 1</option>
                     <option>Value 2</option>
                     <option>Value 3</option>
@@ -155,11 +156,6 @@
                   <div class="input-group">
                     <!-- Input untuk kuantitas -->
                     <input type="number" class="form-control" id="quantity" name="quantity" min="0" value="0">
-                    <!-- Tombol-tombol untuk menambah dan mengurangi kuantitas -->
-                    <div class="input-group-append">
-                      <button type="button" class="btn btn-block btn-danger" onclick="decreaseQuantity()">-</button>
-                      <button type="button" class="btn btn-primary" onclick="increaseQuantity()">+</button>
-                    </div>
                   </div>
                 </div>
                 <div class="card">
@@ -213,6 +209,10 @@
                     </div>
                   </div>
                   <!-- /.card-body -->
+                </div>
+                <div class="form-group">
+                  <label>Deskripsi</label>
+                  <textarea class="form-control" rows="3" placeholder="Masukkan keterangan produksi device ..."></textarea>
                 </div>
               </div>
               <!-- /.card-body -->
