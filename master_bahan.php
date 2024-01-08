@@ -49,7 +49,7 @@ if (isset($_POST['quantity'])) {
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Maintenance</title>
+    <title>Master Bahan</title>
 
     <link rel="icon" href="assets/adminlte/dist/img/OWLlogo.png" type="image/x-icon">
     <!-- Google Font: Source Sans Pro -->
@@ -60,7 +60,6 @@ if (isset($_POST['quantity'])) {
     <link rel="stylesheet" href="assets/adminlte/dist/css/adminlte.min.css">
     <!-- Ionicons -->
     <link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
-
 </head>
 
 <body class="hold-transition sidebar-mini">
@@ -108,7 +107,7 @@ if (isset($_POST['quantity'])) {
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="maintenance.php" class="nav-link active">
+                            <a href="maintenance.php" class="nav-link">
                                 <i class="nav-icon fas fa-wrench"></i>
                                 <p>
                                     Maintenance
@@ -125,7 +124,7 @@ if (isset($_POST['quantity'])) {
                         </li>
                         <li class="nav-header">TAMBAH DATA</li>
                         <li class="nav-item">
-                            <a href="master_bahan.php" class="nav-link">
+                            <a href="master_bahan.php" class="nav-link active">
                                 <i class="nav-icon fa fa-pen"></i>
                                 <p>
                                     Master Bahan
@@ -163,12 +162,12 @@ if (isset($_POST['quantity'])) {
                 <div class="container-fluid">
                     <div class="row mb-2">
                         <div class="col-sm-6">
-                            <h1>Maintenance</h1>
+                            <h1>Master Bahan</h1>
                         </div>
                         <div class="col-sm-6">
                             <ol class="breadcrumb float-sm-right">
                                 <li class="breadcrumb-item"><a href="homepage.php">Home</a></li>
-                                <li class="breadcrumb-item active">Maintenance</li>
+                                <li class="breadcrumb-item active">Master Bahan</li>
                             </ol>
                         </div>
                     </div>
@@ -182,19 +181,15 @@ if (isset($_POST['quantity'])) {
                     <!-- general form elements -->
                     <div class="card card-primary">
                         <div class="card-header">
-                            <h3 class="card-title">Mengurangi Bahan Untuk Keperluan Maintenance</h3>
+                            <h3 class="card-title">Menambah Jenis Master Bahan</h3>
                         </div>
                         <!-- /.card-header -->
                         <!-- form start -->
                         <form id="maintenanceForm">
                             <div class="card-body">
                                 <div class="form-group">
-                                    <label for="exampleSelectBorderWidth2">Pilih Bahan :</label>
-                                    <select class="custom-select form-control-border border-width-2" id="pilihBahanMaintenance" name="selectedItem">
-                                        <option value="1">U101</option>
-                                        <option value="10">R102</option>
-                                        <option value="11">L203</option>
-                                    </select>
+                                    <label for="exampleInputBorderWidth2">Nama Bahan</label>
+                                    <input type="text" class="form-control form-control-border border-width-2" id="exampleInputBorderWidth2" placeholder="Masukkan nama bahan">
                                 </div>
                                 <div class="form-group">
                                     <label for="quantity">Kuantitas :</label>

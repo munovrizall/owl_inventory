@@ -44,7 +44,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       <div class="card-header text-center">
         <a href="login.php" class="h1">
           <img src="assets/adminlte/dist/img/OWLlogo.png" alt="OWL Inventory" class="brand-image img-circle elevation-3" style="background-color: black; padding: 8px; opacity: .8; height: 50px; width: 50px;">
-          <b>OWL</b> Inventory
+          <b>OWL</b> RnD
         </a>
       </div>
       <div class="card-body">
