@@ -22,7 +22,7 @@ if (isset($_POST['quantity'])) {
 
 
     // Fetch the stock quantity from the database based on the selected item
-    $query = "SELECT quantity FROM stokbahan WHERE stok_id = ?";
+    $query = "SELECT quantity FROM masterbahan WHERE stok_id = ?";
     $stmt = $conn->prepare($query);
     $stmt->bind_param("i", $selectedItemId);
     $stmt->execute();
@@ -41,7 +41,7 @@ if (isset($_POST['quantity'])) {
 
     // Update the database with the new stock quantity
     $newStockQuantity = $stockQuantity + $submittedQuantity;
-    $updateQueryStock = "UPDATE stokbahan SET quantity = ? WHERE stok_id = ?";
+    $updateQueryStock = "UPDATE masterbahan SET quantity = ? WHERE stok_id = ?";
     $updateStmt = $conn->prepare($updateQueryStock);
     $updateStmt->bind_param("ii", $newStockQuantity, $selectedItemId);
     $updateStmt->execute();
@@ -188,9 +188,9 @@ if (isset($_POST['quantity'])) {
                                 <div class="form-group">
                                     <label for="exampleSelectBorderWidth2">Pilih Bahan :</label>
                                     <select class="custom-select form-control-border border-width-2" id="pilihBahanRestock" name="selectedItem">
-                                        <option value="1">U101</option>
-                                        <option value="10">R102</option>
-                                        <option value="11">L203</option>
+                                        <option value="1">R0608</option>
+                                        <option value="10">I8712</option>
+                                        <option value="11">I9090</option>
                                     </select>
                                 </div>
                                 <div class="form-group">
@@ -207,7 +207,7 @@ if (isset($_POST['quantity'])) {
                                 </div>
                                 <p id="stockMessage">Stok Bahan Tersisa: <?php echo $stockQuantity; ?></p>
                                 <p id="successMessage">Stok Bahan Terkini: <?php echo $newStockQuantity; ?></p>
-                              </div>
+                            </div>
 
                             <!-- /.card-body -->
                             <div class="card-footer">
