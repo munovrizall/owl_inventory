@@ -46,13 +46,13 @@ if (isset($_POST['quantity'])) {
     $updateStmt->execute();
     $updateStmt->close();
 
-     // Insert a new record into the 'historis' table
-     $insertQueryHistoris = "INSERT INTO historis (pengguna, stok_id, waktu, quantity, activity) VALUES (?, ?, NOW(), ?, 'Restock')";
-     $insertStmt = $conn->prepare($insertQueryHistoris);
-     $insertStmt->bind_param("sii", $pengguna, $selectedItemId, $submittedQuantity); 
- 
-     $insertStmt->execute();
-     $insertStmt->close();
+    // Insert a new record into the 'historis' table
+    $insertQueryHistoris = "INSERT INTO historis (pengguna, stok_id, waktu, quantity, activity) VALUES (?, ?, NOW(), ?, 'Restock')";
+    $insertStmt = $conn->prepare($insertQueryHistoris);
+    $insertStmt->bind_param("sii", $pengguna, $selectedItemId, $submittedQuantity);
+
+    $insertStmt->execute();
+    $insertStmt->close();
 
     // Return the updated stock quantity
     echo $stockQuantity;
@@ -75,6 +75,9 @@ if (isset($_POST['quantity'])) {
     <link rel="stylesheet" href="assets/adminlte/plugins/fontawesome-free/css/all.min.css">
     <!-- Theme style -->
     <link rel="stylesheet" href="assets/adminlte/dist/css/adminlte.min.css">
+    <!-- Sweetalert2 -->
+    <link rel="stylesheet" href="assets/adminlte/plugins/sweetalert2-theme-bootstrap-4/bootstrap-4.min.css">
+
 </head>
 
 <body class="hold-transition sidebar-mini">
@@ -197,7 +200,7 @@ if (isset($_POST['quantity'])) {
                                 </div>
                                 <p id="stockMessage">Stok Bahan Tersisa: <?php echo $stockQuantity; ?></p>
                                 <p id="successMessage" style="display: none; color: green;">Stok berhasil ditambahkan</p>
-                              </div>
+                            </div>
                             <!-- /.card-body -->
                             <div class="card-footer">
                                 <button type="button" class="btn btn-primary" onclick="validateSuccess()">Submit</button>
@@ -230,6 +233,8 @@ if (isset($_POST['quantity'])) {
     <script src="assets/adminlte/plugins/bs-custom-file-input/bs-custom-file-input.min.js"></script>
     <!-- AdminLTE App -->
     <script src="assets/adminlte/dist/js/adminlte.min.js"></script>
+    <!-- SweetAlert2 Toast -->
+    <script src="assets/adminlte/plugins/sweetalert2/sweetalert2.min.js"></script>
     <!-- Page specific script -->
     <script>
         $(function() {
@@ -298,6 +303,15 @@ if (isset($_POST['quantity'])) {
                     document.getElementById("stockMessage").style.display = "none";
                     // Update the stock message with success message
                     document.getElementById("successMessage").style.display = "block";
+
+                    Swal.fire({
+                        toast: true,
+                        position: 'top-end',
+                        icon: 'success',
+                        title: 'Stok berhasil ditambahkan!',
+                        showConfirmButton: false,
+                        timer: 3000
+                    });
                 },
                 error: function(error) {
                     alert("Error fetching stock quantity.");
