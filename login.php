@@ -30,9 +30,9 @@
       <div class="card-body">
         <p class="login-box-msg">Silahkan login terlebih dahulu</p>
 
-        <form action="homepage.php" method="post">
+        <form id="loginForm">
           <div class="input-group mb-3">
-            <input type="text" class="form-control" placeholder="Username">
+            <input type="text" class="form-control" placeholder="Username" id="usernameInput">
             <div class="input-group-append">
               <div class="input-group-text">
                 <span class="fas fa-user"></span>
@@ -58,7 +58,7 @@
             </div>
             <!-- /.col -->
             <div class="col-4">
-              <button type="submit" class="btn btn-primary btn-block">Sign In</button>
+              <button type="button" class="btn btn-primary btn-block" onclick="saveUsername()">Sign In</button>
             </div>
             <!-- /.col -->
           </div>
@@ -76,6 +76,21 @@
   <script src="assets/adminlte/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
   <!-- AdminLTE App -->
   <script src="assets/adminlte/dist/js/adminlte.min.js"></script>
+
+  <script>
+    function saveUsername() {
+      var username = document.getElementById("usernameInput").value;
+      if (username.trim() !== "") {
+        // Save the username to local storage
+        localStorage.setItem("username", username);
+
+        // Redirect to homepage.php
+        window.location.href = "homepage.php";
+      } else {
+        alert("Username cannot be empty");
+      }
+    }
+  </script>
 </body>
 
 </html>
