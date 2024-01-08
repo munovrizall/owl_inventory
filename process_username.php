@@ -1,13 +1,19 @@
 <?php
-// process_username.php
+// Start a session
+session_start();
 
-if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["username"])) {
-    $receivedUsername = $_POST["username"];
-    // Send a response (optional)
-    echo "Username received and processed successfully.";
+// Fetch the username from the POST data
+$username = isset($_POST['username']) ? $_POST['username'] : '';
+
+// Check if the username is not empty
+if (!empty($username)) {
+    // Save the username in a session variable
+    $_SESSION['username'] = $username;
+
+    // Return a success message or any other response if needed
+    echo "Username successfully saved in session.";
 } else {
-    // Invalid request
-    http_response_code(400);
-    echo "Invalid request.";
+    // Return an error message or handle the case where the username is empty
+    echo "Error: Username cannot be empty.";
 }
 ?>
