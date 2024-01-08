@@ -2,19 +2,18 @@
 session_start();
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $username = $_POST['username'];
+  $username = $_POST['username'];
 
-    // Check if the username is not empty
-    if (!empty($username)) {
-        // Save the username in a session variable
-        $_SESSION['username'] = $username;
+  // Check if the username is not empty
+  if (!empty($username)) {
+    // Save the username in a session variable
+    $_SESSION['username'] = $username;
 
-        // Redirect to homepage.php
-        header("Location: homepage.php");
-        exit();
-    } else {
-        echo "Username cannot be empty";
-    }
+    
+    exit();
+  } else {
+    echo "Username cannot be empty";
+  }
 }
 ?>
 
@@ -35,6 +34,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   <link rel="stylesheet" href="assets/adminlte/plugins/icheck-bootstrap/icheck-bootstrap.min.css">
   <!-- Theme style -->
   <link rel="stylesheet" href="assets/adminlte/dist/css/adminlte.min.css">
+  <!-- Sweetalert2 -->
+  <link rel="stylesheet" href="assets/adminlte/plugins/sweetalert2-theme-bootstrap-4/bootstrap-4.min.css">
 </head>
 
 <body class="hold-transition login-page">
@@ -52,7 +53,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         <form id="loginForm">
           <div class="input-group mb-3">
-            <input type="text" class="form-control" placeholder="Username" id="usernameInput">
+            <select class="form-control" placeholder="Username" id="usernameInput">
+              <option value="Riki">Riki</option>
+              <option value="Ahmad">Ahmad</option>
+              <option value="Tatang">Tatang</option>
+            </select>
             <div class="input-group-append">
               <div class="input-group-text">
                 <span class="fas fa-user"></span>
@@ -60,7 +65,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             </div>
           </div>
           <div class="input-group mb-3">
-            <input type="password" class="form-control" placeholder="Password">
+            <input type="password" class="form-control" placeholder="Password" id="passwordInput">
             <div class="input-group-append">
               <div class="input-group-text">
                 <span class="fas fa-lock"></span>
@@ -78,7 +83,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             </div>
             <!-- /.col -->
             <div class="col-4">
-              <button type="button" class="btn btn-primary btn-block" onclick="saveUsername()">Sign In</button>
+              <button type="button" class="btn btn-primary btn-block" onclick="validatePassword()">Sign In</button>
             </div>
             <!-- /.col -->
           </div>
@@ -96,6 +101,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   <script src="assets/adminlte/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
   <!-- AdminLTE App -->
   <script src="assets/adminlte/dist/js/adminlte.min.js"></script>
+  <!-- SweetAlert2 Toast -->
+  <script src="assets/adminlte/plugins/sweetalert2/sweetalert2.min.js"></script>
 
   <script>
     function saveUsername() {
@@ -113,7 +120,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
           },
           success: function(response) {
             console.log(response); // Handle the server response if needed
-            // Redirect to homepage.php
             window.location.href = "homepage.php";
           },
           error: function(error) {
@@ -124,7 +130,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         alert("Username cannot be empty");
       }
     }
-
   </script>
 </body>
 

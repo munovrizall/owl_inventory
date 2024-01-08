@@ -60,9 +60,18 @@ $result = mysqli_query($conn, $query);
           <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
         </li>
       </ul>
+
+      <!-- Right navbar links -->
+      <ul class="navbar-nav ml-auto">
+        <li class="nav-item">
+          <a class="nav-link" href="logout.php">
+            <i class="fas fa-sign-out-alt"></i> Logout
+          </a>
+        </li>
+      </ul>
     </nav>
     <!-- /.navbar -->
-
+    
     <!-- Main Sidebar Container -->
     <aside class="main-sidebar sidebar-dark-primary elevation-4">
       <!-- Brand Logo -->
@@ -127,8 +136,8 @@ $result = mysqli_query($conn, $query);
                 </p>
               </a>
             </li>
-          <li class="nav-header">PELAPORAN</li>
-          <li class="nav-item">
+            <li class="nav-header">PELAPORAN</li>
+            <li class="nav-item">
               <a href="laporan_stok.php" class="nav-link">
                 <i class="nav-icon ion ion-pie-graph"></i>
                 <p>
@@ -150,7 +159,7 @@ $result = mysqli_query($conn, $query);
         <div class="container-fluid">
           <div class="row mb-2">
             <div class="col-sm-6">
-              <h1 class="m-0">Halo <?php echo $username; ?>!</h1>
+              <h1 class="m-0">Halo <?php echo $username ?>!</h1>
             </div><!-- /.col -->
             <div class="col-sm-6">
               <ol class="breadcrumb float-sm-right">
