@@ -12,6 +12,7 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 $stockQuantity = ""; // Default value, replace it with the actual stock quantity based on the selected item from the database
+$newStockQuantity = "";
 
 if (isset($_POST['quantity'])) {
     $selectedItemId = $_POST['selectedItem'];
@@ -31,7 +32,7 @@ if (isset($_POST['quantity'])) {
 
     $submittedQuantity = $_POST['quantity'];
     if ($submittedQuantity == "") {
-        echo "$stockQuantity";
+        echo json_encode(array('currentStock' => $stockQuantity, 'newStock' => $newStockQuantity));
         exit();
     } elseif ($submittedQuantity <= 0) {
         echo "Kuantitas yang dimasukkan harus lebih besar dari 0";
@@ -55,7 +56,7 @@ if (isset($_POST['quantity'])) {
      $insertStmt->close();
 
     // Return the updated stock quantity
-    echo $stockQuantity;
+    echo json_encode(array('currentStock' => $stockQuantity, 'newStock' => $newStockQuantity));
     exit();
 }
 
@@ -75,6 +76,11 @@ if (isset($_POST['quantity'])) {
     <link rel="stylesheet" href="assets/adminlte/plugins/fontawesome-free/css/all.min.css">
     <!-- Theme style -->
     <link rel="stylesheet" href="assets/adminlte/dist/css/adminlte.min.css">
+    <style>
+        #successMessage {
+            display: none; /* Hide the success message initially */
+        }
+    </style>
 </head>
 
 <body class="hold-transition sidebar-mini">
@@ -196,7 +202,7 @@ if (isset($_POST['quantity'])) {
                                     </div>
                                 </div>
                                 <p id="stockMessage">Stok Bahan Tersisa: <?php echo $stockQuantity; ?></p>
-                                <p id="successMessage" style="display: none; color: green;">Stok berhasil ditambahkan</p>
+                                <p id="successMessage">Stok Bahan Terkini: <?php echo $newStockQuantity; ?></p>
                               </div>
                             <!-- /.card-body -->
                             <div class="card-footer">
@@ -272,11 +278,12 @@ if (isset($_POST['quantity'])) {
                 type: "POST",
                 url: "restock.php",
                 data: formData,
+                dataType: "json",
                 success: function(response) {
                     // Hide the stock message
                     document.getElementById("successMessage").style.display = "none";
                     // Update the stock message with the fetched quantity
-                    document.getElementById("stockMessage").innerText = "Stok Bahan Tersisa: " + response;
+                    document.getElementById("stockMessage").innerText = "Stok Bahan Tersisa: " + response.currentStock;
                 },
                 error: function(error) {
                     alert("Error fetching stock quantity.");
@@ -293,14 +300,16 @@ if (isset($_POST['quantity'])) {
                 type: "POST",
                 url: "restock.php",
                 data: formData,
+                dataType: "json",
                 success: function(response) {
                     // Hide the stock message
                     document.getElementById("stockMessage").style.display = "none";
                     // Update the stock message with success message
                     document.getElementById("successMessage").style.display = "block";
+                    document.getElementById("successMessage").innerText = "Stok Bahan Terkini: " + response.newStock;
                 },
                 error: function(error) {
-                    alert("Error fetching stock quantity.");
+                    alert("Error fetching new stock quantity.");
                 }
             });
         }
