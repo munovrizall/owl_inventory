@@ -7,7 +7,7 @@ $dbName = "databaseinventory";
 $conn = new mysqli($serverName, $userName, $password, $dbName);
 
 if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
+  die("Connection failed: " . $conn->connect_error);
 }
 
 $query = "SELECT h.pengguna, h.waktu, h.quantity, h.activity, m.kode
@@ -217,12 +217,27 @@ $result = mysqli_query($conn, $query);
                       </tr>
                     </thead>
                     <tbody>
-                      <tr>
                       <?php
-
-                      while($row = mysqli_fetch_assoc($result))
-                      {
+                      while ($row = mysqli_fetch_assoc($result)) {
+                        // Tentukan kelas badge berdasarkan nilai activity
+                        $badgeClass = "";
+                        switch ($row["activity"]) {
+                          case "Produksi":
+                            $badgeClass = "badge bg-info";
+                            break;
+                          case "Restock":
+                            $badgeClass = "badge bg-warning";
+                            break;
+                          case "Maintenance":
+                            $badgeClass = "badge bg-success";
+                            break;
+                          default:
+                            // Set kelas default jika nilai activity tidak sesuai dengan kasus di atas
+                            $badgeClass = "badge bg-secondary";
+                            break;
+                        }
                       ?>
+
                         <td><?php echo $row["pengguna"]; ?></td>
                         <td><?php echo $row["kode"]; ?></td>
                         <td><?php echo $row["quantity"]; ?></td>
@@ -230,10 +245,12 @@ $result = mysqli_query($conn, $query);
                         <td><?php echo $row["waktu"]; ?></td>
 
                       </tr>
+
                       <?php
-                        }
+                      }
                       ?>
                     </tbody>
+
                   </table>
                 </div>
                 <!-- /.card-body -->
