@@ -10,7 +10,10 @@ if ($conn->connect_error) {
   die("Connection failed: " . $conn->connect_error);
 }
 
-$query = "SELECT * FROM historis ORDER BY waktu DESC LIMIT 20";
+$query = "SELECT h.pengguna, h.waktu, h.quantity, h.activity, m.kode
+FROM historis h
+JOIN masterbahan m ON h.stok_id = m.stok_id 
+ORDER BY waktu DESC LIMIT 20";
 $result = mysqli_query($conn, $query);
 
 ?>
@@ -234,14 +237,15 @@ $result = mysqli_query($conn, $query);
                             break;
                         }
                       ?>
-                        <tr>
-                          <td><?php echo $row["pengguna"]; ?></td>
-                          <td><?php echo $row["stok_id"]; ?></td>
-                          <td><?php echo $row["quantity"]; ?></td>
-                          <!-- Tambahkan span dengan kelas badge sesuai dengan nilai activity -->
-                          <td><span class="<?php echo $badgeClass; ?>"><?php echo $row["activity"]; ?></span></td>
-                          <td><?php echo $row["waktu"]; ?></td>
-                        </tr>
+
+                        <td><?php echo $row["pengguna"]; ?></td>
+                        <td><?php echo $row["kode"]; ?></td>
+                        <td><?php echo $row["quantity"]; ?></td>
+                        <td><?php echo $row["activity"]; ?></td>
+                        <td><?php echo $row["waktu"]; ?></td>
+
+                      </tr>
+
                       <?php
                       }
                       ?>
