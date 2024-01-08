@@ -217,7 +217,8 @@ if (isset($_POST['quantity'])) {
                             <div class="card-body">
                                 <div class="form-group">
                                     <label for="exampleSelectBorderWidth2">Pilih Bahan :</label>
-                                    <select class="custom-select form-control-border border-width-2" id="pilihBahanRestock" name="selectedItem">
+                                    <select class="custom-select form-control-border border-width-2" id="pilihBahanRestock" name="selectedItem" searchable="Search here...">
+                                        <option value="" selected disabled>Pilih Bahan</option>
                                         <option value="1">R0608</option>
                                         <option value="10">I8712</option>
                                         <option value="11">I9090</option>
@@ -228,17 +229,15 @@ if (isset($_POST['quantity'])) {
                                     <div class="input-group">
                                         <!-- Input untuk kuantitas -->
                                         <input type="number" class="form-control" id="quantity" name="quantity" min="0" value="">
-                                        <!-- Tombol-tombol untuk menambah dan mengurangi kuantitas -->
-                                        <div class="input-group-append">
-                                            <button type="button" class="btn btn-block btn-danger" onclick="decreaseQuantity()">-</button>
-                                            <button type="button" class="btn btn-primary" onclick="increaseQuantity()">+</button>
-                                        </div>
                                     </div>
                                 </div>
                                 <p id="stockMessage">Stok Bahan Tersisa: <?php echo $stockQuantity; ?></p>
                                 <p id="successMessage">Stok Bahan Terkini: <?php echo $newStockQuantity; ?></p>
+                                <div class="form-group">
+                                    <label>Deskripsi</label>
+                                    <textarea class="form-control" rows="3" placeholder="Masukkan keterangan pembelian bahan ..."></textarea>
+                                </div>
                             </div>
-
                             <!-- /.card-body -->
                             <div class="card-footer">
                                 <button type="button" class="btn btn-primary" onclick="validateSuccess()">Submit</button>
@@ -283,20 +282,6 @@ if (isset($_POST['quantity'])) {
                 validateCurrentStock();
             });
         });
-
-        function decreaseQuantity() {
-            var quantityInput = document.getElementById("quantity");
-            if (quantityInput.value > 0) {
-                quantityInput.value--;
-                updateStockMessage();
-            }
-        }
-
-        function increaseQuantity() {
-            var quantityInput = document.getElementById("quantity");
-            quantityInput.value++;
-            updateStockMessage();
-        }
 
         function updateStockMessage() {
             var stockMessage = document.getElementById("stockMessage");
