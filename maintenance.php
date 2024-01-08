@@ -76,6 +76,7 @@ if (isset($_POST['quantity'])) {
     <link rel="stylesheet" href="assets/adminlte/plugins/fontawesome-free/css/all.min.css">
     <!-- Theme style -->
     <link rel="stylesheet" href="assets/adminlte/dist/css/adminlte.min.css">
+
     <!-- Sweetalert2 -->
     <link rel="stylesheet" href="assets/adminlte/plugins/sweetalert2-theme-bootstrap-4/bootstrap-4.min.css">
     <!-- Ionicons -->
@@ -87,7 +88,7 @@ if (isset($_POST['quantity'])) {
             /* Hide the success message initially */
         }
     </style>
-
+  
 </head>
 
 <body class="hold-transition sidebar-mini">

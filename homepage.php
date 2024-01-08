@@ -60,15 +60,24 @@ $result = mysqli_query($conn, $query);
           <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
         </li>
       </ul>
+
+      <!-- Right navbar links -->
+      <ul class="navbar-nav ml-auto">
+        <li class="nav-item">
+          <a class="nav-link" href="logout.php">
+            <i class="fas fa-sign-out-alt"></i> Logout
+          </a>
+        </li>
+      </ul>
     </nav>
     <!-- /.navbar -->
-
+    
     <!-- Main Sidebar Container -->
     <aside class="main-sidebar sidebar-dark-primary elevation-4">
       <!-- Brand Logo -->
       <a href="homepage.php" class="brand-link">
         <img src="assets/adminlte/dist/img/OWLlogo.png" alt="OWL Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
-        <span class="brand-text font-weight-heavy">OWL Inventory</span>
+        <span class="brand-text font-weight-heavy">OWL RnD</span>
       </a>
 
       <!-- Sidebar -->
@@ -85,6 +94,7 @@ $result = mysqli_query($conn, $query);
               </a>
             </li>
             </li>
+            <li class="nav-header">TRANSAKSI</li>
             <li class="nav-item">
               <a href="produksi.php" class="nav-link">
                 <i class="nav-icon fas fa-toolbox"></i>
@@ -109,6 +119,32 @@ $result = mysqli_query($conn, $query);
                 </p>
               </a>
             </li>
+            <li class="nav-header">TAMBAH DATA</li>
+            <li class="nav-item">
+              <a href="master_bahan.php" class="nav-link">
+                <i class="nav-icon fa fa-pen"></i>
+                <p>
+                  Master Bahan
+                </p>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="master_device.php" class="nav-link">
+                <i class="nav-icon fas fa-cube"></i>
+                <p>
+                  Master Device
+                </p>
+              </a>
+            </li>
+            <li class="nav-header">PELAPORAN</li>
+            <li class="nav-item">
+              <a href="laporan_stok.php" class="nav-link">
+                <i class="nav-icon ion ion-pie-graph"></i>
+                <p>
+                  Laporan Stok
+                </p>
+              </a>
+            </li>
           </ul>
         </nav>
         <!-- /.sidebar-menu -->
@@ -123,7 +159,7 @@ $result = mysqli_query($conn, $query);
         <div class="container-fluid">
           <div class="row mb-2">
             <div class="col-sm-6">
-              <h1 class="m-0">Halo <?php echo $username; ?>!</h1>
+              <h1 class="m-0">Halo <?php echo $username ?>!</h1>
             </div><!-- /.col -->
             <div class="col-sm-6">
               <ol class="breadcrumb float-sm-right">
