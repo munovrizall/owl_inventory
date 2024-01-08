@@ -287,7 +287,7 @@ if (isset($_POST['quantity'])) {
             var selectedItem = document.getElementById("pilihBahanRestock").value;
             var quantity = document.getElementById("quantity").value;
 
-            if (selectedItem === "" || quantity === "") {
+            if (selectedItem === "" || quantity === "" || quantity <= 0) {
                 Swal.fire({
                     icon: 'error',
                     title: 'Oops...',
