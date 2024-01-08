@@ -241,7 +241,7 @@ $result = mysqli_query($conn, $query);
                         <td><?php echo $row["pengguna"]; ?></td>
                         <td><?php echo $row["kode"]; ?></td>
                         <td><?php echo $row["quantity"]; ?></td>
-                        <td><?php echo $row["activity"]; ?></td>
+                        <td><span class="<?php echo $badgeClass; ?>"><?php echo $row["activity"]; ?></span></td>
                         <td><?php echo $row["waktu"]; ?></td>
 
                       </tr>
