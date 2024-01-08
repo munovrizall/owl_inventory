@@ -1,3 +1,23 @@
+<?php
+session_start();
+
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $username = $_POST['username'];
+
+    // Check if the username is not empty
+    if (!empty($username)) {
+        // Save the username in a session variable
+        $_SESSION['username'] = $username;
+
+        // Redirect to homepage.php
+        header("Location: homepage.php");
+        exit();
+    } else {
+        echo "Username cannot be empty";
+    }
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -30,9 +50,9 @@
       <div class="card-body">
         <p class="login-box-msg">Silahkan login terlebih dahulu</p>
 
-        <form action="homepage.php" method="post">
+        <form id="loginForm">
           <div class="input-group mb-3">
-            <input type="text" class="form-control" placeholder="Username">
+            <input type="text" class="form-control" placeholder="Username" id="usernameInput">
             <div class="input-group-append">
               <div class="input-group-text">
                 <span class="fas fa-user"></span>
@@ -58,7 +78,7 @@
             </div>
             <!-- /.col -->
             <div class="col-4">
-              <button type="submit" class="btn btn-primary btn-block">Sign In</button>
+              <button type="button" class="btn btn-primary btn-block" onclick="saveUsername()">Sign In</button>
             </div>
             <!-- /.col -->
           </div>
@@ -76,6 +96,36 @@
   <script src="assets/adminlte/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
   <!-- AdminLTE App -->
   <script src="assets/adminlte/dist/js/adminlte.min.js"></script>
+
+  <script>
+    function saveUsername() {
+      var username = document.getElementById("usernameInput").value;
+      if (username.trim() !== "") {
+        // Save the username to local storage
+        localStorage.setItem("username", username);
+
+        // Perform AJAX request to send username to server
+        $.ajax({
+          type: "POST",
+          url: "process_username.php",
+          data: {
+            username: username
+          },
+          success: function(response) {
+            console.log(response); // Handle the server response if needed
+            // Redirect to homepage.php
+            window.location.href = "homepage.php";
+          },
+          error: function(error) {
+            console.error("Error sending username to server: " + error);
+          }
+        });
+      } else {
+        alert("Username cannot be empty");
+      }
+    }
+
+  </script>
 </body>
 
 </html>

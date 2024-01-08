@@ -1,4 +1,6 @@
 <?php
+session_start();
+
 $serverName = "localhost";
 $userName = "root";
 $password = "";
@@ -9,11 +11,15 @@ $conn = new mysqli($serverName, $userName, $password, $dbName);
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
-
 $stockQuantity = ""; // Default value, replace it with the actual stock quantity based on the selected item from the database
 
 if (isset($_POST['quantity'])) {
     $selectedItemId = $_POST['selectedItem'];
+
+    // Fetch the username from the POST data
+    $pengguna = isset($_SESSION['username']) ? $_SESSION['username'] : '';
+
+
     // Fetch the stock quantity from the database based on the selected item
     $query = "SELECT quantity FROM stokbahan WHERE stok_id = ?";
     $stmt = $conn->prepare($query);
@@ -43,10 +49,7 @@ if (isset($_POST['quantity'])) {
      // Insert a new record into the 'historis' table
      $insertQueryHistoris = "INSERT INTO historis (pengguna, stok_id, waktu, quantity, activity) VALUES (?, ?, NOW(), ?, 'Restock')";
      $insertStmt = $conn->prepare($insertQueryHistoris);
-     $insertStmt->bind_param("sii", $pengguna, $selectedItemId, $submittedQuantity);
- 
-     // Replace 'your_username' with the actual username or identifier of the user performing the restock
-     $pengguna = 'your_username';
+     $insertStmt->bind_param("sii", $pengguna, $selectedItemId, $submittedQuantity); 
  
      $insertStmt->execute();
      $insertStmt->close();
