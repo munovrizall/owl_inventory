@@ -60,6 +60,16 @@ if (isset($_POST['quantity'])) {
     <link rel="stylesheet" href="assets/adminlte/dist/css/adminlte.min.css">
     <!-- Ionicons -->
     <link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+    <!-- Sweetalert2 -->
+    <link rel="stylesheet" href="assets/adminlte/plugins/sweetalert2-theme-bootstrap-4/bootstrap-4.min.css">
+
+    <style>
+        .input-group-append label {
+            margin-right: 24px;
+        }
+    </style>
+
+
 </head>
 
 <body class="hold-transition sidebar-mini">
@@ -185,31 +195,47 @@ if (isset($_POST['quantity'])) {
                         </div>
                         <!-- /.card-header -->
                         <!-- form start -->
-                        <form id="maintenanceForm">
+                        <form id="masterBahanForm">
                             <div class="card-body">
                                 <div class="form-group">
-                                    <label for="exampleInputBorderWidth2">Nama Bahan</label>
-                                    <input type="text" class="form-control form-control-border border-width-2" id="exampleInputBorderWidth2" placeholder="Masukkan nama bahan">
+                                    <div class="row">
+                                        <div class="col">
+                                            <label for="pilihNamaKelompok">Pilih Kelompok : <span style="color: red;">*</span></label>
+                                        </div>
+                                        <div class="col-auto">
+                                            <button class="btn btn-block btn-success" type="button" onclick="tambahKelompok()">Tambah Kelompok</button>
+                                        </div>
+                                    </div>
+                                    <select class="custom-select form-control-border border-width-2" id="pilihNamaKelompok" name="selectedItem" searchable="Search here...">
+                                        <option value="" selected disabled>Pilih Kelompok</option>
+                                        <option value="1">Resistor</option>
+                                        <option value="10">Kapasitor</option>
+                                        <option value="11">Sensor</option>
+                                    </select>
                                 </div>
                                 <div class="form-group">
-                                    <label for="quantity">Kuantitas :</label>
+                                    <label for="namaBahan">Nama Bahan : <span style="color: red;">*</span></label>
+                                    <input type="text" class="form-control form-control-border border-width-2" id="namaBahan" placeholder="Masukkan nama bahan">
+                                </div>
+                                <div class="form-group">
+                                    <label for="quantity">Kuantitas : <span style="color: red;">*</span></label>
                                     <div class="input-group">
                                         <!-- Input untuk kuantitas -->
-                                        <input type="number" class="form-control" id="quantity" name="quantity" min="0" value="">
-                                        <!-- Tombol-tombol untuk menambah dan mengurangi kuantitas -->
-                                        <div class="input-group-append">
-                                            <button type="button" class="btn btn-block btn-danger" onclick="decreaseQuantity()">-</button>
-                                            <button type="button" class="btn btn-primary" onclick="increaseQuantity()">+</button>
-                                        </div>
+                                        <input type="number" class="form-control" id="quantity" name="quantity" min="0" value="" placeholder="Masukkan jumlah stok bahan">
+
                                     </div>
                                 </div>
                                 <p id="stockMessage">Stok Bahan Tersisa: <?php echo $stockQuantity; ?></p>
+                                <div class="form-group">
+                                    <label>Deskripsi</label>
+                                    <textarea class="form-control" rows="3" placeholder="Masukkan keterangan bahan ..."></textarea>
+                                </div>
                             </div>
                             <!-- /.card-body -->
-                            <div class="card-footer">
-                                <button type="button" class="btn btn-primary" onclick="validateAndFetchStock()">Submit</button>
-                            </div>
                         </form>
+                        <div class="card-footer d-flex justify-content-end">
+                            <button type="button" class="btn btn-primary" onclick="if(validateForm()) {validateAndFetchStock(); resetForm()}">Submit</button>
+                        </div>
                     </div>
                     <!-- general form elements -->
                     <!-- /.card -->
@@ -237,6 +263,8 @@ if (isset($_POST['quantity'])) {
     <script src="assets/adminlte/plugins/bs-custom-file-input/bs-custom-file-input.min.js"></script>
     <!-- AdminLTE App -->
     <script src="assets/adminlte/dist/js/adminlte.min.js"></script>
+    <!-- SweetAlert2 Toast -->
+    <script src="assets/adminlte/plugins/sweetalert2/sweetalert2.min.js"></script>
     <!-- Page specific script -->
     <script>
         $(function() {
@@ -248,18 +276,21 @@ if (isset($_POST['quantity'])) {
             });
         });
 
-        function decreaseQuantity() {
-            var quantityInput = document.getElementById("quantity");
-            if (quantityInput.value > 0) {
-                quantityInput.value--;
-                updateStockMessage();
-            }
-        }
+        function validateForm() {
+            var pilihNamaKelompok = document.getElementById("pilihNamaKelompok").value;
+            var namaBahan = document.getElementById("namaBahan").value;
+            var quantity = document.getElementById("quantity").value;
 
-        function increaseQuantity() {
-            var quantityInput = document.getElementById("quantity");
-            quantityInput.value++;
-            updateStockMessage();
+            if (pilihNamaKelompok === "" || namaBahan === "" || quantity === "" || quantity <= 0) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: 'Harap lengkapi semua form!',
+                });
+                return false;
+            }
+
+            return true;
         }
 
         function updateStockMessage() {
@@ -287,6 +318,10 @@ if (isset($_POST['quantity'])) {
                     alert("Error fetching stock quantity.");
                 }
             });
+        }
+
+        function resetForm() {
+            document.getElementById("masterBahanForm").reset();
         }
     </script>
 </body>

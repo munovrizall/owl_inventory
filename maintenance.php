@@ -217,7 +217,7 @@ if (isset($_POST['quantity'])) {
                         <form id="maintenanceForm">
                             <div class="card-body">
                                 <div class="form-group">
-                                    <label for="exampleSelectBorderWidth2">Pilih Bahan <span style="color: red;">*</span> :</label>
+                                    <label for="exampleSelectBorderWidth2">Pilih Bahan : <span style="color: red;">*</span></label>
                                     <select class="custom-select form-control-border border-width-2" id="pilihBahanMaintenance" name="selectedItem">
                                         <option value="" selected disabled>Pilih Bahan</option>
                                         <option value="1">R0608</option>
@@ -226,10 +226,10 @@ if (isset($_POST['quantity'])) {
                                     </select>
                                 </div>
                                 <div class="form-group">
-                                    <label for="quantity">Kuantitas <span style="color: red;">*</span> :</label>
+                                    <label for="quantity">Kuantitas : <span style="color: red;">*</span></label>
                                     <div class="input-group">
                                         <!-- Input untuk kuantitas -->
-                                        <input type="number" class="form-control" id="quantity" name="quantity" min="0" value="">
+                                        <input type="number" class="form-control" id="quantity" name="quantity" min="0" value="" placeholder="Masukkan jumlah stok bahan yang ingin digunakan">
                                     </div>
                                 </div>
                                 <p id="stockMessage">Stok Bahan Tersisa: <?php echo $stockQuantity; ?></p>
@@ -241,10 +241,10 @@ if (isset($_POST['quantity'])) {
                             </div>
 
                             <!-- /.card-body -->
-                            <div class="card-footer">
-                                <button type="button" class="btn btn-primary" onclick="if(validateForm()) { validateSuccess(); resetForm(); }">Submit</button>
-                            </div>
                         </form>
+                        <div class="card-footer d-flex justify-content-end">
+                            <button type="button" class="btn btn-primary" onclick="if(validateForm()) { validateSuccess(); resetForm(); }">Submit</button>
+                        </div>
                     </div>
                     <!-- general form elements -->
                     <!-- /.card -->
@@ -254,7 +254,6 @@ if (isset($_POST['quantity'])) {
             <!-- /.content -->
         </div>
         <!-- /.content-wrapper -->
-
 
         <!-- Control Sidebar -->
         <aside class="control-sidebar control-sidebar-dark">
@@ -289,7 +288,7 @@ if (isset($_POST['quantity'])) {
             var selectedItem = document.getElementById("pilihBahanMaintenance").value;
             var quantity = document.getElementById("quantity").value;
 
-            if (selectedItem === "" || quantity === "") {
+            if (selectedItem === "" || quantity === "" || quantity <= 0) {
                 Swal.fire({
                     icon: 'error',
                     title: 'Oops...',
