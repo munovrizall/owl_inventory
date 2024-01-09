@@ -68,7 +68,7 @@ if (!$resultKelompok) {
 
 </head>
 
-<body class="hold-transition sidebar-mini">
+<body class="hold-transition sidebar-mini layout-fixed">
     <div class="wrapper">
         <!-- Navbar -->
         <nav class="main-header navbar navbar-expand navbar-dark navbar-dark">
@@ -82,7 +82,7 @@ if (!$resultKelompok) {
         <!-- /.navbar -->
 
         <!-- Main Sidebar Container -->
-        <aside class="main-sidebar sidebar-dark-primary elevation-4">
+        <aside class="main-sidebar sidebar-dark-primary elevation-4 fixed">
             <!-- Brand Logo -->
             <a href="homepage.php" class="brand-link">
                 <img src="assets/adminlte/dist/img/OWLlogo.png" alt="OWL Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
@@ -293,12 +293,8 @@ if (!$resultKelompok) {
                 data: formData,
                 success: function(response) {
                     Swal.fire({
-                        toast: true,
-                        position: 'top-end',
                         icon: 'success',
                         title: 'Bahan berhasil didaftarkan!',
-                        showConfirmButton: false,
-                        timer: 3000
                     });
 
                 },
