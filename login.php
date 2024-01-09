@@ -66,7 +66,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             </div>
           </div>
           <div class="input-group mb-3">
-            <input type="password" class="form-control" placeholder="Password" id="passwordInput">
+            <input type="password" class="form-control" placeholder="Password" id="passwordInput" onkeypress="checkEnter(event)">
             <div class="input-group-append">
               <div class="input-group-text">
                 <span class="fas fa-lock"></span>
@@ -92,6 +92,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   <script src="assets/adminlte/plugins/sweetalert2/sweetalert2.min.js"></script>
 
   <script>
+    function checkEnter(event) {
+      if (event.key === "Enter") {
+        performLogin();
+      }
+    }
+
     function performLogin() {
       var username = document.getElementById("usernameInput").value;
       var password = document.getElementById("passwordInput").value;
