@@ -341,19 +341,12 @@ if (isset($_POST['quantity'])) {
                 data: formData,
                 dataType: "json",
                 success: function(response) {
-                    // Hide the stock message
-                    document.getElementById("stockMessage").style.display = "none";
-                    // Update the stock message with success message
-                    document.getElementById("successMessage").style.display = "block";
-                    document.getElementById("successMessage").innerText = "Stok Bahan Terkini: " + response.newStock;
-
+                    document.getElementById("stockMessage").innerText = "Stok Bahan Tersisa: ";
+                   
                     Swal.fire({
-                        toast: true,
-                        position: 'top-end',
                         icon: 'success',
                         title: 'Stok berhasil ditambahkan!',
-                        showConfirmButton: false,
-                        timer: 3000
+                        text: 'Stok terbaru adalah ' + response.newStock + ' bahan'
                     });
 
                 },

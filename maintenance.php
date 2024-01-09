@@ -249,7 +249,7 @@ if (isset($_POST['quantity'])) {
                             <!-- /.card-body -->
                         </form>
                         <div class="card-footer d-flex justify-content-end">
-                            <button type="button" class="btn btn-primary" onclick="if(validateForm()) { validateSuccess(); resetForm(); }">Submit</button>
+                            <button type="button" class="btn btn-primary" onclick="if(validateForm()) { validateSuccess();}">Submit</button>
                         </div>
                     </div>
                     <!-- general form elements -->
@@ -348,23 +348,23 @@ if (isset($_POST['quantity'])) {
                 dataType: "json",
                 success: function(response) {
                     // Hide the stock message
-                    document.getElementById("stockMessage").style.display = "none";
-                    // Update the stock message with success message
-                    document.getElementById("successMessage").style.display = "block";
-                    document.getElementById("successMessage").innerText = "Stok Bahan Terkini: " + response.newStock;
-
+                    document.getElementById("stockMessage").innerText = "Stok Bahan Tersisa: ";
+                
                     Swal.fire({
-                        toast: true,
-                        position: 'top-end',
                         icon: 'success',
                         title: 'Stok berhasil diambil!',
-                        showConfirmButton: false,
-                        timer: 3000
+                        text: 'Stok terbaru adalah ' + response.newStock + ' bahan'
                     });
+
+                    resetForm();
 
                 },
                 error: function(error) {
-                    alert("Error fetching new stock quantity.");
+                    Swal.fire({
+                    icon: 'error',
+                    title: 'Stok Kurang',
+                    text: 'Kurangi kuantitas yang diinput!',
+                });
                 }
             });
         }
