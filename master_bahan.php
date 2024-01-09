@@ -203,7 +203,7 @@ if (isset($_POST['quantity'])) {
                                             <label for="pilihNamaKelompok">Pilih Kelompok : <span style="color: red;">*</span></label>
                                         </div>
                                         <div class="col-auto">
-                                            <button class="btn btn-block btn-success" type="button" onclick="tambahKelompok()">Tambah Kelompok</button>
+                                            <button class="btn btn-xs btn-success" type="button" onclick="tambahKelompok()">Tambah Kelompok Baru</button>
                                         </div>
                                     </div>
                                     <select class="custom-select form-control-border border-width-2" id="pilihNamaKelompok" name="selectedItem" searchable="Search here...">

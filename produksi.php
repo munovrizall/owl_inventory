@@ -155,7 +155,7 @@
                   <label for="quantity">Kuantitas :</label>
                   <div class="input-group">
                     <!-- Input untuk kuantitas -->
-                    <input type="number" class="form-control" id="quantity" name="quantity" min="0" value="0">
+                    <input type="number" class="form-control" id="quantity" name="quantity" min="0" value="" placeholder="Masukkan jumlah produksi device">
                   </div>
                 </div>
                 <div class="card">
@@ -216,10 +216,10 @@
                 </div>
               </div>
               <!-- /.card-body -->
-              <div class="card-footer">
-                <button type="submit" class="btn btn-primary">Submit</button>
-              </div>
             </form>
+            <div class="card-footer d-flex justify-content-end">
+              <button type="submit" class="btn btn-primary">Submit</button>
+            </div>
           </div>
           <!-- general form elements -->
           <!-- /.card -->
