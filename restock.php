@@ -228,6 +228,7 @@ if (isset($_POST['quantity'])) {
                                     <label for="quantity">Kuantitas : <span style="color: red;">*</span></label>
                                     <div class="input-group">
                                         <!-- Input untuk kuantitas -->
+
                                         <input type="number" class="form-control" id="quantity" name="quantity" min="0" value="" placeholder="Masukkan jumlah stok bahan yang dibeli">
                                     </div>
                                 </div>
