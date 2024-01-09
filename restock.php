@@ -11,6 +11,10 @@ $conn = new mysqli($serverName, $userName, $password, $dbName);
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
+
+$queryBahan = "SELECT * FROM masterbahan";
+$resultBahan = $conn->query($queryBahan);
+
 $stockQuantity = ""; // Default value, replace it with the actual stock quantity based on the selected item from the database
 $newStockQuantity = "";
 
@@ -219,9 +223,11 @@ if (isset($_POST['quantity'])) {
                                     <label for="exampleSelectBorderWidth2">Pilih Bahan : <span style="color: red;">*</span></label>
                                     <select class="custom-select form-control-border border-width-2" id="pilihBahanRestock" name="selectedItem" searchable="Search here...">
                                         <option value="" selected disabled>Pilih Bahan</option>
-                                        <option value="1">R0608</option>
-                                        <option value="10">I8712</option>
-                                        <option value="11">I9090</option>
+                                        <?php
+                                        while ($row = $resultBahan->fetch_assoc()) {
+                                            echo '<option value="' . $row['stok_id'] . '">' . $row['nama'] . '</option>';
+                                        }
+                                        ?>
                                     </select>
                                 </div>
                                 <div class="form-group">
