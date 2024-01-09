@@ -40,7 +40,7 @@ if (isset($_POST['quantity'])) {
     }
 
     // Update the database with the new stock quantity
-    $newStockQuantity = $stockQuantity - $submittedQuantity;
+    $newStockQuantity = max(0, $stockQuantity - $submittedQuantity);
     $updateQueryStock = "UPDATE masterbahan SET quantity = ? WHERE stok_id = ?";
     $updateStmt = $conn->prepare($updateQueryStock);
     $updateStmt->bind_param("ii", $newStockQuantity, $selectedItemId);
@@ -292,7 +292,7 @@ if (isset($_POST['quantity'])) {
                 Swal.fire({
                     icon: 'error',
                     title: 'Oops...',
-                    text: 'Harap lengkapi semua formulir!',
+                    text: 'Harap lengkapi formulir dengan benar!',
                 });
                 return false;
             }
