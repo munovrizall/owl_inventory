@@ -1,4 +1,6 @@
 <?php
+session_start();
+
 $serverName = "localhost";
 $userName = "root";
 $password = "";
@@ -10,36 +12,31 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-$stockQuantity = ""; // Default value, replace it with the actual stock quantity based on the selected item from the database
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $kelompok = $_POST["kelompok"];
+    $nama = $_POST["nama"];
+    $quantity = $_POST["quantity"];
+    $deskripsi = $_POST["deskripsi"];
 
-if (isset($_POST['quantity'])) {
-    $selectedItemId = $_POST['selectedItem'];
-    // Fetch the stock quantity from the database based on the selected item
-    $query = "SELECT quantity FROM stokbahan WHERE stok_id = ?";
+    // Gunakan prepared statement untuk menghindari SQL injection
+    $query = "INSERT INTO masterbahan (kelompok, nama, quantity, deskripsi) VALUES (?, ?, ?, ?)";
     $stmt = $conn->prepare($query);
-    $stmt->bind_param("i", $selectedItemId);
-    $stmt->execute();
-    $stmt->bind_result($stockQuantity);
-    $stmt->fetch();
-    $stmt->close();
+    $stmt->bind_param("ssis", $kelompok, $nama, $quantity, $deskripsi);
 
-    // Check if the submitted quantity is greater than the available stock
-    $submittedQuantity = $_POST['quantity'];
-    if ($submittedQuantity > $stockQuantity) {
-        // Quantity exceeds available stock, handle accordingly (e.g., show an error message)
-        echo "Stok bahan tidak mencukupi.";
-        exit();
-    } elseif ($submittedQuantity == "") {
-        echo "$stockQuantity";
-        exit();
-    } elseif ($submittedQuantity <= 0) {
-        echo "Kuantitas yang dimasukkan harus lebih besar dari";
-        exit();
+    if ($stmt->execute()) {
+        echo "Data berhasil ditambahkan ke tabel masterbahan.";
+    } else {
+        echo "Error: " . $stmt->error;
     }
 
-    // Return the updated stock quantity
-    echo $stockQuantity;
-    exit();
+    $stmt->close();
+}
+// Fetch data from masterkelompok table
+$queryKelompok = "SELECT kelompok_id, nama_kelompok FROM masterkelompok";
+$resultKelompok = $conn->query($queryKelompok);
+
+if (!$resultKelompok) {
+    die("Error fetching kelompok data: " . $conn->error);
 }
 
 ?>
@@ -208,14 +205,17 @@ if (isset($_POST['quantity'])) {
                                     </div>
                                     <select class="custom-select form-control-border border-width-2" id="pilihNamaKelompok" name="selectedItem" searchable="Search here...">
                                         <option value="" selected disabled>Pilih Kelompok</option>
-                                        <option value="1">Resistor</option>
-                                        <option value="10">Kapasitor</option>
-                                        <option value="11">Sensor</option>
+                                        <?php
+                                        // Dynamically generate options from fetched data
+                                        while ($row = $resultKelompok->fetch_assoc()) {
+                                            echo '<option value="' . $row['kelompok_id'] . '">' . $row['nama_kelompok'] . '</option>';
+                                        }
+                                        ?>
                                     </select>
                                 </div>
                                 <div class="form-group">
-                                    <label for="namaBahan">Nama Bahan : <span style="color: red;">*</span></label>
-                                    <input type="text" class="form-control form-control-border border-width-2" id="namaBahan" placeholder="Masukkan nama bahan">
+                                    <label for="nama">Nama Bahan : <span style="color: red;">*</span></label>
+                                    <input type="text" class="form-control form-control-border border-width-2" id="nama" placeholder="Masukkan nama bahan">
                                 </div>
                                 <div class="form-group">
                                     <label for="quantity">Kuantitas : <span style="color: red;">*</span></label>
@@ -225,16 +225,15 @@ if (isset($_POST['quantity'])) {
 
                                     </div>
                                 </div>
-                                <p id="stockMessage">Stok Bahan Tersisa: <?php echo $stockQuantity; ?></p>
                                 <div class="form-group">
                                     <label>Deskripsi</label>
-                                    <textarea class="form-control" rows="3" placeholder="Masukkan keterangan bahan ..."></textarea>
+                                    <textarea class="form-control" id="deskripsi" name="deskripsi" rows="3" placeholder="Masukkan keterangan bahan ..."></textarea>
                                 </div>
                             </div>
                             <!-- /.card-body -->
                         </form>
                         <div class="card-footer d-flex justify-content-end">
-                            <button type="button" class="btn btn-primary" onclick="if(validateForm()) {validateAndFetchStock(); resetForm()}">Submit</button>
+                            <button type="button" class="btn btn-primary" onclick="if(validateForm()) { validateSuccess(); resetForm(); }">Submit</button>
                         </div>
                     </div>
                     <!-- general form elements -->
@@ -267,25 +266,17 @@ if (isset($_POST['quantity'])) {
     <script src="assets/adminlte/plugins/sweetalert2/sweetalert2.min.js"></script>
     <!-- Page specific script -->
     <script>
-        $(function() {
-            bsCustomFileInput.init();
-
-            // Add an event listener to the select element
-            $("#pilihBahanMaintenance").change(function() {
-                validateAndFetchStock();
-            });
-        });
 
         function validateForm() {
-            var pilihNamaKelompok = document.getElementById("pilihNamaKelompok").value;
-            var namaBahan = document.getElementById("namaBahan").value;
+            var selectedItem = document.getElementById("pilihNamaKelompok").value;
+            var nama = document.getElementById("nama").value;
             var quantity = document.getElementById("quantity").value;
 
-            if (pilihNamaKelompok === "" || namaBahan === "" || quantity === "" || quantity <= 0) {
+            if (selectedItem === "" || nama === "" ||quantity === "" || quantity <= 0) {
                 Swal.fire({
                     icon: 'error',
                     title: 'Oops...',
-                    text: 'Harap lengkapi semua form!',
+                    text: 'Harap lengkapi semua formulir!',
                 });
                 return false;
             }
@@ -293,29 +284,28 @@ if (isset($_POST['quantity'])) {
             return true;
         }
 
-        function updateStockMessage() {
-            var stockMessage = document.getElementById("stockMessage");
-            var selectedQuantity = parseInt(document.getElementById("quantity").value, 10);
 
-            // Update stock message dynamically based on the selected item's stock quantity
-            stockMessage.innerText = "Stok Bahan Tersisa: " + (<?php echo $stockQuantity; ?> - selectedQuantity);
-        }
-
-        function validateAndFetchStock() {
+        function validateSuccess() {
             // Get the form data
-            var formData = $("#maintenanceForm").serialize();
+            var formData = $("#masterBahanForm").serialize();
 
-            // Use AJAX to submit the form data and fetch the updated stock quantity
             $.ajax({
                 type: "POST",
-                url: "maintenance.php",
+                url: "master_bahan.php",
                 data: formData,
                 success: function(response) {
-                    // Update the stock message with the fetched quantity
-                    document.getElementById("stockMessage").innerText = "Stok Bahan Tersisa: " + response;
+                    Swal.fire({
+                        toast: true,
+                        position: 'top-end',
+                        icon: 'success',
+                        title: 'Bahan berhasil didaftarkan!',
+                        showConfirmButton: false,
+                        timer: 3000
+                    });
+
                 },
                 error: function(error) {
-                    alert("Error fetching stock quantity.");
+                    alert("Error mendaftarkan barang.");
                 }
             });
         }
@@ -323,6 +313,7 @@ if (isset($_POST['quantity'])) {
         function resetForm() {
             document.getElementById("masterBahanForm").reset();
         }
+
     </script>
 </body>
 
