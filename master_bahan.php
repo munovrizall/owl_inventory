@@ -18,7 +18,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $quantity = $_POST["quantity"];
     $deskripsi = $_POST["deskripsi"];
 
-    // Gunakan prepared statement untuk menghindari SQL injection
     $query = "INSERT INTO masterbahan (kelompok, nama, quantity, deskripsi) VALUES (?, ?, ?, ?)";
     $stmt = $conn->prepare($query);
     $stmt->bind_param("ssis", $kelompok, $nama, $quantity, $deskripsi);
@@ -203,19 +202,18 @@ if (!$resultKelompok) {
                                             <button class="btn btn-block btn-success" type="button" onclick="tambahKelompok()">Tambah Kelompok</button>
                                         </div>
                                     </div>
-                                    <select class="custom-select form-control-border border-width-2" id="pilihNamaKelompok" name="selectedItem" searchable="Search here...">
+                                    <select class="custom-select form-control-border border-width-2" id="pilihNamaKelompok" name="kelompok" searchable="Search here...">
                                         <option value="" selected disabled>Pilih Kelompok</option>
                                         <?php
-                                        // Dynamically generate options from fetched data
                                         while ($row = $resultKelompok->fetch_assoc()) {
-                                            echo '<option value="' . $row['kelompok_id'] . '">' . $row['nama_kelompok'] . '</option>';
+                                            echo '<option value="' . $row['nama_kelompok'] . '">' . $row['nama_kelompok'] . '</option>';
                                         }
                                         ?>
                                     </select>
                                 </div>
                                 <div class="form-group">
                                     <label for="nama">Nama Bahan : <span style="color: red;">*</span></label>
-                                    <input type="text" class="form-control form-control-border border-width-2" id="nama" placeholder="Masukkan nama bahan">
+                                    <input type="text" class="form-control form-control-border border-width-2" id="nama" name="nama" placeholder="Masukkan nama bahan">
                                 </div>
                                 <div class="form-group">
                                     <label for="quantity">Kuantitas : <span style="color: red;">*</span></label>
