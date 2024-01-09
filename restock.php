@@ -228,7 +228,16 @@ if (isset($_POST['quantity'])) {
                                     <label for="quantity">Kuantitas : <span style="color: red;">*</span></label>
                                     <div class="input-group">
                                         <!-- Input untuk kuantitas -->
+<<<<<<< Updated upstream
                                         <input type="number" class="form-control" id="quantity" name="quantity" min="0" value="" placeholder="Masukkan jumlah stok bahan yang dibeli">
+=======
+                                        <input type="number" class="form-control" id="quantity" name="quantity" min="0" value="0">
+                                        <!-- Tombol-tombol untuk menambah dan mengurangi kuantitas -->
+                                        <div class="input-group-append">
+                                            <button type="button" class="btn btn-block btn-danger" onclick="decreaseQuantity()">-</button>
+                                            <button type="button" class="btn btn-primary" onclick="increaseQuantity()">+</button>
+                                        </div>
+>>>>>>> Stashed changes
                                     </div>
                                 </div>
                                 <p id="stockMessage">Stok Bahan Tersisa: <?php echo $stockQuantity; ?></p>

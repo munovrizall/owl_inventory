@@ -120,7 +120,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
           },
           success: function(response) {
             console.log(response); // Handle the server response if needed
-        window.location.href = "homepage.php";
+            window.location.href = "homepage.php";
           },
           error: function(error) {
             console.error("Error sending username to server: " + error);
