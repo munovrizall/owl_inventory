@@ -251,6 +251,7 @@ $result = mysqli_query($conn, $query);
                         <th>Kuantitas</th>
                         <th>Aktivitas</th>
                         <th>Waktu</th>
+                        <th>Deskripsi</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -281,6 +282,7 @@ $result = mysqli_query($conn, $query);
                           <!-- Tambahkan span dengan kelas badge sesuai dengan nilai activity -->
                           <td><span class="<?php echo $badgeClass; ?>"><?php echo $row["activity"]; ?></span></td>
                           <td><?php echo $row["waktu"]; ?></td>
+                          <td><?php echo $row["deskripsi"]; ?></td>
                         </tr>
                       <?php
                       }

@@ -48,9 +48,9 @@ if (isset($_POST['quantity'])) {
     $updateStmt->close();
 
     // Insert a new record into the 'historis' table
-    $insertQueryHistoris = "INSERT INTO historis (pengguna, stok_id, waktu, quantity, activity) VALUES (?, ?, NOW(), ?, 'Maintenance')";
+    $insertQueryHistoris = "INSERT INTO historis (pengguna, stok_id, waktu, quantity, activity, deskripsi) VALUES (?, ?, NOW(), ?, 'Maintenance', ?)";
     $insertStmt = $conn->prepare($insertQueryHistoris);
-    $insertStmt->bind_param("sii", $pengguna, $selectedItemId, $submittedQuantity);
+    $insertStmt->bind_param("siis", $pengguna, $selectedItemId, $submittedQuantity, $_POST['deskripsi']);
 
     $insertStmt->execute();
     $insertStmt->close();
@@ -235,8 +235,8 @@ if (isset($_POST['quantity'])) {
                                 <p id="stockMessage">Stok Bahan Tersisa: <?php echo $stockQuantity; ?></p>
                                 <p id="successMessage">Stok Bahan Terkini: <?php echo $newStockQuantity; ?></p>
                                 <div class="form-group">
-                                    <label>Deskripsi</label>
-                                    <textarea class="form-control" rows="3" placeholder="Masukkan keterangan penggunaan bahan ..."></textarea>
+                                    <label for="deksripsi">Deskripsi</label>
+                                    <textarea class="form-control" id="deskripsi" name="deskripsi" rows="3" placeholder="Masukkan keterangan penggunaan bahan ..."></textarea>
                                 </div>
                             </div>
 
