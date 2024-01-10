@@ -15,17 +15,31 @@ if ($conn->connect_error) {
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $namaDevice = $_POST["namaDevice"];
 
-    $query = "INSERT INTO masterkelompok (nama_kelompok) VALUES (?)";
-    $stmt = $conn->prepare($query);
-    $stmt->bind_param("s", $namaDevice);
+    // Check if the material name already exists
+    $checkQuery = "SELECT COUNT(*) FROM masterkelompok WHERE nama = ?";
+    $checkStmt = $conn->prepare($checkQuery);
+    $checkStmt->bind_param("s", $namaDevice);
+    $checkStmt->execute();
+    $checkStmt->bind_result($count);
+    $checkStmt->fetch();
+    $checkStmt->close();
 
-    if ($stmt->execute()) {
-        echo "Data berhasil ditambahkan ke tabel masterbahan.";
+    if ($count > 0) {
+        echo "Error: Material name '$nama' already exists in the database.";
     } else {
-        echo "Error: " . $stmt->error;
-    }
+        // Insert the new record
+        $query = "INSERT INTO masterkelompok (nama_kelompok) VALUES (?)";
+        $stmt = $conn->prepare($query);
+        $stmt->bind_param("s", $namaDevice);
 
-    $stmt->close();
+        if ($stmt->execute()) {
+            echo "Data berhasil ditambahkan ke tabel masterkelompok.";
+        } else {
+            echo "Error: " . $stmt->error;
+        }
+
+        $stmt->close();
+    }
 }
 // Fetch data from masterkelompok table
 $queryMasterBahan = "SELECT nama FROM masterbahan";
@@ -293,7 +307,18 @@ if (!$resultMasterBahan) {
 
                 },
                 error: function(error) {
-                    alert("Error mendaftarkan barang.");
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Barang sudah terdaftar!',
+                        text: 'Masukkan nama baru!',
+                        showCancelButton: false,
+                        confirmButtonColor: '#3085d6',
+                        confirmButtonText: 'OK'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            resetForm();
+                        }
+                    });
                 }
             });
         }
