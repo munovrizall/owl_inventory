@@ -252,7 +252,7 @@ if (!$resultKelompok) {
                                 </div>
                                 <div class="form-group">
                                     <label for="nama">Nama Bahan <span style="color: red;">*</span></label>
-                                    <input type="text" class="form-control form-control-border border-width-2" id="nama" name="nama" placeholder="Masukkan nama bahan">
+                                    <input type="text" class="form-control form-control-border border-width-2" id="nama" name="nama" placeholder="Contoh : R060310k">
                                 </div>
                                 <div class="form-group">
                                     <label for="quantity">Kuantitas <span style="color: red;">*</span></label>
@@ -369,7 +369,7 @@ if (!$resultKelompok) {
                 }
             });
         }
-        
+
         function addNewKelompok() {
             
         }
