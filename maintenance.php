@@ -96,6 +96,33 @@ if (isset($_POST['quantity'])) {
             display: none;
             /* Hide the success message initially */
         }
+
+        .gray-italic-text {
+            color: #808080;
+            font-style: italic;
+        }
+
+        .form-select {
+            display: block;
+            width: 100%;
+            padding: 0.375rem 2.25rem 0.375rem 0.75rem;
+            -moz-padding-start: calc(0.75rem - 3px);
+            font-size: 1rem;
+            font-weight: 400;
+            line-height: 1.5;
+            color: #212529;
+            background-color: #fff;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 0.75rem center;
+            background-size: 16px 12px;
+            border: 1px solid #ced4da;
+            border-radius: 0.25rem;
+            transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+        }
     </style>
 
 </head>
@@ -226,9 +253,9 @@ if (isset($_POST['quantity'])) {
                         <form id="maintenanceForm">
                             <div class="card-body">
                                 <div class="form-group">
-                                    <label for="exampleSelectBorderWidth2">Pilih Bahan : <span style="color: red;">*</span></label>
-                                    <select class="custom-select form-control-border border-width-2" id="pilihBahanMaintenance" name="selectedItem">
-                                        <option value="" selected disabled>Pilih Bahan</option>
+                                    <label for="exampleSelectBorderWidth2">Pilih Bahan <span style="color: red;">*</span></label>
+                                    <select class="form-select" id="pilihBahanMaintenance" name="selectedItem">
+                                        <option value="">Pilih Bahan</option>
                                         <?php
                                         while ($row = $resultBahan->fetch_assoc()) {
                                             echo '<option value="' . $row['stok_id'] . '">' . $row['nama'] . '</option>';
@@ -237,7 +264,7 @@ if (isset($_POST['quantity'])) {
                                     </select>
                                 </div>
                                 <div class="form-group">
-                                    <label for="quantity">Kuantitas : <span style="color: red;">*</span></label>
+                                    <label for="quantity">Kuantitas <span style="color: red;">*</span></label>
                                     <div class="input-group">
                                         <!-- Input untuk kuantitas -->
                                         <input type="number" class="form-control" id="quantity" name="quantity" min="0" value="" placeholder="Masukkan jumlah stok bahan yang ingin digunakan">
@@ -246,7 +273,7 @@ if (isset($_POST['quantity'])) {
                                 <p id="stockMessage">Stok Bahan Tersisa: <?php echo $stockQuantity; ?></p>
                                 <p id="successMessage">Stok Bahan Terkini: <?php echo $newStockQuantity; ?></p>
                                 <div class="form-group">
-                                    <label for="deksripsi">Deskripsi</label>
+                                    <label for="deksripsi">Deskripsi<span class="gray-italic-text"> (opsional)</span></label>
                                     <textarea class="form-control" id="deskripsi" name="deskripsi" rows="3" placeholder="Masukkan keterangan penggunaan bahan ..."></textarea>
                                 </div>
                             </div>
@@ -284,6 +311,9 @@ if (isset($_POST['quantity'])) {
     <script src="assets/adminlte/dist/js/adminlte.min.js"></script>
     <!-- SweetAlert2 Toast -->
     <script src="assets/adminlte/plugins/sweetalert2/sweetalert2.min.js"></script>
+    <!-- bootstrap searchable dropdown -->
+    <script src="assets/bootstrap-5/bootstrap.bundle.min.js"></script>
+    <script src="assets/dselect.js"></script>
     <!-- Page specific script -->
     <script>
         $(function() {
@@ -336,7 +366,7 @@ if (isset($_POST['quantity'])) {
                     document.getElementById("stockMessage").innerText = "Stok Bahan Tersisa: " + response.currentStock;
                 },
                 error: function(error) {
-                    alert("Error fetching stock quantity.");
+                    alert("Error, refresh the page!");
                 }
             });
         }
@@ -354,7 +384,7 @@ if (isset($_POST['quantity'])) {
                 success: function(response) {
                     // Hide the stock message
                     document.getElementById("stockMessage").innerText = "Stok Bahan Tersisa: ";
-                
+
                     Swal.fire({
                         icon: 'success',
                         title: 'Stok berhasil diambil!',
@@ -366,17 +396,60 @@ if (isset($_POST['quantity'])) {
                 },
                 error: function(error) {
                     Swal.fire({
-                    icon: 'error',
-                    title: 'Stok Kurang',
-                    text: 'Kurangi kuantitas yang diinput!',
-                });
+                        icon: 'error',
+                        title: 'Stok Kurang',
+                        text: 'Kurangi kuantitas yang diinput!',
+                        showCancelButton: false,
+                        confirmButtonColor: '#3085d6',
+                        confirmButtonText: 'OK'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            resetForm();
+                        }
+                    });
                 }
             });
         }
 
         function resetForm() {
             document.getElementById("maintenanceForm").reset();
+            resetDropdown();
+            disableQuantityInput();
         }
+
+        function resetDropdown() {
+            const dropdown = document.getElementById("pilihBahanMaintenance");
+            dropdown.selectedIndex = 0; // reset ke pilihan pertama
+
+            // jika multiple selection
+            dropdown.querySelectorAll("option:checked").forEach(option => {
+                option.selected = false;
+            });
+
+            // memicu event change 
+            dropdown.dispatchEvent(new Event('change'));
+        }
+
+        // Searchable dropdown
+        var select_box_element = document.querySelector('#pilihBahanMaintenance');
+        dselect(select_box_element, {
+            search: true,
+        });
+
+        // Quantity input disabled to prevent bugs
+        document.addEventListener("DOMContentLoaded", function() {
+            disableQuantityInput();
+        });
+
+        function disableQuantityInput() {
+            const quantityInput = document.getElementById("quantity");
+            quantityInput.disabled = true;
+        }
+
+        $("#pilihBahanMaintenance").change(function() {
+            const quantityInput = document.getElementById("quantity");
+            quantityInput.disabled = false;
+        });
     </script>
 </body>
 

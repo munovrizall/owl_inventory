@@ -255,12 +255,12 @@ $result = mysqli_query($conn, $query);
                   <table class="table table-striped">
                     <thead>
                       <tr>
-                        <th>User</th>
-                        <th>Nama Barang</th>
-                        <th>Kuantitas</th>
-                        <th>Aktivitas</th>
-                        <th>Deskripsi</th>
-                        <th>Waktu</th>
+                        <th class="text-center">User</th>
+                        <th class="text-center">Nama Barang</th>
+                        <th class="text-center">Kuantitas</th>
+                        <th class="text-center">Aktivitas</th>
+                        <th class="text-center">Deskripsi</th>
+                        <th class="text-center">Waktu</th>
                       </tr>
                     </thead>
                     <tbody>

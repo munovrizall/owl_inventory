@@ -15,6 +15,35 @@
   <link rel="stylesheet" href="assets/adminlte/dist/css/adminlte.min.css">
   <!-- Ionicons -->
   <link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+
+  <style>
+    .gray-italic-text {
+      color: #808080;
+      font-style: italic;
+    }
+
+    .form-select {
+      display: block;
+      width: 100%;
+      padding: 0.375rem 2.25rem 0.375rem 0.75rem;
+      -moz-padding-start: calc(0.75rem - 3px);
+      font-size: 1rem;
+      font-weight: 400;
+      line-height: 1.5;
+      color: #212529;
+      background-color: #fff;
+      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e");
+      background-repeat: no-repeat;
+      background-position: right 0.75rem center;
+      background-size: 16px 12px;
+      border: 1px solid #ced4da;
+      border-radius: 0.25rem;
+      transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      appearance: none;
+    }
+  </style>
 </head>
 
 <body class="hold-transition sidebar-mini layout-fixed">
@@ -143,9 +172,9 @@
             <form>
               <div class="card-body">
                 <div class="form-group">
-                  <label for="exampleSelectBorderWidth2">Pilih Device :</label>
-                  <select class="custom-select form-control-border border-width-2" id="pilihProduksiDevice">
-                    <option value="" selected disabled>Pilih Produk</option>
+                  <label for="exampleSelectBorderWidth2">Pilih Device <span style="color: red;">*</span></label>
+                  <select class="form-select" id="pilihProduksiDevice">
+                    <option value="">Pilih Produk</option>
                     <option>Value 1</option>
                     <option>Value 2</option>
                     <option>Value 3</option>
@@ -247,10 +276,18 @@
   <script src="assets/adminlte/plugins/bs-custom-file-input/bs-custom-file-input.min.js"></script>
   <!-- AdminLTE App -->
   <script src="assets/adminlte/dist/js/adminlte.min.js"></script>
+  <!-- bootstrap searchable dropdown -->
+  <script src="assets/bootstrap-5/bootstrap.bundle.min.js"></script>
+  <script src="assets/dselect.js"></script>
   <!-- Page specific script -->
   <script>
     $(function() {
       bsCustomFileInput.init();
+    });
+    // Searchable dropdown
+    var select_box_element = document.querySelector('#pilihProduksiDevice');
+    dselect(select_box_element, {
+      search: true,
     });
   </script>
 </body>
