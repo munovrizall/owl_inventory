@@ -10,7 +10,14 @@ if ($conn->connect_error) {
   die("Connection failed: " . $conn->connect_error);
 }
 
-$query = "SELECT * FROM historis ORDER BY waktu DESC LIMIT 20";
+// Define the number of rows per page and current page number
+$rows_per_page = 3;
+$current_page = isset($_GET['page']) ? $_GET['page'] : 1;
+
+// Calculate the offset for the LIMIT clause
+$start = ($current_page - 1) * $rows_per_page;
+
+$query = "SELECT * FROM masterbahan ORDER BY stok_id LIMIT $start, $rows_per_page";
 $result = mysqli_query($conn, $query);
 
 ?>
@@ -171,7 +178,7 @@ $result = mysqli_query($conn, $query);
 
                         <div class="card">
                             <div class="card-header">
-                                <h3 class="card-title"><b>Histori</b></h3>
+                                <h3 class="card-title"><b>List Bahan</b></h3>
                             </div>
                             <!-- /.card-header -->
                             <div class="card-body p-0">
@@ -179,43 +186,23 @@ $result = mysqli_query($conn, $query);
                                     <table class="table table-striped">
                                         <thead>
                                             <tr>
-                                                <th>User</th>
-                                                <th>Nama Barang</th>
+                                                <th>Stok ID</th>
+                                                <th>Kelompok</th>
+                                                <th>Nama</th>
                                                 <th>Kuantitas</th>
-                                                <th>Aktivitas</th>
-                                                <th>Waktu</th>
+                                                <th>Deskripsi</th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             <?php
                       while ($row = mysqli_fetch_assoc($result)) {
-                        // Tentukan kelas badge berdasarkan nilai activity
-                        $badgeClass = "";
-                        switch ($row["activity"]) {
-                          case "Produksi":
-                            $badgeClass = "badge bg-info";
-                            break;
-                          case "Restock":
-                            $badgeClass = "badge bg-success";
-                            break;
-                          case "Maintenance":
-                            $badgeClass = "badge bg-danger";
-                            break;
-                          default:
-                            // Set kelas default jika nilai activity tidak sesuai dengan kasus di atas
-                            $badgeClass = "badge bg-secondary";
-                            break;
-                        }
                       ?>
                                             <tr>
-                                                <td><?php echo $row["pengguna"]; ?></td>
                                                 <td><?php echo $row["stok_id"]; ?></td>
+                                                <td><?php echo $row["kelompok"]; ?></td>
+                                                <td><?php echo $row["nama"]; ?></td>
                                                 <td><?php echo $row["quantity"]; ?></td>
-                                                <!-- Tambahkan span dengan kelas badge sesuai dengan nilai activity -->
-                                                <td><span
-                                                        class="<?php echo $badgeClass; ?>"><?php echo $row["activity"]; ?></span>
-                                                </td>
-                                                <td><?php echo $row["waktu"]; ?></td>
+                                                <td><?php echo $row["deskripsi"]; ?></td>
                                             </tr>
                                             <?php
                       }
@@ -228,7 +215,40 @@ $result = mysqli_query($conn, $query);
                             </div>
                             <!-- general form elements -->
                             <!-- /.card -->
+                            <!-- Pagination links -->
+                            <div class="card-footer clearfix">
+                                <ul class="pagination pagination-sm m-0 float-right">
+                                <?php
+                                $query = "SELECT COUNT(*) AS total_rows FROM masterbahan";
+                                $result = mysqli_query($conn, $query);
+                                $row = mysqli_fetch_assoc($result);
+                                $total_rows = $row['total_rows'];
+                                $total_pages = ceil($total_rows / $rows_per_page);
 
+                                $prev_page = $current_page > 1 ? $current_page - 1 : 1;
+                                $next_page = $current_page < $total_pages ? $current_page + 1 : $total_pages;
+
+                                // First page button
+                                echo '<li class="page-item"><a class="page-link" href="?page=1">First (1)</a></li>';
+
+                                // Display up to 5 pages before the current page
+                                for ($i = max(1, $current_page - 2); $i <= min($total_pages, $current_page + 2); $i++) {
+                                    $active_class = $i == $current_page ? 'active' : ''; // Add 'active' class for the current page
+                                    echo '<li class="page-item ' . $active_class . '"><a class="page-link" href="?page=' . $i . '">' . $i . '</a></li>';
+                                }
+
+                                // Last page button
+                                echo '<li class="page-item"><a class="page-link" href="?page=' . $total_pages . '">Last (' . $total_pages . ')</a></li>';
+                                ?>
+                                 <!-- Search input for page number -->
+                                    <li class="page-item">
+                                        <form class="form-inline ml-2">
+                                            <input class="form-control form-control-sm" type="text" placeholder="Page" name="page">
+                                            <button class="btn btn-sm btn-outline-secondary" type="submit">Go</button>
+                                        </form>
+                                    </li>
+                                </ul>
+                            </div>
                         </div><!-- /.container-fluid -->
                     </section>
                 </div><!-- /.container-fluid -->
