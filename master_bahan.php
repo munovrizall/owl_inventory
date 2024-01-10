@@ -17,7 +17,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $nama = $_POST["nama"];
     $quantity = $_POST["quantity"];
     $deskripsi = $_POST["deskripsi"];
-    
+
     // Check if the material name already exists
     $checkQuery = "SELECT COUNT(*) FROM masterbahan WHERE nama = ?";
     $checkStmt = $conn->prepare($checkQuery);
@@ -78,6 +78,33 @@ if (!$resultKelompok) {
     <style>
         .input-group-append label {
             margin-right: 24px;
+        }
+
+        .gray-italic-text {
+            color: #808080;
+            font-style: italic;
+        }
+
+        .form-select {
+            display: block;
+            width: 100%;
+            padding: 0.375rem 2.25rem 0.375rem 0.75rem;
+            -moz-padding-start: calc(0.75rem - 3px);
+            font-size: 1rem;
+            font-weight: 400;
+            line-height: 1.5;
+            color: #212529;
+            background-color: #fff;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 0.75rem center;
+            background-size: 16px 12px;
+            border: 1px solid #ced4da;
+            border-radius: 0.25rem;
+            transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
         }
     </style>
 
@@ -210,15 +237,10 @@ if (!$resultKelompok) {
                         <form id="masterBahanForm">
                             <div class="card-body">
                                 <div class="form-group">
-                                    <div class="row">
-                                        <div class="col">
-                                            <label for="pilihNamaKelompok">Pilih Kelompok : <span style="color: red;">*</span></label>
-                                        </div>
-                                        <div class="col-auto">
-                                            <button class="btn btn-xs btn-success" type="button" onclick="tambahKelompok()">Tambah Kelompok Baru</button>
-                                        </div>
+                                    <div>
+                                        <label for="pilihNamaKelompok">Pilih Kelompok <span style="color: red;">*</span></label>
                                     </div>
-                                    <select class="custom-select form-control-border border-width-2" id="pilihNamaKelompok" name="kelompok" searchable="Search here...">
+                                    <select class="form-select" id="pilihNamaKelompok" name="kelompok" searchable="Search here...">
                                         <option value="" selected disabled>Pilih Kelompok</option>
                                         <?php
                                         while ($row = $resultKelompok->fetch_assoc()) {
@@ -226,13 +248,14 @@ if (!$resultKelompok) {
                                         }
                                         ?>
                                     </select>
+                                    <button type="button" class="btn btn-outline-info btn-block" data-toggle="modal" data-target="#modalBuatKelompok" style="margin-top: 10px; max-width: 180px;"><i class="fas fa-plus " style="margin-right: 16px;"></i>Kelompok Baru</button>
                                 </div>
                                 <div class="form-group">
-                                    <label for="nama">Nama Bahan : <span style="color: red;">*</span></label>
+                                    <label for="nama">Nama Bahan <span style="color: red;">*</span></label>
                                     <input type="text" class="form-control form-control-border border-width-2" id="nama" name="nama" placeholder="Masukkan nama bahan">
                                 </div>
                                 <div class="form-group">
-                                    <label for="quantity">Kuantitas : <span style="color: red;">*</span></label>
+                                    <label for="quantity">Kuantitas <span style="color: red;">*</span></label>
                                     <div class="input-group">
                                         <!-- Input untuk kuantitas -->
                                         <input type="number" class="form-control" id="quantity" name="quantity" min="0" value="" placeholder="Masukkan jumlah stok bahan">
@@ -240,7 +263,7 @@ if (!$resultKelompok) {
                                     </div>
                                 </div>
                                 <div class="form-group">
-                                    <label>Deskripsi</label>
+                                    <label>Deskripsi<span class="gray-italic-text"> (opsional)</span></label>
                                     <textarea class="form-control" id="deskripsi" name="deskripsi" rows="3" placeholder="Masukkan keterangan bahan ..."></textarea>
                                 </div>
                             </div>
@@ -265,6 +288,31 @@ if (!$resultKelompok) {
             <!-- Control sidebar content goes here -->
         </aside>
         <!-- /.control-sidebar -->
+
+        <!-- Modal menambahkan kelompok baru -->
+        <div class="modal fade" id="modalBuatKelompok" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalCenterTitle">Buat Kelompok Baru</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label for="nama">Nama Kelompok</span></label>
+                            <input type="text" class="form-control form-control-border border-width-2" id="nama" name="nama" placeholder="Masukkan nama kelompok yang ingin dibuat">
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-primary" onclick="addNewKelompok()">Submit</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </div>
     <!-- ./wrapper -->
 
@@ -278,15 +326,17 @@ if (!$resultKelompok) {
     <script src="assets/adminlte/dist/js/adminlte.min.js"></script>
     <!-- SweetAlert2 Toast -->
     <script src="assets/adminlte/plugins/sweetalert2/sweetalert2.min.js"></script>
+    <!-- bootstrap searchable dropdown -->
+    <script src="assets/bootstrap-5/bootstrap.bundle.min.js"></script>
+    <script src="assets/dselect.js"></script>
     <!-- Page specific script -->
     <script>
-
         function validateForm() {
             var selectedItem = document.getElementById("pilihNamaKelompok").value;
             var nama = document.getElementById("nama").value;
             var quantity = document.getElementById("quantity").value;
 
-            if (selectedItem === "" || nama === "" ||quantity === "" || quantity <= 0) {
+            if (selectedItem === "" || nama === "" || quantity === "" || quantity <= 0) {
                 Swal.fire({
                     icon: 'error',
                     title: 'Oops...',
@@ -319,11 +369,34 @@ if (!$resultKelompok) {
                 }
             });
         }
+        
+        function addNewKelompok() {
+            
+        }
 
         function resetForm() {
             document.getElementById("masterBahanForm").reset();
+            resetDropdown();
         }
 
+        function resetDropdown() {
+            const dropdown = document.getElementById("pilihNamaKelompok");
+            dropdown.selectedIndex = 0; // reset ke pilihan pertama
+
+            // jika multiple selection
+            dropdown.querySelectorAll("option:checked").forEach(option => {
+                option.selected = false;
+            });
+
+            // memicu event change 
+            dropdown.dispatchEvent(new Event('change'));
+        }
+
+        // Searchable dropdown
+        var select_box_element = document.querySelector('#pilihNamaKelompok');
+        dselect(select_box_element, {
+            search: true,
+        });
     </script>
 </body>
 
