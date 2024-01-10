@@ -229,10 +229,7 @@ $result = mysqli_query($conn, $query);
                                 $next_page = $current_page < $total_pages ? $current_page + 1 : $total_pages;
 
                                 // First page button
-                                echo '<li class="page-item"><a class="page-link" href="?page=1">&laquo;&laquo;</a></li>';
-
-                                // Previous page button
-                                echo '<li class="page-item"><a class="page-link" href="?page=' . $prev_page . '">&laquo;</a></li>';
+                                echo '<li class="page-item"><a class="page-link" href="?page=1">First (1)</a></li>';
 
                                 // Display up to 5 pages before the current page
                                 for ($i = max(1, $current_page - 2); $i <= min($total_pages, $current_page + 2); $i++) {
@@ -240,12 +237,16 @@ $result = mysqli_query($conn, $query);
                                     echo '<li class="page-item ' . $active_class . '"><a class="page-link" href="?page=' . $i . '">' . $i . '</a></li>';
                                 }
 
-                                // Next page button
-                                echo '<li class="page-item"><a class="page-link" href="?page=' . $next_page . '">&raquo;</a></li>';
-
                                 // Last page button
-                                echo '<li class="page-item"><a class="page-link" href="?page=' . $total_pages . '">&raquo;&raquo;</a></li>';
+                                echo '<li class="page-item"><a class="page-link" href="?page=' . $total_pages . '">Last (' . $total_pages . ')</a></li>';
                                 ?>
+                                 <!-- Search input for page number -->
+                                    <li class="page-item">
+                                        <form class="form-inline ml-2">
+                                            <input class="form-control form-control-sm" type="text" placeholder="Page" name="page">
+                                            <button class="btn btn-sm btn-outline-secondary" type="submit">Go</button>
+                                        </form>
+                                    </li>
                                 </ul>
                             </div>
                         </div><!-- /.container-fluid -->
