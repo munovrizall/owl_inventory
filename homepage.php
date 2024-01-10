@@ -47,6 +47,15 @@ $result = mysqli_query($conn, $query);
   <link rel="stylesheet" href="assets/adminlte/plugins/daterangepicker/daterangepicker.css">
   <!-- summernote -->
   <link rel="stylesheet" href="assets/adminlte/plugins/summernote/summernote-bs4.min.css">
+
+  <style>
+    .table-striped .deskripsi-col {
+      max-width: 400px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+  </style>
 </head>
 
 <body class="hold-transition sidebar-mini layout-fixed">
@@ -71,7 +80,7 @@ $result = mysqli_query($conn, $query);
       </ul>
     </nav>
     <!-- /.navbar -->
-    
+
     <!-- Main Sidebar Container -->
     <aside class="main-sidebar sidebar-dark-primary elevation-4">
       <!-- Brand Logo -->
@@ -246,12 +255,12 @@ $result = mysqli_query($conn, $query);
                   <table class="table table-striped">
                     <thead>
                       <tr>
-                        <th>User</th>
-                        <th>Nama Barang</th>
-                        <th>Kuantitas</th>
-                        <th>Aktivitas</th>
-                        <th>Waktu</th>
-                        <th>Deskripsi</th>
+                        <th class="text-center">User</th>
+                        <th class="text-center">Nama Barang</th>
+                        <th class="text-center">Kuantitas</th>
+                        <th class="text-center">Aktivitas</th>
+                        <th class="text-center">Deskripsi</th>
+                        <th class="text-center">Waktu</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -281,8 +290,8 @@ $result = mysqli_query($conn, $query);
                           <td><?php echo $row["quantity"]; ?></td>
                           <!-- Tambahkan span dengan kelas badge sesuai dengan nilai activity -->
                           <td><span class="<?php echo $badgeClass; ?>"><?php echo $row["activity"]; ?></span></td>
+                          <td class="deskripsi-col"><?php echo $row["deskripsi"]; ?></td>
                           <td><?php echo $row["waktu"]; ?></td>
-                          <td><?php echo $row["deskripsi"]; ?></td>
                         </tr>
                       <?php
                       }

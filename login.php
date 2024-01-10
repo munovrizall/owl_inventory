@@ -54,6 +54,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <form id="loginForm">
           <div class="input-group mb-3">
             <select class="form-control" placeholder="Username" id="usernameInput">
+              <option value="" selected disabled>User</option>
               <option value="Riki">Riki</option>
               <option value="Ahmad">Ahmad</option>
               <option value="Tatang">Tatang</option>
@@ -65,28 +66,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             </div>
           </div>
           <div class="input-group mb-3">
-            <input type="password" class="form-control" placeholder="Password" id="passwordInput">
+            <input type="password" class="form-control" placeholder="Password" id="passwordInput" onkeypress="checkEnter(event)">
             <div class="input-group-append">
               <div class="input-group-text">
                 <span class="fas fa-lock"></span>
               </div>
             </div>
           </div>
-          <div class="row">
-            <div class="col-8">
-              <div class="icheck-primary">
-                <input type="checkbox" id="remember">
-                <label for="remember">
-                  Ingat Saya
-                </label>
-              </div>
-            </div>
-            <!-- /.col -->
-            <div class="col-4">
-              <button type="button" class="btn btn-primary btn-block" onclick="saveUsername()">Sign In</button>
-            </div>
-            <!-- /.col -->
-          </div>
+          <button type="button" class="btn btn-primary btn-block" onclick="performLogin()">Sign In</button>
         </form>
       </div>
       <!-- /.card-body -->
@@ -105,30 +92,55 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   <script src="assets/adminlte/plugins/sweetalert2/sweetalert2.min.js"></script>
 
   <script>
-    function saveUsername() {
-      var username = document.getElementById("usernameInput").value;
-      if (username.trim() !== "") {
-        // Save the username to local storage
-        localStorage.setItem("username", username);
-
-        // Perform AJAX request to send username to server
-        $.ajax({
-          type: "POST",
-          url: "process_username.php",
-          data: {
-            username: username
-          },
-          success: function(response) {
-            console.log(response); // Handle the server response if needed
-            window.location.href = "homepage.php";
-          },
-          error: function(error) {
-            console.error("Error sending username to server: " + error);
-          }
-        });
-      } else {
-        alert("Username cannot be empty");
+    function checkEnter(event) {
+      if (event.key === "Enter") {
+        performLogin();
       }
+    }
+
+    function performLogin() {
+      var username = document.getElementById("usernameInput").value;
+      var password = document.getElementById("passwordInput").value;
+
+      if (username.trim() !== "") {
+        if (password === 'origin') {
+          // Save the username to local storage
+          localStorage.setItem("username", username);
+
+          // Perform AJAX request to send username to server
+          $.ajax({
+            type: "POST",
+            url: "process_username.php",
+            data: {
+              username: username
+            },
+            success: function(response) {
+              console.log(response); // Handle the server response if needed
+              window.location.href = "homepage.php";
+            },
+            error: function(error) {
+              console.error("Error sending username to server: " + error);
+            }
+          });
+        } else {
+          Swal.fire({
+            icon: 'error',
+            title: 'Password Salah',
+            text: 'Masukkan password yang benar!',
+          });
+          resetForm();
+        }
+      } else {
+        Swal.fire({
+          icon: 'error',
+          title: 'Username Kosong',
+          text: 'Pilih username terlebih dahulu!',
+        });
+      }
+    }
+
+    function resetForm() {
+      document.getElementById("loginForm").reset();
     }
   </script>
 </body>
