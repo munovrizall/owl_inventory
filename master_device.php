@@ -1,4 +1,6 @@
 <?php
+session_start();
+
 $serverName = "localhost";
 $userName = "root";
 $password = "";
@@ -10,36 +12,27 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-$stockQuantity = ""; // Default value, replace it with the actual stock quantity based on the selected item from the database
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $namaDevice = $_POST["namaDevice"];
 
-if (isset($_POST['quantity'])) {
-    $selectedItemId = $_POST['selectedItem'];
-    // Fetch the stock quantity from the database based on the selected item
-    $query = "SELECT quantity FROM stokbahan WHERE stok_id = ?";
+    $query = "INSERT INTO masterkelompok (nama_kelompok) VALUES (?)";
     $stmt = $conn->prepare($query);
-    $stmt->bind_param("i", $selectedItemId);
-    $stmt->execute();
-    $stmt->bind_result($stockQuantity);
-    $stmt->fetch();
-    $stmt->close();
+    $stmt->bind_param("s", $namaDevice);
 
-    // Check if the submitted quantity is greater than the available stock
-    $submittedQuantity = $_POST['quantity'];
-    if ($submittedQuantity > $stockQuantity) {
-        // Quantity exceeds available stock, handle accordingly (e.g., show an error message)
-        echo "Stok bahan tidak mencukupi.";
-        exit();
-    } elseif ($submittedQuantity == "") {
-        echo "$stockQuantity";
-        exit();
-    } elseif ($submittedQuantity <= 0) {
-        echo "Kuantitas yang dimasukkan harus lebih besar dari";
-        exit();
+    if ($stmt->execute()) {
+        echo "Data berhasil ditambahkan ke tabel masterbahan.";
+    } else {
+        echo "Error: " . $stmt->error;
     }
 
-    // Return the updated stock quantity
-    echo $stockQuantity;
-    exit();
+    $stmt->close();
+}
+// Fetch data from masterkelompok table
+$queryMasterBahan = "SELECT nama FROM masterbahan";
+$resultMasterBahan = $conn->query($queryMasterBahan);
+
+if (!$resultMasterBahan) {
+    die("Error fetching kelompok data: " . $conn->error);
 }
 
 ?>
@@ -49,7 +42,7 @@ if (isset($_POST['quantity'])) {
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Master Device</title>
+    <title>Master Bahan</title>
 
     <link rel="icon" href="assets/adminlte/dist/img/OWLlogo.png" type="image/x-icon">
     <!-- Google Font: Source Sans Pro -->
@@ -60,6 +53,16 @@ if (isset($_POST['quantity'])) {
     <link rel="stylesheet" href="assets/adminlte/dist/css/adminlte.min.css">
     <!-- Ionicons -->
     <link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+    <!-- Sweetalert2 -->
+    <link rel="stylesheet" href="assets/adminlte/plugins/sweetalert2-theme-bootstrap-4/bootstrap-4.min.css">
+
+    <style>
+        .input-group-append label {
+            margin-right: 24px;
+        }
+    </style>
+
+
 </head>
 
 <body class="hold-transition sidebar-mini">
@@ -181,39 +184,45 @@ if (isset($_POST['quantity'])) {
                     <!-- general form elements -->
                     <div class="card card-primary">
                         <div class="card-header">
-                            <h3 class="card-title">Menambah Jenis Master Device untuk Diproduksi</h3>
+                            <h3 class="card-title">Menambah Jenis Device untuk Diproduksi</h3>
                         </div>
                         <!-- /.card-header -->
                         <!-- form start -->
-                        <form id="maintenanceForm">
+                        <form id="masterDeviceForm">
                             <div class="card-body">
                                 <div class="form-group">
-                                    <label for="exampleSelectBorderWidth2">Pilih Bahan :</label>
-                                    <select class="custom-select form-control-border border-width-2" id="pilihBahanMaintenance" name="selectedItem">
-                                        <option value="1">U101</option>
-                                        <option value="10">R102</option>
-                                        <option value="11">L203</option>
-                                    </select>
-                                </div>
-                                <div class="form-group">
-                                    <label for="quantity">Kuantitas :</label>
-                                    <div class="input-group">
-                                        <!-- Input untuk kuantitas -->
-                                        <input type="number" class="form-control" id="quantity" name="quantity" min="0" value="">
-                                        <!-- Tombol-tombol untuk menambah dan mengurangi kuantitas -->
-                                        <div class="input-group-append">
-                                            <button type="button" class="btn btn-block btn-danger" onclick="decreaseQuantity()">-</button>
-                                            <button type="button" class="btn btn-primary" onclick="increaseQuantity()">+</button>
+                                    <div class="row">
+                                        <div class="col">
+                                            <label for="namaDevice">Masukkan Nama Device : <span style="color: red;">*</span></label>
+                                            <input type="text" class="form-control form-control-border border-width-2" id="namaDevice" name="namaDevice" placeholder="Masukkan nama device baru">
                                         </div>
                                     </div>
                                 </div>
-                                <p id="stockMessage">Stok Bahan Tersisa: <?php echo $stockQuantity; ?></p>
+                                <div class="form-group">
+                                    <label for="namaBahan">Nama Bahan : <span style="color: red;">*</span></label>
+                                    <select class="custom-select form-control-border border-width-2" id="namaBahan" name="namaBahan" searchable="Search here...">
+                                        <option value="" selected disabled>Pilih Bahan</option>
+                                        <?php
+                                        while ($row = $resultMasterBahan->fetch_assoc()) {
+                                            echo '<option value="' . $row['nama'] . '">' . $row['nama'] . '</option>';
+                                        }
+                                        ?>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="quantity">Kuantitas : <span style="color: red;">*</span></label>
+                                    <div class="input-group">
+                                        <!-- Input untuk kuantitas -->
+                                        <input type="number" class="form-control" id="quantity" name="quantity" min="0" value="" placeholder="Masukkan jumlah kuantitas yang dibutuhkan">
+
+                                    </div>
+                                </div>
                             </div>
                             <!-- /.card-body -->
-                            <div class="card-footer">
-                                <button type="button" class="btn btn-primary" onclick="validateAndFetchStock()">Submit</button>
-                            </div>
                         </form>
+                        <div class="card-footer d-flex justify-content-end">
+                            <button type="button" class="btn btn-primary" onclick="if(validateForm()) { validateSuccess(); resetForm(); }">Submit</button>
+                        </div>
                     </div>
                     <!-- general form elements -->
                     <!-- /.card -->
@@ -241,57 +250,58 @@ if (isset($_POST['quantity'])) {
     <script src="assets/adminlte/plugins/bs-custom-file-input/bs-custom-file-input.min.js"></script>
     <!-- AdminLTE App -->
     <script src="assets/adminlte/dist/js/adminlte.min.js"></script>
+    <!-- SweetAlert2 Toast -->
+    <script src="assets/adminlte/plugins/sweetalert2/sweetalert2.min.js"></script>
     <!-- Page specific script -->
     <script>
-        $(function() {
-            bsCustomFileInput.init();
 
-            // Add an event listener to the select element
-            $("#pilihBahanMaintenance").change(function() {
-                validateAndFetchStock();
-            });
-        });
+        function validateForm() {
+            var selectedItem = document.getElementById("namaDevice").value;
+            var nama = document.getElementById("namaBahan").value;
+            var quantity = document.getElementById("quantity").value;
 
-        function decreaseQuantity() {
-            var quantityInput = document.getElementById("quantity");
-            if (quantityInput.value > 0) {
-                quantityInput.value--;
-                updateStockMessage();
+            if (selectedItem === "" || nama === "" ||quantity === "" || quantity <= 0) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: 'Harap lengkapi semua formulir!',
+                });
+                return false;
             }
+
+            return true;
         }
 
-        function increaseQuantity() {
-            var quantityInput = document.getElementById("quantity");
-            quantityInput.value++;
-            updateStockMessage();
-        }
 
-        function updateStockMessage() {
-            var stockMessage = document.getElementById("stockMessage");
-            var selectedQuantity = parseInt(document.getElementById("quantity").value, 10);
-
-            // Update stock message dynamically based on the selected item's stock quantity
-            stockMessage.innerText = "Stok Bahan Tersisa: " + (<?php echo $stockQuantity; ?> - selectedQuantity);
-        }
-
-        function validateAndFetchStock() {
+        function validateSuccess() {
             // Get the form data
-            var formData = $("#maintenanceForm").serialize();
+            var formData = $("#masterDeviceForm").serialize();
 
-            // Use AJAX to submit the form data and fetch the updated stock quantity
             $.ajax({
                 type: "POST",
-                url: "maintenance.php",
+                url: "master_device.php",
                 data: formData,
                 success: function(response) {
-                    // Update the stock message with the fetched quantity
-                    document.getElementById("stockMessage").innerText = "Stok Bahan Tersisa: " + response;
+                    Swal.fire({
+                        toast: true,
+                        position: 'top-end',
+                        icon: 'success',
+                        title: 'Device berhasil didaftarkan!',
+                        showConfirmButton: false,
+                        timer: 3000
+                    });
+
                 },
                 error: function(error) {
-                    alert("Error fetching stock quantity.");
+                    alert("Error mendaftarkan barang.");
                 }
             });
         }
+
+        function resetForm() {
+            document.getElementById("masterDeviceForm").reset();
+        }
+
     </script>
 </body>
 
