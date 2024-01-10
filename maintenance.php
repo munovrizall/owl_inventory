@@ -11,7 +11,7 @@ $conn = new mysqli($serverName, $userName, $password, $dbName);
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
-$queryBahan = "SELECT * FROM masterbahan";
+$queryBahan = "SELECT * FROM masterbahan ORDER BY nama";
 $resultBahan = $conn->query($queryBahan);
 
 $stockQuantity = ""; // Default value, replace it with the actual stock quantity based on the selected item from the database

@@ -47,7 +47,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 }
 
 // Fetch data from masterkelompok table
-$queryKelompok = "SELECT kelompok_id, nama_kelompok FROM masterkelompok";
+$queryKelompok = "SELECT kelompok_id, nama_kelompok FROM masterkelompok ORDER BY nama_kelompok";
 $resultKelompok = $conn->query($queryKelompok);
 
 if (!$resultKelompok) {
@@ -241,7 +241,7 @@ if (!$resultKelompok) {
                                         <label for="pilihNamaKelompok">Pilih Kelompok <span style="color: red;">*</span></label>
                                     </div>
                                     <select class="form-select" id="pilihNamaKelompok" name="kelompok" searchable="Search here...">
-                                        <option value="" selected disabled>Pilih Kelompok</option>
+                                        <option value="">Pilih Kelompok</option>
                                         <?php
                                         while ($row = $resultKelompok->fetch_assoc()) {
                                             echo '<option value="' . $row['nama_kelompok'] . '">' . $row['nama_kelompok'] . '</option>';
