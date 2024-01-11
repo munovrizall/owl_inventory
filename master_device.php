@@ -14,26 +14,28 @@ if ($conn->connect_error) {
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $namaDevice = $_POST["namaDevice"];
+    $namaBahan = $_POST["namaBahan"];
+    $quantity = $_POST["quantity"];
 
-    // Check if the material name already exists
-    $checkQuery = "SELECT COUNT(*) FROM masterkelompok WHERE nama = ?";
+    // Check if either 'produk' or 'namaBahan' already exists
+    $checkQuery = "SELECT COUNT(*) FROM produksi WHERE produk = ? AND nama_bahan = ?";
     $checkStmt = $conn->prepare($checkQuery);
-    $checkStmt->bind_param("s", $namaDevice);
+    $checkStmt->bind_param("ss", $namaDevice, $namaBahan);  
     $checkStmt->execute();
     $checkStmt->bind_result($count);
-    $checkStmt->fetch();
+    $checkStmt->fetch();   
     $checkStmt->close();
 
     if ($count > 0) {
-        echo "Error: Material name '$nama' already exists in the database.";
+        echo "Error: Either 'produk' and 'namaBahan' already exists in the database.";
     } else {
         // Insert the new record
-        $query = "INSERT INTO masterkelompok (nama_kelompok) VALUES (?)";
+        $query = "INSERT INTO produksi (produk, nama_bahan, quantity) VALUES (?, ?, ?)";
         $stmt = $conn->prepare($query);
-        $stmt->bind_param("s", $namaDevice);
+        $stmt->bind_param("ssi", $namaDevice, $namaBahan, $quantity);  // Assuming 'quantity' is an integer parameter
 
         if ($stmt->execute()) {
-            echo "Data berhasil ditambahkan ke tabel masterkelompok.";
+            echo "Data berhasil ditambahkan ke tabel produksi.";
         } else {
             echo "Error: " . $stmt->error;
         }
@@ -41,8 +43,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $stmt->close();
     }
 }
-// Fetch data from masterkelompok table
-$queryMasterBahan = "SELECT nama FROM masterbahan";
+
+// Fetch data from produksi table
+$queryMasterBahan = "SELECT nama FROM masterbahan ORDER BY nama";
 $resultMasterBahan = $conn->query($queryMasterBahan);
 
 if (!$resultMasterBahan) {
