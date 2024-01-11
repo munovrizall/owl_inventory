@@ -212,26 +212,41 @@ if (!$resultMasterBahan) {
                                         </div>
                                     </div>
                                 </div>
-                                <div class="form-group">
-                                    <label for="namaBahan">Nama Bahan : <span style="color: red;">*</span></label>
-                                    <select class="custom-select form-control-border border-width-2" id="namaBahan" name="namaBahan" searchable="Search here...">
-                                        <option value="" selected disabled>Pilih Bahan</option>
-                                        <?php
-                                        while ($row = $resultMasterBahan->fetch_assoc()) {
-                                            echo '<option value="' . $row['nama'] . '">' . $row['nama'] . '</option>';
-                                        }
-                                        ?>
-                                    </select>
-                                </div>
-                                <div class="form-group">
-                                    <label for="quantity">Kuantitas : <span style="color: red;">*</span></label>
-                                    <div class="input-group">
-                                        <!-- Input untuk kuantitas -->
-                                        <input type="number" class="form-control" id="quantity" name="quantity" min="0" value="" placeholder="Masukkan jumlah kuantitas yang dibutuhkan">
-
+                                <div class="card-body p-0">
+                                    <div class="table-responsive">
+                                        <table id="myTable" class=" table order-list table-striped">
+                                            <thead>
+                                                <tr>
+                                                    <td class="text-center">Nama Bahan</td>
+                                                    <td class="text-center">Kuantitas</td>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td class="col-sm-8">
+                                                        <input type="text" id="namaBahan" name="namaBahan" class="form-control" placeholder="Masukkan nama bahan" />
+                                                    </td>
+                                                    <td class="col-sm-4">
+                                                        <input type="number" class="form-control" id="quantity" name="quantity" min="0" value="" placeholder="Jumlah bahan">
+                                                    </td>
+                                                    <td class="col-sm-2"><a class="deleteRow"></a>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                            <tfoot>
+                                                <tr>
+                                                    <td colspan="5" style="text-align: left;">
+                                                        <input type="button" class="btn btn-outline-info btn-block" id="addrow" value="+ Bahan lainnya" />
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                </tr>
+                                            </tfoot>
+                                        </table>
                                     </div>
                                 </div>
                             </div>
+
                             <!-- /.card-body -->
                         </form>
                         <div class="card-footer d-flex justify-content-end">
@@ -268,13 +283,54 @@ if (!$resultMasterBahan) {
     <script src="assets/adminlte/plugins/sweetalert2/sweetalert2.min.js"></script>
     <!-- Page specific script -->
     <script>
+        $(document).ready(function() {
+            var counter = 0;
+
+            $("#addrow").on("click", function() {
+                var newRow = $("<tr>");
+                var cols = "";
+
+                cols += '<td><input type="text" class="form-control" id="namaBahan' + counter + '" name="namaBahan' + counter + '" placeholder="Masukkan nama bahan ' + (counter + 2) + '"/></td>';
+                cols += '<td><input type="number" class="form-control" id="quantity ' + counter + '" name="quantity' + counter + '" min="0" value="" placeholder="Jumlah bahan ' + (counter + 2) + '"/></td>';
+
+                cols += '<td><input type="button" class="ibtnDel btn btn-md btn-danger "  value="Delete"></td>';
+                newRow.append(cols);
+                $("table.order-list").append(newRow);
+                counter++;
+            });
+
+            $("table.order-list").on("click", ".ibtnDel", function(event) {
+                $(this).closest("tr").remove();
+                counter -= 1
+            });
+
+
+        });
+
+        function calculateRow(row) {
+            var price = +row.find('input[name^="price"]').val();
+        }
+
+        function calculateGrandTotal() {
+            var grandTotal = 0;
+            $("table.order-list").find('input[name^="price"]').each(function() {
+                grandTotal += +$(this).val();
+            });
+            $("#grandtotal").text(grandTotal.toFixed(2));
+        }
+
+        // Searchable dropdown
+        var select_box_element = document.querySelector('#pilihNamaBahan');
+        dselect(select_box_element, {
+            search: true,
+        });
 
         function validateForm() {
             var selectedItem = document.getElementById("namaDevice").value;
             var nama = document.getElementById("namaBahan").value;
             var quantity = document.getElementById("quantity").value;
 
-            if (selectedItem === "" || nama === "" ||quantity === "" || quantity <= 0) {
+            if (selectedItem === "" || nama === "" || quantity === "" || quantity <= 0) {
                 Swal.fire({
                     icon: 'error',
                     title: 'Oops...',
@@ -326,7 +382,6 @@ if (!$resultMasterBahan) {
         function resetForm() {
             document.getElementById("masterDeviceForm").reset();
         }
-
     </script>
 </body>
 
