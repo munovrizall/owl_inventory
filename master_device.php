@@ -74,6 +74,40 @@ if (!$resultMasterBahan) {
         .input-group-append label {
             margin-right: 24px;
         }
+
+        .form-select {
+            display: block;
+            width: 100%;
+            padding: 0.375rem 2.25rem 0.375rem 0.75rem;
+            -moz-padding-start: calc(0.75rem - 3px);
+            font-size: 1rem;
+            font-weight: 400;
+            line-height: 1.5;
+            color: #212529;
+            background-color: #fff;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 0.75rem center;
+            background-size: 16px 12px;
+            border: 1px solid #ced4da;
+            border-radius: 0.25rem;
+            transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+        }
+
+        .lebar-kolom1 {
+            width: 78%;
+        }
+
+        .lebar-kolom2 {
+            width: 12%;
+        }
+
+        .lebar-kolom3 {
+            width: 10%;
+        }
     </style>
 
 
@@ -207,7 +241,7 @@ if (!$resultMasterBahan) {
                                 <div class="form-group">
                                     <div class="row">
                                         <div class="col">
-                                            <label for="namaDevice">Masukkan Nama Device : <span style="color: red;">*</span></label>
+                                            <label for="namaDevice">Masukkan Nama Device <span style="color: red;">*</span></label>
                                             <input type="text" class="form-control form-control-border border-width-2" id="namaDevice" name="namaDevice" placeholder="Masukkan nama device baru">
                                         </div>
                                     </div>
@@ -217,26 +251,35 @@ if (!$resultMasterBahan) {
                                         <table id="myTable" class=" table order-list table-striped">
                                             <thead>
                                                 <tr>
-                                                    <td class="text-center">Nama Bahan</td>
-                                                    <td class="text-center">Kuantitas</td>
+                                                    <td class="text-center lebar-kolom1"><b>Nama Bahan <span style="color: red;">*</span></b></td>
+                                                    <td class="text-center lebar-kolom2"><b>Kuantitas <span style="color: red;">*</span></b></td>
+                                                    <td class="text-center lebar-kolom3"><b>Aksi</b></td>
                                                 </tr>
                                             </thead>
                                             <tbody>
                                                 <tr>
-                                                    <td class="col-sm-8">
-                                                        <input type="text" id="namaBahan" name="namaBahan" class="form-control" placeholder="Masukkan nama bahan" />
+                                                    <!-- <td class="col-sm-8">
+                                                        <select class="form-select" id="pilihNamaBahan" name="bahan">
+                                                            <option value="">Pilih Kelompok</option>
+                                                            <option value="1">Resistor</option>
+                                                            <option value="2">Transistor</option>
+                                                            <option value="3">Kapasitor</option>
+                                                            <option value="4">Dioda</option>
+                                                            <option value="5">Mosfet</option>
+                                                            <option value="6">Sensor</option>
+                                                        </select>
                                                     </td>
                                                     <td class="col-sm-4">
                                                         <input type="number" class="form-control" id="quantity" name="quantity" min="0" value="" placeholder="Jumlah bahan">
                                                     </td>
                                                     <td class="col-sm-2"><a class="deleteRow"></a>
-                                                    </td>
+                                                    </td> -->
                                                 </tr>
                                             </tbody>
                                             <tfoot>
                                                 <tr>
                                                     <td colspan="5" style="text-align: left;">
-                                                        <input type="button" class="btn btn-outline-info btn-block" id="addrow" value="+ Bahan lainnya" />
+                                                        <input type="button" class="btn btn-outline-info btn-block" id="addrow" value="+  Bahan lain" />
                                                     </td>
                                                 </tr>
                                                 <tr>
@@ -281,19 +324,29 @@ if (!$resultMasterBahan) {
     <script src="assets/adminlte/dist/js/adminlte.min.js"></script>
     <!-- SweetAlert2 Toast -->
     <script src="assets/adminlte/plugins/sweetalert2/sweetalert2.min.js"></script>
+    <!-- bootstrap searchable dropdown -->
+    <script src="assets/bootstrap-5/bootstrap.bundle.min.js"></script>
+    <script src="assets/dselect.js"></script>
     <!-- Page specific script -->
     <script>
         $(document).ready(function() {
             var counter = 0;
 
             $("#addrow").on("click", function() {
+                var dropdownOptions = '<option value="" selected disabled>Pilih Bahan</option>' +
+                    '<option value="1">Resistor</option>' +
+                    '<option value="2">Transistor</option>' +
+                    '<option value="3">Kapasitor</option>' +
+                    '<option value="4">Dioda</option>' +
+                    '<option value="5">Mosfet</option>' +
+                    '<option value="6">Sensor</option>';
                 var newRow = $("<tr>");
                 var cols = "";
 
-                cols += '<td><input type="text" class="form-control" id="namaBahan' + counter + '" name="namaBahan' + counter + '" placeholder="Masukkan nama bahan ' + (counter + 2) + '"/></td>';
-                cols += '<td><input type="number" class="form-control" id="quantity ' + counter + '" name="quantity' + counter + '" min="0" value="" placeholder="Jumlah bahan ' + (counter + 2) + '"/></td>';
+                cols += '<td><select class="form-select" id="pilihNamaBahan ' + counter + '" name="pilihNamaBahan' + counter + '">' + dropdownOptions + '</select></td>';
+                cols += '<td><input type="number" class="form-control" id="quantity ' + counter + '" name="quantity' + counter + '" min="0" value="" placeholder="0"/></td>';
 
-                cols += '<td><input type="button" class="ibtnDel btn btn-md btn-danger "  value="Delete"></td>';
+                cols += '<td><input type="button" class="ibtnDel btn btn-md btn-danger"  value="Delete"></td>';
                 newRow.append(cols);
                 $("table.order-list").append(newRow);
                 counter++;
@@ -319,11 +372,6 @@ if (!$resultMasterBahan) {
             $("#grandtotal").text(grandTotal.toFixed(2));
         }
 
-        // Searchable dropdown
-        var select_box_element = document.querySelector('#pilihNamaBahan');
-        dselect(select_box_element, {
-            search: true,
-        });
 
         function validateForm() {
             var selectedItem = document.getElementById("namaDevice").value;
@@ -381,7 +429,27 @@ if (!$resultMasterBahan) {
 
         function resetForm() {
             document.getElementById("masterDeviceForm").reset();
+            resetDropdown();
         }
+
+        function resetDropdown() {
+            const dropdown = document.getElementById("pilihNamaBahan");
+            dropdown.selectedIndex = 0; // reset ke pilihan pertama
+
+            // jika multiple selection
+            dropdown.querySelectorAll("option:checked").forEach(option => {
+                option.selected = false;
+            });
+
+            // memicu event change 
+            dropdown.dispatchEvent(new Event('change'));
+        }
+
+        // Searchable dropdown
+        var select_box_element = document.querySelector('#pilihNamaBahan');
+        dselect(select_box_element, {
+            search: false,
+        });
     </script>
 </body>
 
