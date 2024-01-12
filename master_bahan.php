@@ -13,25 +13,60 @@ if ($conn->connect_error) {
 }
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $kelompok = $_POST["kelompok"];
-    $nama = $_POST["nama"];
-    $quantity = $_POST["quantity"];
-    $deskripsi = $_POST["deskripsi"];
+    // Check which fields are provided
+    $kelompok = isset($_POST["kelompok"]) ? $_POST["kelompok"] : null;
+    $nama = isset($_POST["nama"]) ? $_POST["nama"] : null;
+    $quantity = isset($_POST["quantity"]) ? $_POST["quantity"] : null;
+    $deskripsi = isset($_POST["deskripsi"]) ? $_POST["deskripsi"] : null;
+
+    $namaKelompokBaru = isset($_POST["namaKelompokBaru"]) ? $_POST["namaKelompokBaru"] : null;
 
     // Check if the material name already exists
-    $checkQuery = "SELECT COUNT(*) FROM masterbahan WHERE nama = ?";
-    $checkStmt = $conn->prepare($checkQuery);
-    $checkStmt->bind_param("s", $nama);
-    $checkStmt->execute();
-    $checkStmt->bind_result($count);
-    $checkStmt->fetch();
-    $checkStmt->close();
+    if ($nama !== null) {
+        $checkQuery = "SELECT COUNT(*) FROM masterbahan WHERE nama = ?";
+        $checkStmt = $conn->prepare($checkQuery);
+        $checkStmt->bind_param("s", $nama);
+        $checkStmt->execute();
+        $checkStmt->bind_result($count);
+        $checkStmt->fetch();
+        $checkStmt->close();
 
-    // If the material name already exists, display an error
-    if ($count > 0) {
-        echo "Error: Material name '$nama' already exists in the database.";
-    } else {
-        // Insert the new record
+        // If the material name already exists, display an error
+        if ($count > 0) {
+            echo "Error: Material name '$nama' already exists in the database.";
+            exit; // Stop further execution
+        }
+    }
+
+    // Check if the group name already exists
+    if ($namaKelompokBaru !== null) {
+        $checkQueryKB = "SELECT COUNT(*) FROM masterkelompok WHERE nama_kelompok = ?";
+        $checkStmtKB = $conn->prepare($checkQueryKB);
+        $checkStmtKB->bind_param("s", $namaKelompokBaru);
+        $checkStmtKB->execute();
+        $checkStmtKB->bind_result($countKB);
+        $checkStmtKB->fetch();
+        $checkStmtKB->close();
+
+        // If the group name already exists, display an error
+        if ($countKB > 0) {
+            echo "Error: Group name '$namaKelompokBaru' already exists in the database.";
+            exit; // Stop further execution
+        }
+        // Insert the new record for the group
+        $insertQueryKB = "INSERT INTO masterkelompok (nama_kelompok) VALUES (?)";
+        $insertStmtKB = $conn->prepare($insertQueryKB);
+        $insertStmtKB->bind_param("s", $namaKelompokBaru);
+
+        if ($insertStmtKB->execute()) {
+            echo "Data berhasil ditambahkan ke tabel masterkelompok.";
+        } else {
+            echo "Error: " . $insertStmtKB->error;
+        }
+
+        $insertStmtKB->close();
+    } elseif ($kelompok !== null) {
+        // Insert the new record for material
         $insertQuery = "INSERT INTO masterbahan (kelompok, nama, quantity, deskripsi) VALUES (?, ?, ?, ?)";
         $insertStmt = $conn->prepare($insertQuery);
         $insertStmt->bind_param("ssis", $kelompok, $nama, $quantity, $deskripsi);
@@ -290,6 +325,7 @@ if (!$resultKelompok) {
         <!-- /.control-sidebar -->
 
         <!-- Modal menambahkan kelompok baru -->
+        <form id="tambahKelompokForm">
         <div class="modal fade" id="modalBuatKelompok" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered" role="document">
                 <div class="modal-content">
@@ -301,18 +337,18 @@ if (!$resultKelompok) {
                     </div>
                     <div class="modal-body">
                         <div class="form-group">
-                            <label for="nama">Nama Kelompok</span></label>
-                            <input type="text" class="form-control form-control-border border-width-2" id="nama" name="nama" placeholder="Masukkan nama kelompok yang ingin dibuat">
+                            <label for="namaKelompokBaru">Nama Kelompok</span></label>
+                            <input type="text" class="form-control form-control-border border-width-2" id="namaKelompokBaru" name="namaKelompokBaru" placeholder="Masukkan nama kelompok yang ingin dibuat">
                         </div>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                        <button type="button" class="btn btn-primary" onclick="addNewKelompok()">Submit</button>
+                        <button type="button" class="btn btn-primary" onclick="if(validateFormKB()) { validateSuccessKB(); resetForm(); }">Submit</button>
                     </div>
                 </div>
             </div>
         </div>
-
+        </form>
     </div>
     <!-- ./wrapper -->
 
@@ -370,12 +406,49 @@ if (!$resultKelompok) {
             });
         }
 
+        function validateFormKB() {
+            var namaKB = document.getElementById("namaKelompokBaru").value;
+
+            if (namaKB === "") {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: 'Harap lengkapi semua formulir!',
+                });
+                return false;
+            }
+
+            return true;
+        }
+        
+        function validateSuccessKB() {
+            // Get the form data
+            var formDataKB = $("#tambahKelompokForm").serialize();
+
+            $.ajax({
+                type: "POST",
+                url: "master_bahan.php",
+                data: formDataKB,
+                success: function(response) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Kelompok berhasil didaftarkan!',
+                    });
+
+                },
+                error: function(error) {
+                    alert("Error mendaftarkan kelompok.");
+                }
+            });
+        }
+
         function addNewKelompok() {
             
         }
 
         function resetForm() {
             document.getElementById("masterBahanForm").reset();
+            document.getElementById("tambahKelompokForm").reset();
             resetDropdown();
         }
 
