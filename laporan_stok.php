@@ -7,17 +7,10 @@ $dbName = "databaseinventory";
 $conn = new mysqli($serverName, $userNameDb, $password, $dbName);
 
 if ($conn->connect_error) {
-  die("Connection failed: " . $conn->connect_error);
+    die("Connection failed: " . $conn->connect_error);
 }
 
-// Define the number of rows per page and current page number
-$rows_per_page = 3;
-$current_page = isset($_GET['page']) ? $_GET['page'] : 1;
-
-// Calculate the offset for the LIMIT clause
-$start = ($current_page - 1) * $rows_per_page;
-
-$query = "SELECT * FROM masterbahan ORDER BY stok_id LIMIT $start, $rows_per_page";
+$query = "SELECT * FROM masterbahan ORDER BY stok_id";
 $result = mysqli_query($conn, $query);
 
 ?>
@@ -31,15 +24,13 @@ $result = mysqli_query($conn, $query);
 
     <link rel="icon" href="assets/adminlte/dist/img/OWLlogo.png" type="image/x-icon">
     <!-- Google Font: Source Sans Pro -->
-    <link rel="stylesheet"
-        href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
     <!-- Font Awesome -->
     <link rel="stylesheet" href="assets/adminlte/plugins/fontawesome-free/css/all.min.css">
     <!-- Ionicons -->
     <link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
     <!-- Tempusdominus Bootstrap 4 -->
-    <link rel="stylesheet"
-        href="assets/adminlte/plugins/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css">
+    <link rel="stylesheet" href="assets/adminlte/plugins/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css">
     <!-- iCheck -->
     <link rel="stylesheet" href="assets/adminlte/plugins/icheck-bootstrap/icheck-bootstrap.min.css">
     <!-- JQVMap -->
@@ -52,6 +43,38 @@ $result = mysqli_query($conn, $query);
     <link rel="stylesheet" href="assets/adminlte/plugins/daterangepicker/daterangepicker.css">
     <!-- summernote -->
     <link rel="stylesheet" href="assets/adminlte/plugins/summernote/summernote-bs4.min.css">
+    <!-- Table with search -->
+    <link href="https://cdn.datatables.net/v/bs4/dt-1.13.8/b-2.4.2/b-colvis-2.4.2/b-print-2.4.2/fh-3.4.0/r-2.5.0/rg-1.4.1/sb-1.6.0/sp-2.2.0/datatables.min.css" rel="stylesheet">
+
+    <style>
+        .lebar-kolom1 {
+            width: 12%;
+        }
+
+        .lebar-kolom2 {
+            width: 15%;
+        }
+
+        .lebar-kolom3 {
+            width: 25%;
+        }
+
+        .lebar-kolom4 {
+            width: 8%;
+        }
+
+        .lebar-kolom5 {
+            width: 40%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .card-padding {
+            padding: 10px 20px;
+        }
+    </style>
+
 </head>
 
 <body class="hold-transition sidebar-mini layout-fixed">
@@ -72,8 +95,7 @@ $result = mysqli_query($conn, $query);
         <aside class="main-sidebar sidebar-dark-primary elevation-4">
             <!-- Brand Logo -->
             <a href="homepage.php" class="brand-link">
-                <img src="assets/adminlte/dist/img/OWLlogo.png" alt="OWL Logo"
-                    class="brand-image img-circle elevation-3" style="opacity: .8">
+                <img src="assets/adminlte/dist/img/OWLlogo.png" alt="OWL Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
                 <span class="brand-text font-weight-heavy">OWL RnD</span>
             </a>
 
@@ -81,8 +103,7 @@ $result = mysqli_query($conn, $query);
             <div class="sidebar">
                 <!-- Sidebar Menu -->
                 <nav class="mt-2">
-                    <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu"
-                        data-accordion="false">
+                    <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
                         <!-- Add icons to the links using the .nav-icon class
                with font-awesome or any other icon font library -->
                         <li class="nav-item">
@@ -182,73 +203,41 @@ $result = mysqli_query($conn, $query);
                             </div>
                             <!-- /.card-header -->
                             <div class="card-body p-0">
-                                <div class="table-responsive">
-                                    <table class="table table-striped">
+                                <div class="table-responsive card-padding">
+                                    <table id="tableBahan" class="table table-striped">
                                         <thead>
                                             <tr>
-                                                <th>Stok ID</th>
-                                                <th>Kelompok</th>
-                                                <th>Nama</th>
-                                                <th>Kuantitas</th>
-                                                <th>Deskripsi</th>
+                                                <th class="lebar-kolom1">Stok ID</th>
+                                                <th class="lebar-kolom2">Kelompok</th>
+                                                <th class="lebar-kolom3">Nama</th>
+                                                <th class="lebar-kolom4">Stok</th>
+                                                <th class="lebar-kolom5">Deskripsi</th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             <?php
-                      while ($row = mysqli_fetch_assoc($result)) {
-                      ?>
-                                            <tr>
-                                                <td><?php echo $row["stok_id"]; ?></td>
-                                                <td><?php echo $row["kelompok"]; ?></td>
-                                                <td><?php echo $row["nama"]; ?></td>
-                                                <td><?php echo $row["quantity"]; ?></td>
-                                                <td><?php echo $row["deskripsi"]; ?></td>
-                                            </tr>
+                                            while ($row = mysqli_fetch_assoc($result)) {
+                                            ?>
+                                                <tr>
+                                                    <td><?php echo $row["stok_id"]; ?></td>
+                                                    <td><?php echo $row["kelompok"]; ?></td>
+                                                    <td><?php echo $row["nama"]; ?></td>
+                                                    <td><?php echo $row["quantity"]; ?></td>
+                                                    <td><?php echo $row["deskripsi"]; ?></td>
+                                                </tr>
                                             <?php
-                      }
-                      ?>
+                                            }
+                                            ?>
                                         </tbody>
-
                                     </table>
+
                                 </div>
                                 <!-- /.card-body -->
                             </div>
                             <!-- general form elements -->
                             <!-- /.card -->
                             <!-- Pagination links -->
-                            <div class="card-footer clearfix">
-                                <ul class="pagination pagination-sm m-0 float-right">
-                                <?php
-                                $query = "SELECT COUNT(*) AS total_rows FROM masterbahan";
-                                $result = mysqli_query($conn, $query);
-                                $row = mysqli_fetch_assoc($result);
-                                $total_rows = $row['total_rows'];
-                                $total_pages = ceil($total_rows / $rows_per_page);
 
-                                $prev_page = $current_page > 1 ? $current_page - 1 : 1;
-                                $next_page = $current_page < $total_pages ? $current_page + 1 : $total_pages;
-
-                                // First page button
-                                echo '<li class="page-item"><a class="page-link" href="?page=1">First (1)</a></li>';
-
-                                // Display up to 5 pages before the current page
-                                for ($i = max(1, $current_page - 2); $i <= min($total_pages, $current_page + 2); $i++) {
-                                    $active_class = $i == $current_page ? 'active' : ''; // Add 'active' class for the current page
-                                    echo '<li class="page-item ' . $active_class . '"><a class="page-link" href="?page=' . $i . '">' . $i . '</a></li>';
-                                }
-
-                                // Last page button
-                                echo '<li class="page-item"><a class="page-link" href="?page=' . $total_pages . '">Last (' . $total_pages . ')</a></li>';
-                                ?>
-                                 <!-- Search input for page number -->
-                                    <li class="page-item">
-                                        <form class="form-inline ml-2">
-                                            <input class="form-control form-control-sm" type="text" placeholder="Page" name="page">
-                                            <button class="btn btn-sm btn-outline-secondary" type="submit">Go</button>
-                                        </form>
-                                    </li>
-                                </ul>
-                            </div>
                         </div><!-- /.container-fluid -->
                     </section>
                 </div><!-- /.container-fluid -->
@@ -271,7 +260,7 @@ $result = mysqli_query($conn, $query);
     <script src="assets/adminlte/plugins/jquery-ui/jquery-ui.min.js"></script>
     <!-- Resolve conflict in jQuery UI tooltip with Bootstrap tooltip -->
     <script>
-    $.widget.bridge('uibutton', $.ui.button)
+        $.widget.bridge('uibutton', $.ui.button)
     </script>
     <!-- Bootstrap 4 -->
     <script src="assets/adminlte/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
@@ -297,6 +286,25 @@ $result = mysqli_query($conn, $query);
     <script src="assets/adminlte/dist/js/adminlte.js"></script>
     <!-- AdminLTE dashboard demo (This is only for demo purposes) -->
     <script src="assets/adminlte/dist/js/pages/dashboard.js"></script>
+    <!-- Table with Search  -->
+    <script src="https://cdn.datatables.net/v/bs4/dt-1.13.8/b-2.4.2/b-colvis-2.4.2/b-print-2.4.2/fh-3.4.0/r-2.5.0/rg-1.4.1/sb-1.6.0/sp-2.2.0/datatables.min.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            $('#tableBahan').DataTable({
+                responsive: true,
+                language: {
+                    lengthMenu: 'Tampilkan _MENU_ data per halaman',
+                    zeroRecords: 'Data tidak ditemukan',
+                    info: 'Menampilkan _START_ sampai _END_ dari _TOTAL_ data',
+                    search: 'Cari:',
+                },
+            });
+        });
+    </script>
+
+
+
 </body>
 
 </html>
