@@ -12,41 +12,50 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $namaDevice = $_POST["namaDevice"];
+if(isset($_GET["getDropdownOptions"])) {
+    $queryMasterBahan = "SELECT stok_id, nama FROM masterbahan ORDER BY nama";
+    $resultMasterBahan = $conn->query($queryMasterBahan);
 
-    // Check if the material name already exists
-    $checkQuery = "SELECT COUNT(*) FROM masterkelompok WHERE nama = ?";
+    $options = '<option value="" selected disabled>Pilih Bahan</option>';
+
+    if ($resultMasterBahan->num_rows > 0) {
+        while ($row = $resultMasterBahan->fetch_assoc()) {
+            $options .= '<option value="' . $row['stok_id'] . '">' . $row['nama'] . '</option>';
+        }
+    }
+
+    echo $options;
+} else if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    // Handle the POST request for submitting form data
+    $namaDevice = $_POST["namaDevice"];
+    $namaBahan = $_POST["pilihNamaBahan"];
+    $quantity = $_POST["quantity"];
+
+    // Check if either 'produk' or 'namaBahan' already exists
+    $checkQuery = "SELECT COUNT(*) FROM produksi WHERE produk = ? AND nama_bahan = ?";
     $checkStmt = $conn->prepare($checkQuery);
-    $checkStmt->bind_param("s", $namaDevice);
+    $checkStmt->bind_param("ss", $namaDevice, $namaBahan);
     $checkStmt->execute();
     $checkStmt->bind_result($count);
     $checkStmt->fetch();
     $checkStmt->close();
 
     if ($count > 0) {
-        echo "Error: Material name '$nama' already exists in the database.";
+        echo "Error: Either 'produk' and 'namaBahan' already exist in the database.";
     } else {
         // Insert the new record
-        $query = "INSERT INTO masterkelompok (nama_kelompok) VALUES (?)";
+        $query = "INSERT INTO produksi (produk, nama_bahan, quantity) VALUES (?, ?, ?)";
         $stmt = $conn->prepare($query);
-        $stmt->bind_param("s", $namaDevice);
+        $stmt->bind_param("ssi", $namaDevice, $namaBahan, $quantity);
 
         if ($stmt->execute()) {
-            echo "Data berhasil ditambahkan ke tabel masterkelompok.";
+            echo "Data berhasil ditambahkan ke tabel produksi.";
         } else {
             echo "Error: " . $stmt->error;
         }
 
         $stmt->close();
     }
-}
-// Fetch data from masterkelompok table
-$queryMasterBahan = "SELECT nama FROM masterbahan";
-$resultMasterBahan = $conn->query($queryMasterBahan);
-
-if (!$resultMasterBahan) {
-    die("Error fetching kelompok data: " . $conn->error);
 }
 
 ?>
@@ -279,7 +288,7 @@ if (!$resultMasterBahan) {
                                             <tfoot>
                                                 <tr>
                                                     <td colspan="5" style="text-align: left;">
-                                                        <input type="button" class="btn btn-outline-info btn-block" id="addrow" value="+  Bahan lain" />
+                                                        <input type="button" class="btn btn-outline-info btn-block" id="addrow" value="+  Tambah Bahan" />
                                                     </td>
                                                 </tr>
                                                 <tr>
@@ -333,23 +342,26 @@ if (!$resultMasterBahan) {
             var counter = 0;
 
             $("#addrow").on("click", function() {
-                var dropdownOptions = '<option value="" selected disabled>Pilih Bahan</option>' +
-                    '<option value="1">Resistor</option>' +
-                    '<option value="2">Transistor</option>' +
-                    '<option value="3">Kapasitor</option>' +
-                    '<option value="4">Dioda</option>' +
-                    '<option value="5">Mosfet</option>' +
-                    '<option value="6">Sensor</option>';
-                var newRow = $("<tr>");
-                var cols = "";
+                // Make an AJAX request to fetch dropdown options
+                $.ajax({
+                    url: 'master_device.php?getDropdownOptions=true',
+                    type: 'GET',
+                    success: function(dropdownOptions) {
+                        var newRow = $("<tr>");
+                        var cols = "";
 
-                cols += '<td><select class="form-select" id="pilihNamaBahan ' + counter + '" name="pilihNamaBahan' + counter + '">' + dropdownOptions + '</select></td>';
-                cols += '<td><input type="number" class="form-control" id="quantity ' + counter + '" name="quantity' + counter + '" min="0" value="" placeholder="0"/></td>';
-
-                cols += '<td><input type="button" class="ibtnDel btn btn-md btn-danger"  value="Delete"></td>';
-                newRow.append(cols);
-                $("table.order-list").append(newRow);
-                counter++;
+                        cols += '<td><select class="form-select" id="pilihNamaBahan' + counter + '" name="pilihNamaBahan' + counter + '">' + dropdownOptions + '</select></td>';
+                        cols += '<td><input type="number" class="form-control" id="quantity' + counter + '" name="quantity' + counter + '" min="0" value="" placeholder="0"/></td>';
+                        cols += '<td><input type="button" class="ibtnDel btn btn-md btn-danger"  value="Delete"></td>';
+                        
+                        newRow.append(cols);
+                        $("table.order-list").append(newRow);
+                        counter++;
+                    },
+                    error: function(error) {
+                        console.log("Error fetching dropdown options: " + error);
+                    }
+                });
             });
 
             $("table.order-list").on("click", ".ibtnDel", function(event) {
