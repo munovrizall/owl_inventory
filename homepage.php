@@ -49,11 +49,36 @@ $result = mysqli_query($conn, $query);
   <link rel="stylesheet" href="assets/adminlte/plugins/summernote/summernote-bs4.min.css">
 
   <style>
-    .table-striped .deskripsi-col {
-      max-width: 400px;
+
+    .lebar-kolom1 {
+      width: 10;
+    }
+
+    .lebar-kolom2 {
+      width: 22%;
+    }
+
+    .lebar-kolom3 {
+      width: 5%;
+    }
+
+    .lebar-kolom4 {
+      width: 5%;
+    }
+
+    .lebar-kolom5 {
+      width: 40%;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
+    }
+
+    .lebar-kolom6 {
+      width: 18%;
+    }
+
+    .lebar-kolom7 {
+      width: 5%;
     }
   </style>
 </head>
@@ -237,7 +262,7 @@ $result = mysqli_query($conn, $query);
                 <div class="icon">
                   <i class="ion ion-pie-graph"></i>
                 </div>
-                <a href="#" class="small-box-footer">Go <i class="fas fa-arrow-circle-right"></i></a>
+                <a href="laporan_stok.php" class="small-box-footer">Go <i class="fas fa-arrow-circle-right"></i></a>
               </div>
             </div>
 
@@ -247,7 +272,7 @@ $result = mysqli_query($conn, $query);
 
             <div class="card">
               <div class="card-header">
-                <h3 class="card-title"><b>Histori</b></h3>
+                <h3 class="card-title"><b>Histori Transaksi</b></h3>
               </div>
               <!-- /.card-header -->
               <div class="card-body p-0">
@@ -255,17 +280,19 @@ $result = mysqli_query($conn, $query);
                   <table class="table table-striped">
                     <thead>
                       <tr>
-                        <th class="text-center">User</th>
-                        <th class="text-center">Nama Barang</th>
-                        <th class="text-center">Kuantitas</th>
-                        <th class="text-center">Aktivitas</th>
-                        <th class="text-center">Deskripsi</th>
-                        <th class="text-center">Waktu</th>
+                        <th class="text-center lebar-kolom1">User</th>
+                        <th class="text-center lebar-kolom2">Nama Barang</th>
+                        <th class="text-center lebar-kolom3">Kuantitas</th>
+                        <th class="text-center lebar-kolom4">Aktivitas</th>
+                        <th class="text-center lebar-kolom5">Deskripsi</th>
+                        <th class="text-center lebar-kolom6">Waktu</th>
+                        <th class="text-center lebar-kolom6">Aksi</th>
                       </tr>
                     </thead>
                     <tbody>
                       <?php
                       while ($row = mysqli_fetch_assoc($result)) {
+                        $tanggal = date('H:i d-m-Y', strtotime($row["waktu"]));  
                         // Tentukan kelas badge berdasarkan nilai activity
                         $badgeClass = "";
                         switch ($row["activity"]) {
@@ -277,6 +304,7 @@ $result = mysqli_query($conn, $query);
                             break;
                           case "Maintenance":
                             $badgeClass = "badge bg-danger";
+                            $row["quantity"] = "-" . $row["quantity"];
                             break;
                           default:
                             // Set kelas default jika nilai activity tidak sesuai dengan kasus di atas
@@ -289,15 +317,15 @@ $result = mysqli_query($conn, $query);
                           <td><?php echo $row["stok_id"]; ?></td>
                           <td><?php echo $row["quantity"]; ?></td>
                           <!-- Tambahkan span dengan kelas badge sesuai dengan nilai activity -->
-                          <td><span class="<?php echo $badgeClass; ?>"><?php echo $row["activity"]; ?></span></td>
-                          <td class="deskripsi-col"><?php echo $row["deskripsi"]; ?></td>
-                          <td><?php echo $row["waktu"]; ?></td>
+                          <td style="text-align: center;"><span class="<?php echo $badgeClass; ?>"><?php echo $row["activity"]; ?></span></td>
+                          <td><?php echo $row["deskripsi"]; ?></td>
+                          <td><?php echo $tanggal; ?></td>
+                          <td><input type="button" class="ibtnDel btn btn-md btn-danger"  value="Delete"></td>
                         </tr>
                       <?php
                       }
                       ?>
                     </tbody>
-
                   </table>
                 </div>
                 <!-- /.card-body -->
