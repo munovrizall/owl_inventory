@@ -424,7 +424,14 @@ if (isset($_GET["getDropdownOptions"])) {
                 processData: false,
                 contentType: false,
                 success: function (response) {
-                    // ... existing code ...
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Device berhasil didaftarkan!',
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            location.reload();
+                        }
+                    });
                 },
                 error: function (error) {
                     // ... existing code ...
