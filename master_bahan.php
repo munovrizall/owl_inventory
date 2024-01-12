@@ -283,7 +283,7 @@ if (!$resultKelompok) {
                                         }
                                         ?>
                                     </select>
-                                    <button type="button" class="btn btn-outline-info btn-block" data-toggle="modal" data-target="#modalBuatKelompok" style="margin-top: 10px; max-width: 180px;"><i class="fas fa-plus " style="margin-right: 16px;"></i>Kelompok Baru</button>
+                                    <button type="button" class="btn btn-outline-info btn-block" data-toggle="modal" data-target="#modalBuatKelompok" style="margin-top: 10px; max-width: 180px;">+ Kelompok Baru</button>
                                 </div>
                                 <div class="form-group">
                                     <label for="nama">Nama Bahan <span style="color: red;">*</span></label>
@@ -326,28 +326,24 @@ if (!$resultKelompok) {
 
         <!-- Modal menambahkan kelompok baru -->
         <form id="tambahKelompokForm">
-        <div class="modal fade" id="modalBuatKelompok" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="exampleModalCenterTitle">Buat Kelompok Baru</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="form-group">
-                            <label for="namaKelompokBaru">Nama Kelompok</span></label>
-                            <input type="text" class="form-control form-control-border border-width-2" id="namaKelompokBaru" name="namaKelompokBaru" placeholder="Masukkan nama kelompok yang ingin dibuat">
+            <div class="modal fade" id="modalBuatKelompok" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalCenterTitle">Buat Kelompok Baru</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
                         </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                        <button type="button" class="btn btn-primary" onclick="if(validateFormKB()) { validateSuccessKB(); resetForm(); }">Submit</button>
-                    </div>
-                </div>
-            </div>
-        </div>
+                        <div class="modal-body">
+                            <div class="form-group">
+                                <label for="namaKelompokBaru">Nama Kelompok <span style="color: red;">*</span></label>
+                                <input type="text" class="form-control form-control-border border-width-2" id="namaKelompokBaru" name="namaKelompokBaru" placeholder="Masukkan nama kelompok yang ingin dibuat">
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-primary" onclick="if(validateFormKB()) { validateSuccessKB(); resetForm(); }">Submit</button>
         </form>
     </div>
     <!-- ./wrapper -->
@@ -420,7 +416,7 @@ if (!$resultKelompok) {
 
             return true;
         }
-        
+
         function validateSuccessKB() {
             // Get the form data
             var formDataKB = $("#tambahKelompokForm").serialize();
@@ -433,7 +429,12 @@ if (!$resultKelompok) {
                     Swal.fire({
                         icon: 'success',
                         title: 'Kelompok berhasil didaftarkan!',
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            location.reload();
+                        }
                     });
+
 
                 },
                 error: function(error) {
@@ -443,7 +444,7 @@ if (!$resultKelompok) {
         }
 
         function addNewKelompok() {
-            
+
         }
 
         function resetForm() {
