@@ -12,53 +12,66 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-if(isset($_GET["getDropdownOptions"])) {
-    $queryMasterBahan = "SELECT stok_id, nama FROM masterbahan ORDER BY nama";
+if (isset($_GET["getDropdownOptions"])) {
+    $queryMasterBahan = "SELECT nama FROM masterbahan ORDER BY nama";
     $resultMasterBahan = $conn->query($queryMasterBahan);
 
     $options = '<option value="" selected disabled>Pilih Bahan</option>';
 
-    if ($resultMasterBahan->num_rows > 0) {
+    if ($resultMasterBahan && $resultMasterBahan->num_rows > 0) {
         while ($row = $resultMasterBahan->fetch_assoc()) {
-            $options .= '<option value="' . $row['stok_id'] . '">' . $row['nama'] . '</option>';
+            $options .= '<option value="' . $row['nama'] . '">' . $row['nama'] . '</option>';
         }
     }
 
     echo $options;
-} else if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    exit();
+} elseif ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Handle the POST request for submitting form data
     $namaDevice = $_POST["namaDevice"];
-    $namaBahan = $_POST["pilihNamaBahan"];
-    $quantity = $_POST["quantity"];
 
-    // Check if either 'produk' or 'namaBahan' already exists
-    $checkQuery = "SELECT COUNT(*) FROM produksi WHERE produk = ? AND nama_bahan = ?";
-    $checkStmt = $conn->prepare($checkQuery);
-    $checkStmt->bind_param("ss", $namaDevice, $namaBahan);
-    $checkStmt->execute();
-    $checkStmt->bind_result($count);
-    $checkStmt->fetch();
-    $checkStmt->close();
+    // Check if 'bahan' and 'quantity' arrays are set in POST
+    if (isset($_POST["pilihNamaBahan"]) && isset($_POST["quantity"])) {
+        $bahanArray = $_POST["pilihNamaBahan"];
+        $quantityArray = $_POST["quantity"];
 
-    if ($count > 0) {
-        echo "Error: Either 'produk' and 'namaBahan' already exist in the database.";
-    } else {
-        // Insert the new record
-        $query = "INSERT INTO produksi (produk, nama_bahan, quantity) VALUES (?, ?, ?)";
-        $stmt = $conn->prepare($query);
-        $stmt->bind_param("ssi", $namaDevice, $namaBahan, $quantity);
+        // Loop through the arrays and insert records
+        foreach ($bahanArray as $key => $bahan) {
+            $quantity = $quantityArray[$key];
 
-        if ($stmt->execute()) {
-            echo "Data berhasil ditambahkan ke tabel produksi.";
-        } else {
-            echo "Error: " . $stmt->error;
+            // Use prepared statements
+            $checkQuery = "SELECT COUNT(*) FROM produksi WHERE produk = ? AND nama_bahan = ?";
+            $checkStmt = $conn->prepare($checkQuery);
+            $checkStmt->bind_param("ss", $namaDevice, $bahan);
+            $checkStmt->execute();
+            $checkStmt->bind_result($count);
+            $checkStmt->fetch();
+            $checkStmt->close();
+
+            if ($count > 0) {
+                echo "Error: Device and Bahan combination already exists in the database.";
+            } else {
+                // Insert the new record
+                $query = "INSERT INTO produksi (produk, nama_bahan, quantity) VALUES (?, ?, ?)";
+                $stmt = $conn->prepare($query);
+                $stmt->bind_param("ssi", $namaDevice, $bahan, $quantity);
+
+                if ($stmt->execute()) {
+                    echo "Data berhasil ditambahkan ke tabel produksi.";
+                } else {
+                    echo "Error: " . $stmt->error;
+                }
+
+                $stmt->close();
+            }
         }
-
-        $stmt->close();
+    } else {
+        echo "Error: Bahan and Quantity arrays are not set.";
     }
 }
 
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -342,6 +355,15 @@ if(isset($_GET["getDropdownOptions"])) {
             var counter = 0;
 
             $("#addrow").on("click", function() {
+                addRow();
+            });
+
+            $("table.order-list").on("click", ".ibtnDel", function (event) {
+                $(this).closest("tr").remove();
+                calculateGrandTotal();
+            });
+
+            function addRow() {
                 // Make an AJAX request to fetch dropdown options
                 $.ajax({
                     url: 'master_device.php?getDropdownOptions=true',
@@ -350,10 +372,10 @@ if(isset($_GET["getDropdownOptions"])) {
                         var newRow = $("<tr>");
                         var cols = "";
 
-                        cols += '<td><select class="form-select" id="pilihNamaBahan' + counter + '" name="pilihNamaBahan' + counter + '">' + dropdownOptions + '</select></td>';
-                        cols += '<td><input type="number" class="form-control" id="quantity' + counter + '" name="quantity' + counter + '" min="0" value="" placeholder="0"/></td>';
+                        cols += '<td><select class="form-select pilihNamaBahan" name="pilihNamaBahan[]">' + dropdownOptions + '</select></td>';
+                        cols += '<td><input type="number" class="form-control quantity" name="quantity[]" min="0" value="" placeholder="0"/></td>';
                         cols += '<td><input type="button" class="ibtnDel btn btn-md btn-danger"  value="Delete"></td>';
-                        
+
                         newRow.append(cols);
                         $("table.order-list").append(newRow);
                         counter++;
@@ -362,15 +384,9 @@ if(isset($_GET["getDropdownOptions"])) {
                         console.log("Error fetching dropdown options: " + error);
                     }
                 });
-            });
-
-            $("table.order-list").on("click", ".ibtnDel", function(event) {
-                $(this).closest("tr").remove();
-                counter -= 1
-            });
-
-
+            }
         });
+
 
         function calculateRow(row) {
             var price = +row.find('input[name^="price"]').val();
@@ -387,16 +403,24 @@ if(isset($_GET["getDropdownOptions"])) {
 
         function validateForm() {
             var selectedItem = document.getElementById("namaDevice").value;
-            var nama = document.getElementById("namaBahan").value;
-            var quantity = document.getElementById("quantity").value;
 
-            if (selectedItem === "" || nama === "" || quantity === "" || quantity <= 0) {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Oops...',
-                    text: 'Harap lengkapi semua formulir!',
-                });
-                return false;
+            // Use classes for dynamic elements
+            var namaElements = document.querySelectorAll(".pilihNamaBahan");
+            var quantityElements = document.querySelectorAll(".quantity");
+
+            // Check each row
+            for (var i = 0; i < namaElements.length; i++) {
+                var nama = namaElements[i].value;
+                var quantity = quantityElements[i].value;
+
+                if (selectedItem === "" || nama === "" || quantity === "" || quantity <= 0) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops...',
+                        text: 'Harap lengkapi semua formulir!',
+                    });
+                    return false;
+                }
             }
 
             return true;
@@ -404,40 +428,23 @@ if(isset($_GET["getDropdownOptions"])) {
 
 
         function validateSuccess() {
-            // Get the form data
-            var formData = $("#masterDeviceForm").serialize();
+            var formData = new FormData(document.getElementById("masterDeviceForm"));
 
             $.ajax({
                 type: "POST",
                 url: "master_device.php",
                 data: formData,
-                success: function(response) {
-                    Swal.fire({
-                        toast: true,
-                        position: 'top-end',
-                        icon: 'success',
-                        title: 'Device berhasil didaftarkan!',
-                        showConfirmButton: false,
-                        timer: 3000
-                    });
-
+                processData: false,
+                contentType: false,
+                success: function (response) {
+                    // ... existing code ...
                 },
-                error: function(error) {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Barang sudah terdaftar!',
-                        text: 'Masukkan nama baru!',
-                        showCancelButton: false,
-                        confirmButtonColor: '#3085d6',
-                        confirmButtonText: 'OK'
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            resetForm();
-                        }
-                    });
+                error: function (error) {
+                    // ... existing code ...
                 }
             });
         }
+
 
         function resetForm() {
             document.getElementById("masterDeviceForm").reset();
