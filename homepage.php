@@ -14,9 +14,16 @@ if ($conn->connect_error) {
   die("Connection failed: " . $conn->connect_error);
 }
 
-$query = "SELECT * FROM historis ORDER BY waktu DESC LIMIT 20";
+$query = "SELECT historis.pengguna, historis.waktu, historis.quantity, 
+          historis.activity, historis.deskripsi, masterbahan.nama 
+          FROM historis
+          JOIN masterbahan ON historis.stok_id = masterbahan.stok_id
+          ORDER BY historis.waktu DESC
+          LIMIT 20";
 $result = mysqli_query($conn, $query);
-
+if (!$result) {
+  die('Error in query: ' . mysqli_error($conn));
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -290,41 +297,44 @@ $result = mysqli_query($conn, $query);
                       </tr>
                     </thead>
                     <tbody>
-                      <?php
-                      while ($row = mysqli_fetch_assoc($result)) {
-                        $tanggal = date('H:i d-m-Y', strtotime($row["waktu"]));  
-                        // Tentukan kelas badge berdasarkan nilai activity
-                        $badgeClass = "";
-                        switch ($row["activity"]) {
-                          case "Produksi":
-                            $badgeClass = "badge bg-info";
-                            break;
-                          case "Restock":
-                            $badgeClass = "badge bg-success";
-                            break;
-                          case "Maintenance":
-                            $badgeClass = "badge bg-danger";
-                            $row["quantity"] = "-" . $row["quantity"];
-                            break;
-                          default:
-                            // Set kelas default jika nilai activity tidak sesuai dengan kasus di atas
-                            $badgeClass = "badge bg-secondary";
-                            break;
+                    <?php
+                    if ($result->num_rows > 0) {
+                        while ($row = mysqli_fetch_assoc($result)) {
+                            $tanggal = date('H:i d-m-Y', strtotime($row["waktu"]));
+                            // Tentukan kelas badge berdasarkan nilai activity
+                            $badgeClass = "";
+                            switch ($row["activity"]) {
+                                case "Produksi":
+                                    $badgeClass = "badge bg-info";
+                                    break;
+                                case "Restock":
+                                    $badgeClass = "badge bg-success";
+                                    break;
+                                case "Maintenance":
+                                    $badgeClass = "badge bg-danger";
+                                    $row["quantity"] = "-" . $row["quantity"];
+                                    break;
+                                default:
+                                    // Set kelas default jika nilai activity tidak sesuai dengan kasus di atas
+                                    $badgeClass = "badge bg-secondary";
+                                    break;
+                            }
+                    ?>
+                            <tr>
+                                <td><?php echo $row["pengguna"]; ?></td>
+                                <td><?php echo $row["nama"]; ?></td>
+                                <td><?php echo $row["quantity"]; ?></td>
+                                <td style="text-align: center;"><span class="<?php echo $badgeClass; ?>"><?php echo $row["activity"]; ?></span></td>
+                                <td><?php echo $row["deskripsi"]; ?></td>
+                                <td><?php echo $tanggal; ?></td>
+                                <td><input type="button" class="ibtnDel btn btn-md btn-danger" value="Delete"></td>
+                            </tr>
+                    <?php
                         }
-                      ?>
-                        <tr>
-                          <td><?php echo $row["pengguna"]; ?></td>
-                          <td><?php echo $row["stok_id"]; ?></td>
-                          <td><?php echo $row["quantity"]; ?></td>
-                          <!-- Tambahkan span dengan kelas badge sesuai dengan nilai activity -->
-                          <td style="text-align: center;"><span class="<?php echo $badgeClass; ?>"><?php echo $row["activity"]; ?></span></td>
-                          <td><?php echo $row["deskripsi"]; ?></td>
-                          <td><?php echo $tanggal; ?></td>
-                          <td><input type="button" class="ibtnDel btn btn-md btn-danger"  value="Delete"></td>
-                        </tr>
-                      <?php
-                      }
-                      ?>
+                    } else {
+                        echo "No rows found in the result set.";
+                    }
+                    ?>
                     </tbody>
                   </table>
                 </div>
