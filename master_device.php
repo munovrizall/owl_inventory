@@ -12,7 +12,7 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-if(isset($_GET["getDropdownOptions"])) {
+if (isset($_GET["getDropdownOptions"])) {
     $queryMasterBahan = "SELECT stok_id, nama FROM masterbahan ORDER BY nama";
     $resultMasterBahan = $conn->query($queryMasterBahan);
 
@@ -23,8 +23,8 @@ if(isset($_GET["getDropdownOptions"])) {
             $options .= '<option value="' . $row['stok_id'] . '">' . $row['nama'] . '</option>';
         }
     }
-
     echo $options;
+    exit();
 } else if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Handle the POST request for submitting form data
     $namaDevice = $_POST["namaDevice"];
@@ -267,22 +267,7 @@ if(isset($_GET["getDropdownOptions"])) {
                                             </thead>
                                             <tbody>
                                                 <tr>
-                                                    <!-- <td class="col-sm-8">
-                                                        <select class="form-select" id="pilihNamaBahan" name="bahan">
-                                                            <option value="">Pilih Kelompok</option>
-                                                            <option value="1">Resistor</option>
-                                                            <option value="2">Transistor</option>
-                                                            <option value="3">Kapasitor</option>
-                                                            <option value="4">Dioda</option>
-                                                            <option value="5">Mosfet</option>
-                                                            <option value="6">Sensor</option>
-                                                        </select>
-                                                    </td>
-                                                    <td class="col-sm-4">
-                                                        <input type="number" class="form-control" id="quantity" name="quantity" min="0" value="" placeholder="Jumlah bahan">
-                                                    </td>
-                                                    <td class="col-sm-2"><a class="deleteRow"></a>
-                                                    </td> -->
+
                                                 </tr>
                                             </tbody>
                                             <tfoot>
@@ -290,8 +275,6 @@ if(isset($_GET["getDropdownOptions"])) {
                                                     <td colspan="5" style="text-align: left;">
                                                         <input type="button" class="btn btn-outline-info btn-block" id="addrow" value="+  Tambah Bahan" />
                                                     </td>
-                                                </tr>
-                                                <tr>
                                                 </tr>
                                             </tfoot>
                                         </table>
@@ -342,18 +325,29 @@ if(isset($_GET["getDropdownOptions"])) {
             var counter = 0;
 
             $("#addrow").on("click", function() {
+                addNewRow();
+            });
+
+            $("table.order-list").on("click", ".ibtnDel", function(event) {
+                $(this).closest("tr").remove();
+                counter -= 1;
+                calculateGrandTotal();
+            });
+
+            function addNewRow() {
                 // Make an AJAX request to fetch dropdown options
                 $.ajax({
-                    url: 'master_device.php?getDropdownOptions=true',
+                    url: 'master_device.php?getDropdownOptions',
                     type: 'GET',
                     success: function(dropdownOptions) {
+
                         var newRow = $("<tr>");
                         var cols = "";
 
                         cols += '<td><select class="form-select" id="pilihNamaBahan' + counter + '" name="pilihNamaBahan' + counter + '">' + dropdownOptions + '</select></td>';
                         cols += '<td><input type="number" class="form-control" id="quantity' + counter + '" name="quantity' + counter + '" min="0" value="" placeholder="0"/></td>';
                         cols += '<td><input type="button" class="ibtnDel btn btn-md btn-danger"  value="Delete"></td>';
-                        
+
                         newRow.append(cols);
                         $("table.order-list").append(newRow);
                         counter++;
@@ -362,28 +356,16 @@ if(isset($_GET["getDropdownOptions"])) {
                         console.log("Error fetching dropdown options: " + error);
                     }
                 });
-            });
+            }
 
-            $("table.order-list").on("click", ".ibtnDel", function(event) {
-                $(this).closest("tr").remove();
-                counter -= 1
-            });
-
-
+            function calculateGrandTotal() {
+                var grandTotal = 0;
+                $("table.order-list").find('input[name^="price"]').each(function() {
+                    grandTotal += +$(this).val();
+                });
+                $("#grandtotal").text(grandTotal.toFixed(2));
+            }
         });
-
-        function calculateRow(row) {
-            var price = +row.find('input[name^="price"]').val();
-        }
-
-        function calculateGrandTotal() {
-            var grandTotal = 0;
-            $("table.order-list").find('input[name^="price"]').each(function() {
-                grandTotal += +$(this).val();
-            });
-            $("#grandtotal").text(grandTotal.toFixed(2));
-        }
-
 
         function validateForm() {
             var selectedItem = document.getElementById("namaDevice").value;
@@ -456,12 +438,6 @@ if(isset($_GET["getDropdownOptions"])) {
             // memicu event change 
             dropdown.dispatchEvent(new Event('change'));
         }
-
-        // Searchable dropdown
-        var select_box_element = document.querySelector('#pilihNamaBahan');
-        dselect(select_box_element, {
-            search: false,
-        });
     </script>
 </body>
 
