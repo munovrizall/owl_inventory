@@ -69,11 +69,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <input type="password" class="form-control" placeholder="Password" id="passwordInput" onkeypress="checkEnter(event)">
             <div class="input-group-append">
               <div class="input-group-text">
-                <span class="fas fa-lock"></span>
+                <span id="togglePassword" onclick="togglePasswordVisibility()" style="cursor: pointer;">
+                  <i class="fas fa-eye"></i>
+                </span>
               </div>
             </div>
           </div>
-          <button type="button" class="btn btn-primary btn-block" onclick="performLogin()">Sign In</button>
+          <button type="button" id="buttonSubmit" class="btn btn-primary btn-block" onclick="performLogin()">Sign In</button>
         </form>
       </div>
       <!-- /.card-body -->
@@ -127,20 +129,58 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             icon: 'error',
             title: 'Password Salah',
             text: 'Masukkan password yang benar!',
+            showCancelButton: false,
+            confirmButtonColor: '#3085d6',
+            confirmButtonText: 'OK (enter)'
+          }).then((result) => {
+            if (result.isConfirmed) {
+              resetForm();
+            }
           });
-          resetForm();
         }
       } else {
         Swal.fire({
           icon: 'error',
           title: 'Username Kosong',
           text: 'Pilih username terlebih dahulu!',
+          showCancelButton: false,
+          confirmButtonColor: '#3085d6',
+          confirmButtonText: 'OK (enter)'
+        }).then((result) => {
+          if (result.isConfirmed) {
+            resetForm();
+          }
         });
       }
     }
 
     function resetForm() {
       document.getElementById("loginForm").reset();
+    }
+
+    // When user press enter on keyboard
+    var passwordInput = document.getElementById('passwordInput');
+    passwordInput.addEventListener('keyup', function(event) {
+      if (event.keyCode === 13) {
+        submitForm();
+      }
+    });
+
+    function submitForm() {
+      document.getElementById('submitButton').click();
+    }
+
+    function togglePasswordVisibility() {
+      var passwordInput = document.getElementById('passwordInput');
+      var togglePassword = document.getElementById('togglePassword');
+
+      if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
+        togglePassword.innerHTML = '<i class="fas fa-eye-slash"></i>';
+      } else {
+        passwordInput.type = 'password';
+        togglePassword.innerHTML = '<i class="fas fa-eye"></i>';
+      }
     }
   </script>
 </body>
