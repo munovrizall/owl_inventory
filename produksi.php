@@ -70,6 +70,7 @@ if (isset($_POST['quantity'])) {
 
         // Update the database with the new stock quantity
         $newStock = $currentStock - ($submittedQuantity * $stokDibutuhkan);
+        $updatedStockQuantities[] = array('namaBahan' => $namaBahan, 'stokDibutuhkan' => $stokDibutuhkan, 'currentStock' => $currentStock, 'newStock' => $newStock);
 
         if ($newStock < 0) {
             echo json_encode(array('error' => 'Stok bahan tidak mencukupi untuk keperluan produksi.'));
@@ -82,8 +83,6 @@ if (isset($_POST['quantity'])) {
         $updateStmt->execute();
         $updateStmt->close();
 
-        // Store the updated stock quantities in the array
-        $updatedStockQuantities[] = array('namaBahan' => $namaBahan, 'stokDibutuhkan' => $stokDibutuhkan, 'currentStock' => $currentStock, 'newStock' => $newStock);
     }
 
     // Return the updated stock quantities
@@ -91,7 +90,7 @@ if (isset($_POST['quantity'])) {
     echo json_encode($responseArray);
     exit();
 }
-?>
+?> 
 
 <!DOCTYPE html>
 <html lang="en">
@@ -415,7 +414,7 @@ if (isset($_POST['quantity'])) {
                         var newRow = "<tr>" +
                             "<td>" + (i + 1) + "</td>" +
                             "<td>" + response.resultProduksi[i].namaBahan + "</td>" +
-                            "<td>" + response.resultProduksi[i].stokDibutuhkan + "</td>" +
+                            "<td>" + response.resultProduksi[i].stokDibutuhkan * quantity + "</td>" +
                             "<td>" + response.updatedStockQuantities[i].currentStock + "</td>" +
                             "<td>" + (response.updatedStockQuantities[i].currentStock >= (quantity * response.resultProduksi[i].stokDibutuhkan) ? "Ya" : "Tidak") + "</td>" +
                             "</tr>";
