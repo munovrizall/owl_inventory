@@ -70,19 +70,13 @@ if (isset($_POST['quantity'])) {
 
         // Update the database with the new stock quantity
         $newStock = $currentStock - ($submittedQuantity * $stokDibutuhkan);
-        $updatedStockQuantities[] = array('namaBahan' => $namaBahan, 'stokDibutuhkan' => $stokDibutuhkan, 'currentStock' => $currentStock, 'newStock' => $newStock);
-
         if ($newStock < 0) {
             echo json_encode(array('error' => 'Stok bahan tidak mencukupi untuk keperluan produksi.'));
             exit();
         }
 
-        $updateQueryStock = "UPDATE masterbahan SET quantity = ? WHERE nama = ?";
-        $updateStmt = $conn->prepare($updateQueryStock);
-        $updateStmt->bind_param("is", $newStock, $namaBahan);
-        $updateStmt->execute();
-        $updateStmt->close();
-
+        // Store the updated stock quantities in the array
+        $updatedStockQuantities[] = array('namaBahan' => $namaBahan, 'stokDibutuhkan' => $stokDibutuhkan, 'currentStock' => $currentStock, 'newStock' => $newStock);
     }
 
     // Return the updated stock quantities
@@ -90,6 +84,13 @@ if (isset($_POST['quantity'])) {
     echo json_encode($responseArray);
     exit();
 }
+
+$updateQueryStock = "UPDATE masterbahan SET quantity = ? WHERE nama = ?";
+$updateStmt = $conn->prepare($updateQueryStock);
+$updateStmt->bind_param("is", $newStock, $namaBahan);
+$updateStmt->execute();
+$updateStmt->close();
+
 ?> 
 
 <!DOCTYPE html>
@@ -326,7 +327,7 @@ if (isset($_POST['quantity'])) {
                             <!-- /.card-body -->
                         </form>
                         <div class="card-footer d-flex justify-content-end">
-                            <button type="submit" class="btn btn-primary" onclick="validateSuccess()">Submit</button>
+                            <button type="submit" class="btn btn-primary" onclick="submitForm()">Submit</button>
                         </div>
                     </div>
                     <!-- general form elements -->
@@ -446,6 +447,33 @@ if (isset($_POST['quantity'])) {
             quantityInput.placeholder = "Masukkan jumlah produksi device";
             quantityInput.disabled = false;
         });
+        function submitForm() {
+            // You can add any additional validation here before submitting the form
+
+            // Assuming validateForm() is the function you want to call for validation
+            if (validateForm()) {
+                document.getElementById("produksiForm").submit();
+            } else {
+                alert("Validation failed. Please check your input.");
+            }
+        }
+
+        function validateForm() {
+            // Add your validation logic here
+            // Return true if the form is valid, false otherwise
+            var selectedDevice = document.getElementById("pilihProduksiDevice").value;
+            var quantity = document.getElementById("quantity").value;
+
+            // Example validation: Check if the selected device and quantity are not empty
+            if (selectedDevice === "" || quantity === "") {
+                alert("Please fill in all required fields.");
+                return false;
+            }
+
+            // Add more validation as needed...
+
+            return true; // If all validations pass
+        }
     </script>
 
 </body>
