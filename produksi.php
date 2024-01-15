@@ -16,7 +16,7 @@ if ($conn->connect_error) {
 }
 
 $resultProduksi = "";
-$stokDibutuhkan = ""; // Default value, replace it with the actual stock quantity based on the selected item from the database
+$stokDibutuhkan = "";
 $currentStock = "";
 
 // Fetch data from produksi table
@@ -37,6 +37,7 @@ if (isset($_POST['selectedDevice'])) {
     while ($stmt->fetch()) {
         $resultProduksi[] = array('namaBahan' => $namaBahan, 'stokDibutuhkan' => $stokDibutuhkan);
     }
+    $stmt->close();
 }
 
 if (isset($_POST['quantity'])) {
@@ -50,7 +51,9 @@ if (isset($_POST['quantity'])) {
         exit();
     }
 
-    // Rest of your code for handling quantity and updating stock
+    // Initialize the array to store updated stock quantities
+    $updatedStockQuantities = array();
+
     // Loop through $resultProduksi and update stock accordingly
     foreach ($resultProduksi as $row) {
         $namaBahan = $row['namaBahan'];
@@ -67,9 +70,10 @@ if (isset($_POST['quantity'])) {
 
         // Update the database with the new stock quantity
         $newStock = $currentStock - ($submittedQuantity * $stokDibutuhkan);
+        $updatedStockQuantities[] = array('namaBahan' => $namaBahan, 'stokDibutuhkan' => $stokDibutuhkan, 'currentStock' => $currentStock, 'newStock' => $newStock);
 
         if ($newStock < 0) {
-            echo "Stok bahan tidak mencukupi untuk keperluan produksi.";
+            echo json_encode(array('error' => 'Stok bahan tidak mencukupi untuk keperluan produksi.'));
             exit();
         }
 
@@ -79,16 +83,14 @@ if (isset($_POST['quantity'])) {
         $updateStmt->execute();
         $updateStmt->close();
 
-        // You might want to store the updated stock quantities in an array for further use
-        $updatedStockQuantities[] = array('currentStock' => $currentStock, 'newStock' => $newStock);
     }
 
     // Return the updated stock quantities
-    echo json_encode($updatedStockQuantities);
+    $responseArray = array('resultProduksi' => $resultProduksi, 'updatedStockQuantities' => $updatedStockQuantities);
+    echo json_encode($responseArray);
     exit();
 }
-
-?>
+?> 
 
 <!DOCTYPE html>
 <html lang="en">
@@ -287,7 +289,9 @@ if (isset($_POST['quantity'])) {
                                         <!-- Input untuk kuantitas -->
                                         <input type="number" class="form-control" id="quantity" name="quantity" min="0" value="">
                                     </div>
-                                    <button type="button" class="btn btn-outline-info btn-block" style="margin-top: 10px; max-width: 180px;"><i class="fas fa-sync-alt" style="margin-right: 8px;"></i>Cek</button>
+                                    <button type="button" class="btn btn-outline-info btn-block" id ="cekButton" name="cekButton" 
+                                    style="margin-top: 10px; max-width: 180px;"><i class="fas fa-sync-alt" style="margin-right: 8px;" 
+                                    onclick="cekProduksi()"></i>Cek</button>
                                 </div>
                                 <div class="card">
                                     <div class="card-header">
@@ -354,8 +358,9 @@ if (isset($_POST['quantity'])) {
     <script src="assets/bootstrap-5/bootstrap.bundle.min.js"></script>
     <script src="assets/dselect.js"></script>
     <!-- Page specific script -->
+    <!-- Page specific script -->
     <script>
-        $(function() {
+        $(function () {
             bsCustomFileInput.init();
 
             // Searchable dropdown
@@ -364,59 +369,69 @@ if (isset($_POST['quantity'])) {
                 search: true,
             });
 
-            // Event listener for dropdown change
-            document.getElementById("pilihProduksiDevice").addEventListener("change", function() {
-                updateProduksiTable(this.value);
+            // Event listener for "Cek" button click
+            document.getElementById("cekButton").addEventListener("click", function () {
+                console.log("Cek button clicked"); // Debugging statement
+                cekProduksi();
             });
-
-            // Initial state on page load
-            var selectedDeviceOnLoad = document.getElementById("pilihProduksiDevice").value;
-            if (selectedDeviceOnLoad !== "") {
-                updateProduksiTable(selectedDeviceOnLoad);
-            }
         });
 
-        function updateProduksiTable(selectedDevice) {
+        function cekProduksi() {
+            console.log("Inside cekProduksi function"); // Debugging statement
+            var selectedDevice = document.getElementById("pilihProduksiDevice").value;
+            var quantity = document.getElementById("quantity").value;
+
+            // Check if a device is selected
+            if (selectedDevice === "") {
+                alert("Pilih produk terlebih dahulu.");
+                return;
+            }
+            // Check if quantity is provided
+            if (quantity === "") {
+                alert("Masukkan jumlah produksi device.");
+                return;
+            }
+            // Fetch and update the table
             $.ajax({
                 type: "POST",
                 url: "produksi.php",
                 data: {
-                    selectedDevice: selectedDevice
+                    selectedDevice: selectedDevice,
+                    quantity: quantity
                 },
                 dataType: "json",
-                success: function(response) {
-                    if ('error' in response) {
-                        // Handle error
-                        console.error(response.error);
-                    } else {
-                        // Update table rows dynamically
-                        var tableBody = document.getElementById("produksiTable");
-                        tableBody.innerHTML = ""; // Clear existing rows
-
-                        // Add new rows based on the response array
-                        for (var i = 0; i < response.length; i++) {
-                            var newRow = "<tr>" +
-                                "<td>" + (i + 1) + "</td>" +
-                                "<td>" + response[i].namaBahan + "</td>" +
-                                "<td>" + response[i].stokDibutuhkan + "</td>" +
-                                "<td>" + response[i].currentStock + "</td>" +
-                                "<td>" + (response[i].currentStock >= (response[i].submittedQuantity * response[i].stokDibutuhkan) ? "Ya" : "Tidak") + "</td>" +
-                                "</tr>";
-                            tableBody.innerHTML += newRow;
-                        }
+                success: function (response) {
+                    console.log("AJAX request successful"); // Debugging statement
+                    if (response.resultProduksi.length === 0) {
+                        alert("Tidak ada data produksi untuk produk yang dipilih.");
+                        return;
                     }
+                    // Update table rows dynamically
+                    var tableBody = document.getElementById("produksiTable");
+                    tableBody.innerHTML = ""; // Clear existing rows
+                    // Add new rows based on the response array
+                    for (var i = 0; i < response.resultProduksi.length; i++) {
+                        var newRow = "<tr>" +
+                            "<td>" + (i + 1) + "</td>" +
+                            "<td>" + response.resultProduksi[i].namaBahan + "</td>" +
+                            "<td>" + response.resultProduksi[i].stokDibutuhkan * quantity + "</td>" +
+                            "<td>" + response.updatedStockQuantities[i].currentStock + "</td>" +
+                            "<td>" + (response.updatedStockQuantities[i].currentStock >= (quantity * response.resultProduksi[i].stokDibutuhkan) ? "Ya" : "Tidak") + "</td>" +
+                            "</tr>";
+                        tableBody.innerHTML += newRow;
+                    }
+
                     // Show the table
-                    document.getElementById("produksiTable").style.display = "table";
+                    tableBody.style.display = "table";
                 },
-                error: function(error) {
-                    // Handle error
+                error: function (error) {
                     console.error("Error fetching produksi data:", error);
                 }
             });
         }
 
         // Quantity input disabled to prevent bugs
-        document.addEventListener("DOMContentLoaded", function() {
+        document.addEventListener("DOMContentLoaded", function () {
             disableQuantityInput();
         });
 
@@ -426,12 +441,13 @@ if (isset($_POST['quantity'])) {
             quantityInput.disabled = true;
         }
 
-        $("#pilihProduksiDevice").change(function() {
+        $("#pilihProduksiDevice").change(function () {
             const quantityInput = document.getElementById("quantity");
             quantityInput.placeholder = "Masukkan jumlah produksi device";
             quantityInput.disabled = false;
         });
     </script>
+
 </body>
 
 </html>
