@@ -15,52 +15,77 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-$result = "";
-$stockQuantity = ""; // Default value, replace it with the actual stock quantity based on the selected item from the database
-$newStockQuantity = "";
+$resultProduksi = "";
+$stokDibutuhkan = ""; // Default value, replace it with the actual stock quantity based on the selected item from the database
+$currentStock = "";
 
 // Fetch data from produksi table
 $queryProdukPilihan = "SELECT DISTINCT produk FROM produksi ORDER BY produk";
 $resultProdukPilihan = $conn->query($queryProdukPilihan);
 
+if (isset($_POST['selectedDevice'])) {
+    $selectedDeviceName = $_POST['selectedDevice'];
+    $pengguna = isset($_SESSION['username']) ? $_SESSION['username'] : '';
+
+    // Milih bahan untuk produksi
+    $query = "SELECT nama_bahan, quantity FROM produksi WHERE produk = ?";
+    $stmt = $conn->prepare($query);
+    $stmt->bind_param("s", $selectedDeviceName);
+    $stmt->execute();
+    $stmt->bind_result($namaBahan, $stokDibutuhkan);
+    $resultProduksi = array();
+    while ($stmt->fetch()) {
+        $resultProduksi[] = array('namaBahan' => $namaBahan, 'stokDibutuhkan' => $stokDibutuhkan);
+    }
+}
+
 if (isset($_POST['quantity'])) {
-  $selectedDeviceName = $_POST['selectedDevice'];
+    $submittedQuantity = $_POST['quantity'];
 
-  // Fetch the username from the POST data
-  $pengguna = isset($_SESSION['username']) ? $_SESSION['username'] : '';
+    if ($submittedQuantity == "") {
+        echo json_encode(array('error' => 'Quantity is required.'));
+        exit();
+    } elseif ($submittedQuantity <= 0) {
+        echo json_encode(array('error' => 'Quantity must be greater than 0.'));
+        exit();
+    }
 
-  // Fetch the stock quantity from the database based on the selected item
-  $query = "SELECT * FROM produksi WHERE produk = '$selectedDeviceName'";
-  $result = $conn->query($query);
-  $row = $result->fetch_assoc();
-  $stockQuantity = $row['quantity'];
+    // Rest of your code for handling quantity and updating stock
+    // Loop through $resultProduksi and update stock accordingly
+    foreach ($resultProduksi as $row) {
+        $namaBahan = $row['namaBahan'];
+        $stokDibutuhkan = $row['stokDibutuhkan'];
 
-  $submittedQuantity = $_POST['quantity'];
-  if ($submittedQuantity == "") {
-      echo json_encode(array('currentStock' => $stockQuantity, 'newStock' => $newStockQuantity));
-      exit();
-  } elseif ($submittedQuantity <= 0) {
-      echo "Kuantitas yang dimasukkan harus lebih besar dari 0";
-      exit();
-  }
+        // Fetch current stock from masterbahan
+        $queryCurrentStock = "SELECT quantity FROM masterbahan WHERE nama = ?";
+        $stmtCurrentStock = $conn->prepare($queryCurrentStock);
+        $stmtCurrentStock->bind_param("s", $namaBahan);
+        $stmtCurrentStock->execute();
+        $stmtCurrentStock->bind_result($currentStock);
+        $stmtCurrentStock->fetch();
+        $stmtCurrentStock->close();
 
-  // Update the database with the new stock quantity
-  $newStockQuantity = $stockQuantity - $submittedQuantity;
+        // Update the database with the new stock quantity
+        $newStock = $currentStock - ($submittedQuantity * $stokDibutuhkan);
 
-  if ($newStockQuantity < 0) {
-      echo "Stok bahan tidak mencukupi untuk keperluan produksi.";
-      exit();
-  }
+        if ($newStock < 0) {
+            echo "Stok bahan tidak mencukupi untuk keperluan produksi.";
+            exit();
+        }
 
-  $updateQueryStock = "UPDATE masterbahan SET quantity = ? WHERE nama = ?";
-  $updateStmt = $conn->prepare($updateQueryStock);
-  $updateStmt->bind_param("is", $newStockQuantity, $selectedDeviceName);
-  $updateStmt->execute();
-  $updateStmt->close();
+        $updateQueryStock = "UPDATE masterbahan SET quantity = ? WHERE nama = ?";
+        $updateStmt = $conn->prepare($updateQueryStock);
+        $updateStmt->bind_param("is", $newStock, $namaBahan);
+        $updateStmt->execute();
+        $updateStmt->close();
 
-  // Return the updated stock quantity
-  echo json_encode(array('currentStock' => $stockQuantity, 'newStock' => $newStockQuantity));
-  exit();
+        // You might want to store the updated stock quantities in an array for further use
+        $updatedStockQuantities[] = array('currentStock' => $currentStock, 'newStock' => $newStock);
+    }
+
+    // Return the updated stock quantities
+    echo json_encode($updatedStockQuantities);
+    exit();
 }
 
 ?>
@@ -239,7 +264,7 @@ if (isset($_POST['quantity'])) {
                         </div>
                         <!-- /.card-header -->
                         <!-- form start -->
-                        <form id="produksiForm">
+                        <form id="produksiForm" onsubmit="return validateForm()">
                             <div class="card-body">
                                 <div class="form-group">
                                     <label for="exampleSelectBorderWidth2">Pilih Device <span
@@ -279,20 +304,7 @@ if (isset($_POST['quantity'])) {
                                                     </tr>
                                                 </thead>
                                                 <tbody id="produksiTable">
-                                                    <?php
-                                                    // Check if $result is not a string before using fetch_assoc
-                                                    $counter = 1;
-                                                    while ($row = $result->fetch_assoc()) {
-                                                        ?>
-                                                        <tr>
-                                                            <td><?php echo $counter++; ?></td>
-                                                            <td><?php echo $row['nama_bahan']; ?></td>
-                                                            <td><?php echo $row['quantity']; ?></td>
-                                                            <td><?php echo $row['quantity']; ?></td>
-                                                        </tr>
-                                                    <?php
-                                                    }
-                                                    ?>
+                                                    
                                                 </tbody>
                                             </table>
                                         </div>
@@ -308,7 +320,7 @@ if (isset($_POST['quantity'])) {
                             <!-- /.card-body -->
                         </form>
                         <div class="card-footer d-flex justify-content-end">
-                            <button type="submit" class="btn btn-primary">Submit</button>
+                            <button type="submit" class="btn btn-primary" onclick="validateSuccess()">Submit</button>
                         </div>
                     </div>
                     <!-- general form elements -->
@@ -341,7 +353,7 @@ if (isset($_POST['quantity'])) {
     <script src="assets/dselect.js"></script>
     <!-- Page specific script -->
     <script>
-        $(function () {
+         $(function () {
             bsCustomFileInput.init();
 
             // Searchable dropdown
@@ -350,81 +362,54 @@ if (isset($_POST['quantity'])) {
                 search: true,
             });
 
-            // Function to handle table visibility
-            function toggleTableVisibility() {
-                var selectedDevice = document.getElementById("pilihProduksiDevice").value;
-                var table = document.getElementById("produksiTable");
-
-                // If a device is selected, show the table; otherwise, hide it
-                if (selectedDevice !== "") {
-                    table.style.display = "block";
-                } else {
-                    table.style.display = "none";
-                }
-            }
-
             // Event listener for dropdown change
             document.getElementById("pilihProduksiDevice").addEventListener("change", function () {
-                toggleTableVisibility();
+                updateProduksiTable(this.value);
             });
 
             // Initial state on page load
-            toggleTableVisibility();
+            var selectedDeviceOnLoad = document.getElementById("pilihProduksiDevice").value;
+            if (selectedDeviceOnLoad !== "") {
+                updateProduksiTable(selectedDeviceOnLoad);
+            }
         });
 
-        function validateForm() {
-            var selectedDevice = document.getElementById("pilihProduksiDevice").value;
-            var quantity = document.getElementById("quantity").value;
-
-            if (selectedDevice === "" || quantity === "" || quantity <= 0) {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Oops...',
-                    text: 'Harap lengkapi semua formulir!',
-                });
-                return false;
-            }
-
-            return true;
-        }
-
-        function validateSuccess() {
-            // Get the form data
-            var formData = $("#produksiForm").serialize();
-
-            // Use AJAX to submit the form data and fetch the updated stock quantity
+        function updateProduksiTable(selectedDevice) {
             $.ajax({
                 type: "POST",
                 url: "produksi.php",
-                data: formData,
+                data: { selectedDevice: selectedDevice },
                 dataType: "json",
-                success: function(response) {
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Stok berhasil diambil!',
-                        text: 'Stok terbaru adalah ' + response.newStock + ' bahan'
-                    });
+                success: function (response) {
+                    if ('error' in response) {
+                        // Handle error
+                        console.error(response.error);
+                    } else {
+                        // Update table rows dynamically
+                        var tableBody = document.getElementById("produksiTable");
+                        tableBody.innerHTML = ""; // Clear existing rows
 
-                    resetForm();
-
-                },
-                error: function(error) {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Stok Kurang',
-                        text: 'Silahkan restock atau pilih produk lain!',
-                        showCancelButton: false,
-                        confirmButtonColor: '#3085d6',
-                        confirmButtonText: 'OK'
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            resetForm();
+                        // Add new rows based on the response array
+                        for (var i = 0; i < response.length; i++) {
+                            var newRow = "<tr>" +
+                                "<td>" + (i + 1) + "</td>" +
+                                "<td>" + response[i].namaBahan + "</td>" +
+                                "<td>" + response[i].stokDibutuhkan + "</td>" +
+                                "<td>" + response[i].currentStock + "</td>" +
+                                "<td>" + (response[i].currentStock >= (response[i].submittedQuantity * response[i].stokDibutuhkan) ? "Ya" : "Tidak") + "</td>" +
+                                "</tr>";
+                            tableBody.innerHTML += newRow;
                         }
-                    });
+                    }
+                    // Show the table
+                    document.getElementById("produksiTable").style.display = "table";
+                },
+                error: function (error) {
+                    // Handle error
+                    console.error("Error fetching produksi data:", error);
                 }
             });
         }
-
     </script>
 </body>
 
