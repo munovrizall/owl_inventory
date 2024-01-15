@@ -33,49 +33,58 @@ if (isset($_POST['selectedDevice'])) {
     $stmt->bind_param("s", $selectedDeviceName);
     $stmt->execute();
     $stmt->bind_result($namaBahan, $stokDibutuhkan);
-    if ($stmt->fetch()) {
-        echo json_encode(array('namaBahan' => $namaBahan, 'stokDibutuhkan' => $stokDibutuhkan));
-    } else {
-        echo json_encode(array('error' => 'No records found'));
+    $resultProduksi = array();
+    while ($stmt->fetch()) {
+        $resultProduksi[] = array('namaBahan' => $namaBahan, 'stokDibutuhkan' => $stokDibutuhkan);
     }
-    
-    $stmt->close();
-    
+}
 
+if (isset($_POST['quantity'])) {
     $submittedQuantity = $_POST['quantity'];
+
     if ($submittedQuantity == "") {
-        echo json_encode(array('namaBahan' => $namaBahan, 'stokDibutuhkan' => $stokDibutuhkan, 'currentStock' => $currentStock));
+        echo json_encode(array('error' => 'Quantity is required.'));
         exit();
     } elseif ($submittedQuantity <= 0) {
-        echo "Kuantitas yang dimasukkan harus lebih besar dari 0";
+        echo json_encode(array('error' => 'Quantity must be greater than 0.'));
         exit();
     }
 
-    // Fetch current stock from masterbahan
-    $queryCurrentStock = "SELECT quantity FROM masterbahan WHERE nama = ?";
-    $stmtCurrentStock = $conn->prepare($queryCurrentStock);
-    $stmtCurrentStock->bind_param("s", $namaBahan);
-    $stmtCurrentStock->execute();
-    $stmtCurrentStock->bind_result($currentStock);
-    $stmtCurrentStock->fetch();
-    $stmtCurrentStock->close();
+    // Rest of your code for handling quantity and updating stock
+    // Loop through $resultProduksi and update stock accordingly
+    foreach ($resultProduksi as $row) {
+        $namaBahan = $row['namaBahan'];
+        $stokDibutuhkan = $row['stokDibutuhkan'];
 
-    // Update the database with the new stock quantity
-    $newStock = $currentStock - ($submittedQuantity * $stokDibutuhkan);
+        // Fetch current stock from masterbahan
+        $queryCurrentStock = "SELECT quantity FROM masterbahan WHERE nama = ?";
+        $stmtCurrentStock = $conn->prepare($queryCurrentStock);
+        $stmtCurrentStock->bind_param("s", $namaBahan);
+        $stmtCurrentStock->execute();
+        $stmtCurrentStock->bind_result($currentStock);
+        $stmtCurrentStock->fetch();
+        $stmtCurrentStock->close();
 
-    if ($newStock < 0) {
-        echo "Stok bahan tidak mencukupi untuk keperluan produksi.";
-        exit();
+        // Update the database with the new stock quantity
+        $newStock = $currentStock - ($submittedQuantity * $stokDibutuhkan);
+
+        if ($newStock < 0) {
+            echo "Stok bahan tidak mencukupi untuk keperluan produksi.";
+            exit();
+        }
+
+        $updateQueryStock = "UPDATE masterbahan SET quantity = ? WHERE nama = ?";
+        $updateStmt = $conn->prepare($updateQueryStock);
+        $updateStmt->bind_param("is", $newStock, $namaBahan);
+        $updateStmt->execute();
+        $updateStmt->close();
+
+        // You might want to store the updated stock quantities in an array for further use
+        $updatedStockQuantities[] = array('currentStock' => $currentStock, 'newStock' => $newStock);
     }
 
-    $updateQueryStock = "UPDATE masterbahan SET quantity = ? WHERE nama = ?";
-    $updateStmt = $conn->prepare($updateQueryStock);
-    $updateStmt->bind_param("is", $newStock, $namaBahan);
-    $updateStmt->execute();
-    $updateStmt->close();
-
-    // Return the updated stock quantity
-    echo json_encode(array('currentStock' => $currentStock, 'newStock' => $newStock));
+    // Return the updated stock quantities
+    echo json_encode($updatedStockQuantities);
     exit();
 }
 
@@ -344,7 +353,7 @@ if (isset($_POST['selectedDevice'])) {
     <script src="assets/dselect.js"></script>
     <!-- Page specific script -->
     <script>
-        $(function () {
+         $(function () {
             bsCustomFileInput.init();
 
             // Searchable dropdown
@@ -379,15 +388,15 @@ if (isset($_POST['selectedDevice'])) {
                         // Update table rows dynamically
                         var tableBody = document.getElementById("produksiTable");
                         tableBody.innerHTML = ""; // Clear existing rows
-                        // Add new rows based on the response
+
+                        // Add new rows based on the response array
                         for (var i = 0; i < response.length; i++) {
-                            var row = response[i];
                             var newRow = "<tr>" +
                                 "<td>" + (i + 1) + "</td>" +
-                                "<td>" + row.namaBahan + "</td>" +
-                                "<td>" + row.stokDibutuhkan + "</td>" +
-                                "<td>" + row.currentStock + "</td>" +
-                                "<td>" + (row.currentStock >= (row.submittedQuantity * row.stokDibutuhkan) ? "Ya" : "Tidak") + "</td>" +
+                                "<td>" + response[i].namaBahan + "</td>" +
+                                "<td>" + response[i].stokDibutuhkan + "</td>" +
+                                "<td>" + response[i].currentStock + "</td>" +
+                                "<td>" + (response[i].currentStock >= (response[i].submittedQuantity * response[i].stokDibutuhkan) ? "Ya" : "Tidak") + "</td>" +
                                 "</tr>";
                             tableBody.innerHTML += newRow;
                         }
