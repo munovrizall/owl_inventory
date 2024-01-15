@@ -14,7 +14,7 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-$query = "SELECT historis.pengguna, historis.waktu, historis.quantity, 
+$query = "SELECT historis.ID, historis.pengguna, historis.waktu, historis.quantity, 
           historis.activity, historis.deskripsi, masterbahan.nama 
           FROM historis
           JOIN masterbahan ON historis.stok_id = masterbahan.stok_id
@@ -39,12 +39,6 @@ if (!$result) {
     <link rel="stylesheet" href="assets/adminlte/plugins/fontawesome-free/css/all.min.css">
     <!-- Ionicons -->
     <link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
-    <!-- Tempusdominus Bootstrap 4 -->
-    <link rel="stylesheet" href="assets/adminlte/plugins/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css">
-    <!-- iCheck -->
-    <link rel="stylesheet" href="assets/adminlte/plugins/icheck-bootstrap/icheck-bootstrap.min.css">
-    <!-- JQVMap -->
-    <link rel="stylesheet" href="assets/adminlte/plugins/jqvmap/jqvmap.min.css">
     <!-- Theme style -->
     <link rel="stylesheet" href="assets/adminlte/dist/css/adminlte.min.css">
     <!-- overlayScrollbars -->
@@ -57,15 +51,15 @@ if (!$result) {
 
     <style>
         .lebar-kolom1 {
-            width: 10;
+            width: 16%;
         }
 
         .lebar-kolom2 {
-            width: 20%;
+            width: 4%;
         }
 
         .lebar-kolom3 {
-            width: 5%;
+            width: 18%;
         }
 
         .lebar-kolom4 {
@@ -73,18 +67,18 @@ if (!$result) {
         }
 
         .lebar-kolom5 {
-            width: 36%;
+            width: 5%;
+        }
+
+        .lebar-kolom6 {
+            width: 32%;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
         }
 
-        .lebar-kolom6 {
-            width: 24%;
-        }
-
         .lebar-kolom7 {
-            width: 5%;
+            width: 20%;
         }
 
         .card-padding {
@@ -232,13 +226,13 @@ if (!$result) {
                                     <table id="tableTransaksi" class="table table-striped table-bordered">
                                         <thead>
                                             <tr>
-                                                <th class="text-center lebar-kolom1">User</th>
-                                                <th class="text-center lebar-kolom2">Nama Barang</th>
-                                                <th class="text-center lebar-kolom3">Kuantitas</th>
-                                                <th class="text-center lebar-kolom4">Aktivitas</th>
-                                                <th class="text-center lebar-kolom5">Deskripsi</th>
-                                                <th class="text-center lebar-kolom6">Waktu</th>
-                                                <th class="text-center lebar-kolom7 aksi-col">Aksi</th>
+                                                <th class="text-center lebar-kolom1">Transaksi ID</th>
+                                                <th class="text-center lebar-kolom2">User</th>
+                                                <th class="text-center lebar-kolom3">Nama Barang</th>
+                                                <th class="text-center lebar-kolom4">Kuantitas</th>
+                                                <th class="text-center lebar-kolom5">Aktivitas</th>
+                                                <th class="text-center lebar-kolom6">Deskripsi</th>
+                                                <th class="text-center lebar-kolom7">Waktu</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -266,13 +260,13 @@ if (!$result) {
                                                     }
                                             ?>
                                                     <tr>
+                                                        <td><?php echo $row["ID"]; ?></td>
                                                         <td><?php echo $row["pengguna"]; ?></td>
                                                         <td><?php echo $row["nama"]; ?></td>
                                                         <td><?php echo $row["quantity"]; ?></td>
-                                                        <td style="text-align: center;"><span class="<?php echo $badgeClass; ?>"><?php echo $row["activity"]; ?></span></td>
+                                                        <td><span class="<?php echo $badgeClass; ?>"><?php echo $row["activity"]; ?></span></td>
                                                         <td><?php echo $row["deskripsi"]; ?></td>
                                                         <td><?php echo $tanggal; ?></td>
-                                                        <td><input type="button" class="ibtnDel btn btn-md btn-danger" value="Delete"></td>
                                                     </tr>
                                             <?php
                                                 }
@@ -316,11 +310,6 @@ if (!$result) {
     </script>
     <!-- Bootstrap 4 -->
     <script src="assets/adminlte/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
-    <!-- JQVMap -->
-    <script src="assets/adminlte/plugins/jqvmap/jquery.vmap.min.js"></script>
-    <script src="assets/adminlte/plugins/jqvmap/maps/jquery.vmap.usa.js"></script>
-    <!-- Tempusdominus Bootstrap 4 -->
-    <script src="assets/adminlte/plugins/tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js"></script>
     <!-- overlayScrollbars -->
     <script src="assets/adminlte/plugins/overlayScrollbars/js/jquery.overlayScrollbars.min.js"></script>
     <!-- AdminLTE App -->
@@ -343,6 +332,7 @@ if (!$result) {
     <script>
         $(document).ready(function() {
             var table = $('#tableTransaksi').DataTable({
+                fixedHeader: true,
                 responsive: true,
                 language: {
                     lengthMenu: 'Tampilkan _MENU_ data per halaman',
@@ -355,49 +345,17 @@ if (!$result) {
                     ['10 rows', '25 rows', '50 rows', 'Show all']
                 ],
                 buttons: [
-                    'pageLength',
-                    {
-                        extend: 'copy',
-                        exportOptions: {
-                            columns: ':visible:not(.aksi-col)'
-                        }
-                    },
+                    'pageLength', 'copy',
                     {
                         extend: 'spacer',
                         style: 'bar',
                         text: 'Export files:'
                     },
-                    {
-                        extend: 'csv',
-                        exportOptions: {
-                            columns: ':visible:not(.aksi-col)'
-                        }
-                    },
-                    {
-                        extend: 'excel',
-                        exportOptions: {
-                            columns: ':visible:not(.aksi-col)'
-                        }
-                    },
-                    {
-                        extend: 'pdf',
-                        exportOptions: {
-                            columns: ':visible:not(.aksi-col)'
-                        }
-                    },
-                    {
-                        extend: 'print',
-                        exportOptions: {
-                            columns: ':visible:not(.aksi-col)'
-                        }
-                    },
+                    'csv', 'excel', 'pdf', 'print',
                 ],
                 order: [],
 
             });
-
-            table.buttons().container()
-                .appendTo('wrapper .col-md-6:eq(0)');
 
         });
     </script>

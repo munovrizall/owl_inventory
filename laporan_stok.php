@@ -214,11 +214,11 @@ $result = mysqli_query($conn, $query);
                                     <table id="tableBahan" class="table table-striped table-bordered">
                                         <thead>
                                             <tr>
-                                                <th class="lebar-kolom1">Stok ID</th>
-                                                <th class="lebar-kolom2">Kelompok</th>
-                                                <th class="lebar-kolom3">Nama</th>
-                                                <th class="lebar-kolom4">Stok</th>
-                                                <th class="lebar-kolom5">Deskripsi</th>
+                                                <th class="text-center lebar-kolom1">Stok ID</th>
+                                                <th class="text-center lebar-kolom2">Kelompok</th>
+                                                <th class="text-center lebar-kolom3">Nama</th>
+                                                <th class="text-center lebar-kolom4">Stok</th>
+                                                <th class="text-center lebar-kolom5">Deskripsi</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -318,7 +318,7 @@ $result = mysqli_query($conn, $query);
                     },
                     'csv', 'excel', 'pdf', 'print'
                 ],
-
+                order: [1, 'asc'],
             });
 
             table.buttons().container()

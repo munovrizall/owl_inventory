@@ -286,7 +286,7 @@ if (!$result) {
 
             <div class="card">
               <div class="card-header">
-                <h3 class="card-title"><b>Histori Transaksi</b></h3>
+                <h3 class="card-title"><b>Histori Transaksi Terakhir</b></h3>
               </div>
               <!-- /.card-header -->
               <div class="card-body p-0">
@@ -300,7 +300,6 @@ if (!$result) {
                         <th class="text-center lebar-kolom4">Aktivitas</th>
                         <th class="text-center lebar-kolom5">Deskripsi</th>
                         <th class="text-center lebar-kolom6">Waktu</th>
-                        <th class="text-center lebar-kolom7">Aksi</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -334,7 +333,6 @@ if (!$result) {
                             <td style="text-align: center;"><span class="<?php echo $badgeClass; ?>"><?php echo $row["activity"]; ?></span></td>
                             <td><?php echo $row["deskripsi"]; ?></td>
                             <td><?php echo $tanggal; ?></td>
-                            <td><input type="button" class="ibtnDel btn btn-md btn-danger" value="Delete"></td>
                           </tr>
                       <?php
                         }
