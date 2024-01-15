@@ -213,6 +213,14 @@ if (isset($_POST['quantity'])) {
                                 </p>
                             </a>
                         </li>
+                        <li class="nav-item">
+                            <a href="histori_transaksi.php" class="nav-link">
+                                <i class="nav-icon fas fa-history"></i>
+                                <p>
+                                    Histori Transaksi
+                                </p>
+                            </a>
+                        </li>
                     </ul>
                 </nav>
                 <!-- /.sidebar-menu -->
@@ -267,7 +275,7 @@ if (isset($_POST['quantity'])) {
                                     <label for="quantity">Kuantitas <span style="color: red;">*</span></label>
                                     <div class="input-group">
                                         <!-- Input untuk kuantitas -->
-                                        <input type="number" class="form-control" id="quantity" name="quantity" min="0" value="" placeholder="Masukkan jumlah stok bahan yang ingin digunakan">
+                                        <input type="number" class="form-control" id="quantity" name="quantity" min="0" value="">
                                     </div>
                                 </div>
                                 <p id="stockMessage">Stok Bahan Tersisa: <?php echo $stockQuantity; ?></p>
@@ -443,11 +451,13 @@ if (isset($_POST['quantity'])) {
 
         function disableQuantityInput() {
             const quantityInput = document.getElementById("quantity");
+            quantityInput.placeholder = "Pilih bahan terlebih dahulu";
             quantityInput.disabled = true;
         }
 
         $("#pilihBahanMaintenance").change(function() {
             const quantityInput = document.getElementById("quantity");
+            quantityInput.placeholder = "Masukkan jumlah stok bahan yang ingin digunakan";
             quantityInput.disabled = false;
         });
     </script>

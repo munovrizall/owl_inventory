@@ -100,8 +100,7 @@ if (isset($_POST['quantity'])) {
 
     <link rel="icon" href="assets/adminlte/dist/img/OWLlogo.png" type="image/x-icon">
     <!-- Google Font: Source Sans Pro -->
-    <link rel="stylesheet"
-        href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
     <!-- Font Awesome -->
     <link rel="stylesheet" href="assets/adminlte/plugins/fontawesome-free/css/all.min.css">
     <!-- Theme style -->
@@ -146,8 +145,7 @@ if (isset($_POST['quantity'])) {
             <!-- Left navbar links -->
             <ul class="navbar-nav">
                 <li class="nav-item">
-                    <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i
-                            class="fas fa-bars"></i></a>
+                    <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
                 </li>
             </ul>
         </nav>
@@ -157,8 +155,7 @@ if (isset($_POST['quantity'])) {
         <aside class="main-sidebar sidebar-dark-primary elevation-4 fixed">
             <!-- Brand Logo -->
             <a href="homepage.php" class="brand-link">
-                <img src="assets/adminlte/dist/img/OWLlogo.png" alt="OWL Logo"
-                    class="brand-image img-circle elevation-3" style="opacity: .8">
+                <img src="assets/adminlte/dist/img/OWLlogo.png" alt="OWL Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
                 <span class="brand-text font-weight-heavy">OWL RnD</span>
             </a>
 
@@ -166,8 +163,7 @@ if (isset($_POST['quantity'])) {
             <div class="sidebar">
                 <!-- Sidebar Menu -->
                 <nav class="mt-2">
-                    <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu"
-                        data-accordion="false">
+                    <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
                         <!-- Add icons to the links using the .nav-icon class
                            with font-awesome or any other icon font library -->
                         <li class="nav-item">
@@ -227,6 +223,14 @@ if (isset($_POST['quantity'])) {
                                 </p>
                             </a>
                         </li>
+                        <li class="nav-item">
+                            <a href="histori_transaksi.php" class="nav-link">
+                                <i class="nav-icon fas fa-history"></i>
+                                <p>
+                                    Histori Transaksi
+                                </p>
+                            </a>
+                        </li>
                     </ul>
                 </nav>
                 <!-- /.sidebar-menu -->
@@ -267,8 +271,7 @@ if (isset($_POST['quantity'])) {
                         <form id="produksiForm" onsubmit="return validateForm()">
                             <div class="card-body">
                                 <div class="form-group">
-                                    <label for="exampleSelectBorderWidth2">Pilih Device <span
-                                            style="color: red;">*</span></label>
+                                    <label for="exampleSelectBorderWidth2">Pilih Device <span style="color: red;">*</span></label>
                                     <select class="form-select" id="pilihProduksiDevice" name="selectedDevice">
                                         <option value="">Pilih Produk</option>
                                         <?php
@@ -279,12 +282,12 @@ if (isset($_POST['quantity'])) {
                                     </select>
                                 </div>
                                 <div class="form-group">
-                                    <label for="quantity">Kuantitas :</label>
+                                    <label for="quantity">Kuantitas <span style="color: red;">*</span></label>
                                     <div class="input-group">
                                         <!-- Input untuk kuantitas -->
-                                        <input type="number" class="form-control" id="quantity" name="quantity" min="0"
-                                            value="" placeholder="Masukkan jumlah produksi device">
+                                        <input type="number" class="form-control" id="quantity" name="quantity" min="0" value="">
                                     </div>
+                                    <button type="button" class="btn btn-outline-info btn-block" style="margin-top: 10px; max-width: 180px;"><i class="fas fa-sync-alt" style="margin-right: 8px;"></i>Cek</button>
                                 </div>
                                 <div class="card">
                                     <div class="card-header">
@@ -304,7 +307,7 @@ if (isset($_POST['quantity'])) {
                                                     </tr>
                                                 </thead>
                                                 <tbody id="produksiTable">
-                                                    
+
                                                 </tbody>
                                             </table>
                                         </div>
@@ -312,9 +315,8 @@ if (isset($_POST['quantity'])) {
                                     <!-- /.card-body -->
                                 </div>
                                 <div class="form-group">
-                                    <label>Deskripsi</label>
-                                    <textarea class="form-control" rows="3"
-                                        placeholder="Masukkan keterangan produksi device ..."></textarea>
+                                    <label>Deskripsi<span class="gray-italic-text"> (opsional)</span></label>
+                                    <textarea class="form-control" rows="3" placeholder="Masukkan keterangan produksi device ..."></textarea>
                                 </div>
                             </div>
                             <!-- /.card-body -->
@@ -353,7 +355,7 @@ if (isset($_POST['quantity'])) {
     <script src="assets/dselect.js"></script>
     <!-- Page specific script -->
     <script>
-         $(function () {
+        $(function() {
             bsCustomFileInput.init();
 
             // Searchable dropdown
@@ -363,7 +365,7 @@ if (isset($_POST['quantity'])) {
             });
 
             // Event listener for dropdown change
-            document.getElementById("pilihProduksiDevice").addEventListener("change", function () {
+            document.getElementById("pilihProduksiDevice").addEventListener("change", function() {
                 updateProduksiTable(this.value);
             });
 
@@ -378,9 +380,11 @@ if (isset($_POST['quantity'])) {
             $.ajax({
                 type: "POST",
                 url: "produksi.php",
-                data: { selectedDevice: selectedDevice },
+                data: {
+                    selectedDevice: selectedDevice
+                },
                 dataType: "json",
-                success: function (response) {
+                success: function(response) {
                     if ('error' in response) {
                         // Handle error
                         console.error(response.error);
@@ -404,12 +408,29 @@ if (isset($_POST['quantity'])) {
                     // Show the table
                     document.getElementById("produksiTable").style.display = "table";
                 },
-                error: function (error) {
+                error: function(error) {
                     // Handle error
                     console.error("Error fetching produksi data:", error);
                 }
             });
         }
+
+        // Quantity input disabled to prevent bugs
+        document.addEventListener("DOMContentLoaded", function() {
+            disableQuantityInput();
+        });
+
+        function disableQuantityInput() {
+            const quantityInput = document.getElementById("quantity");
+            quantityInput.placeholder = "Pilih produk terlebih dahulu";
+            quantityInput.disabled = true;
+        }
+
+        $("#pilihProduksiDevice").change(function() {
+            const quantityInput = document.getElementById("quantity");
+            quantityInput.placeholder = "Masukkan jumlah produksi device";
+            quantityInput.disabled = false;
+        });
     </script>
 </body>
 

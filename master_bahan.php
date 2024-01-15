@@ -232,6 +232,14 @@ if (!$resultKelompok) {
                                 </p>
                             </a>
                         </li>
+                        <li class="nav-item">
+                            <a href="histori_transaksi.php" class="nav-link">
+                                <i class="nav-icon fas fa-history"></i>
+                                <p>
+                                    Histori Transaksi
+                                </p>
+                            </a>
+                        </li>
                     </ul>
                 </nav>
                 <!-- /.sidebar-menu -->

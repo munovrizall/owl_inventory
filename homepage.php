@@ -56,7 +56,6 @@ if (!$result) {
   <link rel="stylesheet" href="assets/adminlte/plugins/summernote/summernote-bs4.min.css">
 
   <style>
-
     .lebar-kolom1 {
       width: 10;
     }
@@ -186,6 +185,14 @@ if (!$result) {
                 </p>
               </a>
             </li>
+            <li class="nav-item">
+              <a href="histori_transaksi.php" class="nav-link">
+                <i class="nav-icon fas fa-history"></i>
+                <p>
+                  Histori Transaksi
+                </p>
+              </a>
+            </li>
           </ul>
         </nav>
         <!-- /.sidebar-menu -->
@@ -293,48 +300,48 @@ if (!$result) {
                         <th class="text-center lebar-kolom4">Aktivitas</th>
                         <th class="text-center lebar-kolom5">Deskripsi</th>
                         <th class="text-center lebar-kolom6">Waktu</th>
-                        <th class="text-center lebar-kolom6">Aksi</th>
+                        <th class="text-center lebar-kolom7">Aksi</th>
                       </tr>
                     </thead>
                     <tbody>
-                    <?php
-                    if ($result->num_rows > 0) {
+                      <?php
+                      if ($result->num_rows > 0) {
                         while ($row = mysqli_fetch_assoc($result)) {
-                            $tanggal = date('H:i d-m-Y', strtotime($row["waktu"]));
-                            // Tentukan kelas badge berdasarkan nilai activity
-                            $badgeClass = "";
-                            switch ($row["activity"]) {
-                                case "Produksi":
-                                    $badgeClass = "badge bg-info";
-                                    break;
-                                case "Restock":
-                                    $badgeClass = "badge bg-success";
-                                    break;
-                                case "Maintenance":
-                                    $badgeClass = "badge bg-danger";
-                                    $row["quantity"] = "-" . $row["quantity"];
-                                    break;
-                                default:
-                                    // Set kelas default jika nilai activity tidak sesuai dengan kasus di atas
-                                    $badgeClass = "badge bg-secondary";
-                                    break;
-                            }
-                    ?>
-                            <tr>
-                                <td><?php echo $row["pengguna"]; ?></td>
-                                <td><?php echo $row["nama"]; ?></td>
-                                <td><?php echo $row["quantity"]; ?></td>
-                                <td style="text-align: center;"><span class="<?php echo $badgeClass; ?>"><?php echo $row["activity"]; ?></span></td>
-                                <td><?php echo $row["deskripsi"]; ?></td>
-                                <td><?php echo $tanggal; ?></td>
-                                <td><input type="button" class="ibtnDel btn btn-md btn-danger" value="Delete"></td>
-                            </tr>
-                    <?php
+                          $tanggal = date('H:i d-m-Y', strtotime($row["waktu"]));
+                          // Tentukan kelas badge berdasarkan nilai activity
+                          $badgeClass = "";
+                          switch ($row["activity"]) {
+                            case "Produksi":
+                              $badgeClass = "badge bg-info";
+                              break;
+                            case "Restock":
+                              $badgeClass = "badge bg-success";
+                              break;
+                            case "Maintenance":
+                              $badgeClass = "badge bg-danger";
+                              $row["quantity"] = "-" . $row["quantity"];
+                              break;
+                            default:
+                              // Set kelas default jika nilai activity tidak sesuai dengan kasus di atas
+                              $badgeClass = "badge bg-secondary";
+                              break;
+                          }
+                      ?>
+                          <tr>
+                            <td><?php echo $row["pengguna"]; ?></td>
+                            <td><?php echo $row["nama"]; ?></td>
+                            <td><?php echo $row["quantity"]; ?></td>
+                            <td style="text-align: center;"><span class="<?php echo $badgeClass; ?>"><?php echo $row["activity"]; ?></span></td>
+                            <td><?php echo $row["deskripsi"]; ?></td>
+                            <td><?php echo $tanggal; ?></td>
+                            <td><input type="button" class="ibtnDel btn btn-md btn-danger" value="Delete"></td>
+                          </tr>
+                      <?php
                         }
-                    } else {
+                      } else {
                         echo "No rows found in the result set.";
-                    }
-                    ?>
+                      }
+                      ?>
                     </tbody>
                   </table>
                 </div>

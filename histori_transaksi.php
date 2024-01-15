@@ -1,4 +1,8 @@
 <?php
+// Check if the user is logged in
+session_start();
+$username = $_SESSION['username'];
+
 $serverName = "localhost";
 $userNameDb = "root";
 $password = "";
@@ -10,9 +14,15 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-$query = "SELECT * FROM masterbahan ORDER BY stok_id";
+$query = "SELECT historis.pengguna, historis.waktu, historis.quantity, 
+          historis.activity, historis.deskripsi, masterbahan.nama 
+          FROM historis
+          JOIN masterbahan ON historis.stok_id = masterbahan.stok_id
+          ORDER BY historis.waktu DESC";
 $result = mysqli_query($conn, $query);
-
+if (!$result) {
+    die('Error in query: ' . mysqli_error($conn));
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -20,7 +30,7 @@ $result = mysqli_query($conn, $query);
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Laporan Stok</title>
+    <title>Histori Transaksi</title>
 
     <link rel="icon" href="assets/adminlte/dist/img/OWLlogo.png" type="image/x-icon">
     <!-- Google Font: Source Sans Pro -->
@@ -47,26 +57,34 @@ $result = mysqli_query($conn, $query);
 
     <style>
         .lebar-kolom1 {
-            width: 12%;
+            width: 10;
         }
 
         .lebar-kolom2 {
-            width: 15%;
+            width: 20%;
         }
 
         .lebar-kolom3 {
-            width: 25%;
+            width: 5%;
         }
 
         .lebar-kolom4 {
-            width: 8%;
+            width: 5%;
         }
 
         .lebar-kolom5 {
-            width: 40%;
+            width: 36%;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
+        }
+
+        .lebar-kolom6 {
+            width: 24%;
+        }
+
+        .lebar-kolom7 {
+            width: 5%;
         }
 
         .card-padding {
@@ -156,7 +174,7 @@ $result = mysqli_query($conn, $query);
                         </li>
                         <li class="nav-header">PELAPORAN</li>
                         <li class="nav-item">
-                            <a href="laporan_stok.php" class="nav-link active">
+                            <a href="laporan_stok.php" class="nav-link">
                                 <i class="nav-icon ion ion-pie-graph"></i>
                                 <p>
                                     Laporan Stok
@@ -164,7 +182,7 @@ $result = mysqli_query($conn, $query);
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="histori_transaksi.php" class="nav-link">
+                            <a href="histori_transaksi.php" class="nav-link active">
                                 <i class="nav-icon fas fa-history"></i>
                                 <p>
                                     Histori Transaksi
@@ -185,12 +203,12 @@ $result = mysqli_query($conn, $query);
                 <div class="container-fluid">
                     <div class="row mb-2">
                         <div class="col-sm-6">
-                            <h1 class="m-0">Laporan Stok</h1>
+                            <h1 class="m-0">Histori Transaksi</h1>
                         </div><!-- /.col -->
                         <div class="col-sm-6">
                             <ol class="breadcrumb float-sm-right">
                                 <li class="breadcrumb-item"><a href="homepage.php">Home</a></li>
-                                <li class="breadcrumb-item active">Laporan Stok</li>
+                                <li class="breadcrumb-item active">Histori Transaksi</li>
                             </ol>
                         </div><!-- /.col -->
                     </div><!-- /.row -->
@@ -206,33 +224,60 @@ $result = mysqli_query($conn, $query);
 
                         <div class="card">
                             <div class="card-header">
-                                <h3 class="card-title"><b>List Bahan</b></h3>
+                                <h3 class="card-title"><b>List Transaksi</b></h3>
                             </div>
                             <!-- /.card-header -->
                             <div class="card-body p-0">
                                 <div class="table-responsive card-padding">
-                                    <table id="tableBahan" class="table table-striped table-bordered">
+                                    <table id="tableTransaksi" class="table table-striped table-bordered">
                                         <thead>
                                             <tr>
-                                                <th class="lebar-kolom1">Stok ID</th>
-                                                <th class="lebar-kolom2">Kelompok</th>
-                                                <th class="lebar-kolom3">Nama</th>
-                                                <th class="lebar-kolom4">Stok</th>
-                                                <th class="lebar-kolom5">Deskripsi</th>
+                                                <th class="text-center lebar-kolom1">User</th>
+                                                <th class="text-center lebar-kolom2">Nama Barang</th>
+                                                <th class="text-center lebar-kolom3">Kuantitas</th>
+                                                <th class="text-center lebar-kolom4">Aktivitas</th>
+                                                <th class="text-center lebar-kolom5">Deskripsi</th>
+                                                <th class="text-center lebar-kolom6">Waktu</th>
+                                                <th class="text-center lebar-kolom7 aksi-col">Aksi</th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             <?php
-                                            while ($row = mysqli_fetch_assoc($result)) {
+                                            if ($result->num_rows > 0) {
+                                                while ($row = mysqli_fetch_assoc($result)) {
+                                                    $tanggal = date('H:i d-m-Y', strtotime($row["waktu"]));
+                                                    // Tentukan kelas badge berdasarkan nilai activity
+                                                    $badgeClass = "";
+                                                    switch ($row["activity"]) {
+                                                        case "Produksi":
+                                                            $badgeClass = "badge bg-info";
+                                                            break;
+                                                        case "Restock":
+                                                            $badgeClass = "badge bg-success";
+                                                            break;
+                                                        case "Maintenance":
+                                                            $badgeClass = "badge bg-danger";
+                                                            $row["quantity"] = "-" . $row["quantity"];
+                                                            break;
+                                                        default:
+                                                            // Set kelas default jika nilai activity tidak sesuai dengan kasus di atas
+                                                            $badgeClass = "badge bg-secondary";
+                                                            break;
+                                                    }
                                             ?>
-                                                <tr>
-                                                    <td><?php echo $row["stok_id"]; ?></td>
-                                                    <td><?php echo $row["kelompok"]; ?></td>
-                                                    <td><?php echo $row["nama"]; ?></td>
-                                                    <td><?php echo $row["quantity"]; ?></td>
-                                                    <td><?php echo $row["deskripsi"]; ?></td>
-                                                </tr>
+                                                    <tr>
+                                                        <td><?php echo $row["pengguna"]; ?></td>
+                                                        <td><?php echo $row["nama"]; ?></td>
+                                                        <td><?php echo $row["quantity"]; ?></td>
+                                                        <td style="text-align: center;"><span class="<?php echo $badgeClass; ?>"><?php echo $row["activity"]; ?></span></td>
+                                                        <td><?php echo $row["deskripsi"]; ?></td>
+                                                        <td><?php echo $tanggal; ?></td>
+                                                        <td><input type="button" class="ibtnDel btn btn-md btn-danger" value="Delete"></td>
+                                                    </tr>
                                             <?php
+                                                }
+                                            } else {
+                                                echo "No rows found in the result set.";
                                             }
                                             ?>
                                         </tbody>
@@ -297,7 +342,7 @@ $result = mysqli_query($conn, $query);
 
     <script>
         $(document).ready(function() {
-            var table = $('#tableBahan').DataTable({
+            var table = $('#tableTransaksi').DataTable({
                 responsive: true,
                 language: {
                     lengthMenu: 'Tampilkan _MENU_ data per halaman',
@@ -310,14 +355,44 @@ $result = mysqli_query($conn, $query);
                     ['10 rows', '25 rows', '50 rows', 'Show all']
                 ],
                 buttons: [
-                    'pageLength', 'copy',
+                    'pageLength',
+                    {
+                        extend: 'copy',
+                        exportOptions: {
+                            columns: ':visible:not(.aksi-col)'
+                        }
+                    },
                     {
                         extend: 'spacer',
                         style: 'bar',
                         text: 'Export files:'
                     },
-                    'csv', 'excel', 'pdf', 'print'
+                    {
+                        extend: 'csv',
+                        exportOptions: {
+                            columns: ':visible:not(.aksi-col)'
+                        }
+                    },
+                    {
+                        extend: 'excel',
+                        exportOptions: {
+                            columns: ':visible:not(.aksi-col)'
+                        }
+                    },
+                    {
+                        extend: 'pdf',
+                        exportOptions: {
+                            columns: ':visible:not(.aksi-col)'
+                        }
+                    },
+                    {
+                        extend: 'print',
+                        exportOptions: {
+                            columns: ':visible:not(.aksi-col)'
+                        }
+                    },
                 ],
+                order: [],
 
             });
 
