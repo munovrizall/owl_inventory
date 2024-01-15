@@ -313,7 +313,7 @@ if (!$resultKelompok) {
                             <!-- /.card-body -->
                         </form>
                         <div class="card-footer d-flex justify-content-end">
-                            <button type="button" class="btn btn-primary" onclick="if(validateForm()) { validateSuccess(); resetForm(); }">Submit</button>
+                            <button type="button" id="submitButton" class="btn btn-primary" onclick="if(validateForm()) { validateSuccess(); resetForm(); }">Submit</button>
                         </div>
                     </div>
                     <!-- general form elements -->
@@ -381,6 +381,13 @@ if (!$resultKelompok) {
                     icon: 'error',
                     title: 'Oops...',
                     text: 'Harap lengkapi semua formulir!',
+                    showCancelButton: false,
+                    confirmButtonColor: '#3085d6',
+                    confirmButtonText: 'OK (enter)'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        resetForm();
+                    }
                 });
                 return false;
             }
@@ -401,6 +408,13 @@ if (!$resultKelompok) {
                     Swal.fire({
                         icon: 'success',
                         title: 'Bahan berhasil didaftarkan!',
+                        showCancelButton: false,
+                        confirmButtonColor: '#3085d6',
+                        confirmButtonText: 'OK (enter)'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            resetForm();
+                        }
                     });
 
                 },
@@ -479,6 +493,18 @@ if (!$resultKelompok) {
         dselect(select_box_element, {
             search: true,
         });
+
+        // When user press enter on keyboard
+        var quantityInput = document.getElementById('quantity');
+        quantityInput.addEventListener('keyup', function(event) {
+            if (event.keyCode === 13) {
+                submitForm();
+            }
+        });
+
+        function submitForm() {
+            document.getElementById('submitButton').click();
+        }
     </script>
 </body>
 

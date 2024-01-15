@@ -15,6 +15,14 @@ if ($conn->connect_error) {
 $queryBahan = "SELECT * FROM masterbahan ORDER BY nama";
 $resultBahan = $conn->query($queryBahan);
 
+// Fetch data from masterkelompok table
+$queryKelompok = "SELECT kelompok_id, nama_kelompok FROM masterkelompok ORDER BY nama_kelompok";
+$resultKelompok = $conn->query($queryKelompok);
+
+if (!$resultKelompok) {
+    die("Error fetching kelompok data: " . $conn->error);
+}
+
 $stockQuantity = ""; // Default value, replace it with the actual stock quantity based on the selected item from the database
 $newStockQuantity = "";
 
@@ -255,6 +263,19 @@ if (isset($_POST['quantity'])) {
                         <form id="restockForm">
                             <div class="card-body">
                                 <div class="form-group">
+                                    <div>
+                                        <label for="pilihNamaKelompok">Pilih Kelompok<span class="gray-italic-text"> (opsional)</span></label>
+                                    </div>
+                                    <select class="form-select" id="pilihNamaKelompok" name="kelompok">
+                                        <option value="">Pilih Kelompok</option>
+                                        <?php
+                                        while ($row = $resultKelompok->fetch_assoc()) {
+                                            echo '<option value="' . $row['nama_kelompok'] . '">' . $row['nama_kelompok'] . '</option>';
+                                        }
+                                        ?>
+                                    </select>
+                                </div>
+                                <div class="form-group">
                                     <label for="exampleSelectBorderWidth2">Pilih Bahan <span style="color: red;">*</span></label>
                                     <select class="form-select" id="pilihBahanRestock" name="selectedItem">
                                         <option value="">Pilih Bahan</option>
@@ -284,7 +305,7 @@ if (isset($_POST['quantity'])) {
                             <!-- /.card-body -->
                         </form>
                         <div class="card-footer d-flex justify-content-end">
-                            <button type="button" class="btn btn-primary" onclick="if(validateForm()) { validateSuccess(); resetForm(); }">Submit</button>
+                            <button type="button" id="submitButton" class="btn btn-primary" onclick="if(validateForm()) { validateSuccess(); resetForm(); }">Submit</button>
                         </div>
                     </div>
                     <!-- general form elements -->
@@ -338,6 +359,13 @@ if (isset($_POST['quantity'])) {
                     icon: 'error',
                     title: 'Oops...',
                     text: 'Harap lengkapi semua formulir!',
+                    showCancelButton: false,
+                    confirmButtonColor: '#3085d6',
+                    confirmButtonText: 'OK (enter)'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        resetForm();
+                    }
                 });
                 return false;
             }
@@ -391,7 +419,14 @@ if (isset($_POST['quantity'])) {
                     Swal.fire({
                         icon: 'success',
                         title: 'Stok berhasil ditambahkan!',
-                        text: 'Stok terbaru adalah ' + response.newStock + ' bahan'
+                        text: 'Stok terbaru adalah ' + response.newStock + ' bahan',
+                        showCancelButton: false,
+                        confirmButtonColor: '#3085d6',
+                        confirmButtonText: 'OK (enter)'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            resetForm();
+                        }
                     });
 
                 },
@@ -421,8 +456,14 @@ if (isset($_POST['quantity'])) {
         }
 
         // Searchable dropdown
-        var select_box_element = document.querySelector('#pilihBahanRestock');
+        var select_box_element = document.querySelector('#pilihNamaKelompok');
+        var select_box_element2 = document.querySelector('#pilihBahanRestock');
+
         dselect(select_box_element, {
+            search: true,
+        });
+
+        dselect(select_box_element2, {
             search: true,
         });
 
@@ -442,6 +483,18 @@ if (isset($_POST['quantity'])) {
             quantityInput.placeholder = "Masukkan jumlah stok bahan yang dibeli";
             quantityInput.disabled = false;
         });
+
+        // When user press enter on keyboard
+        var quantityInput = document.getElementById('quantity');
+        quantityInput.addEventListener('keyup', function(event) {
+            if (event.keyCode === 13) {
+                submitForm();
+            }
+        });
+
+        function submitForm() {
+            document.getElementById('submitButton').click();
+        }
     </script>
 </body>
 
