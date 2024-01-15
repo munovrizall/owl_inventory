@@ -39,12 +39,12 @@ $result = mysqli_query($conn, $query);
     <link rel="stylesheet" href="assets/adminlte/dist/css/adminlte.min.css">
     <!-- overlayScrollbars -->
     <link rel="stylesheet" href="assets/adminlte/plugins/overlayScrollbars/css/OverlayScrollbars.min.css">
-    <!-- Daterange picker -->
-    <link rel="stylesheet" href="assets/adminlte/plugins/daterangepicker/daterangepicker.css">
-    <!-- summernote -->
-    <link rel="stylesheet" href="assets/adminlte/plugins/summernote/summernote-bs4.min.css">
     <!-- Table with search -->
     <link href="https://cdn.datatables.net/v/bs4/dt-1.13.8/b-2.4.2/b-colvis-2.4.2/b-print-2.4.2/fh-3.4.0/r-2.5.0/rg-1.4.1/sb-1.6.0/sp-2.2.0/datatables.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.dataTables.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.2/css/bootstrap.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap4.min.css">
 
     <style>
         .lebar-kolom1 {
@@ -204,7 +204,7 @@ $result = mysqli_query($conn, $query);
                             <!-- /.card-header -->
                             <div class="card-body p-0">
                                 <div class="table-responsive card-padding">
-                                    <table id="tableBahan" class="table table-striped">
+                                    <table id="tableBahan" class="table table-striped table-bordered">
                                         <thead>
                                             <tr>
                                                 <th class="lebar-kolom1">Stok ID</th>
@@ -264,42 +264,59 @@ $result = mysqli_query($conn, $query);
     </script>
     <!-- Bootstrap 4 -->
     <script src="assets/adminlte/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
-    <!-- ChartJS -->
-    <script src="assets/adminlte/plugins/chart.js/Chart.min.js"></script>
-    <!-- Sparkline -->
-    <script src="assets/adminlte/plugins/sparklines/sparkline.js"></script>
     <!-- JQVMap -->
     <script src="assets/adminlte/plugins/jqvmap/jquery.vmap.min.js"></script>
     <script src="assets/adminlte/plugins/jqvmap/maps/jquery.vmap.usa.js"></script>
-    <!-- jQuery Knob Chart -->
-    <script src="assets/adminlte/plugins/jquery-knob/jquery.knob.min.js"></script>
-    <!-- daterangepicker -->
-    <script src="assets/adminlte/plugins/moment/moment.min.js"></script>
-    <script src="assets/adminlte/plugins/daterangepicker/daterangepicker.js"></script>
     <!-- Tempusdominus Bootstrap 4 -->
     <script src="assets/adminlte/plugins/tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js"></script>
-    <!-- Summernote -->
-    <script src="assets/adminlte/plugins/summernote/summernote-bs4.min.js"></script>
     <!-- overlayScrollbars -->
     <script src="assets/adminlte/plugins/overlayScrollbars/js/jquery.overlayScrollbars.min.js"></script>
     <!-- AdminLTE App -->
     <script src="assets/adminlte/dist/js/adminlte.js"></script>
     <!-- AdminLTE dashboard demo (This is only for demo purposes) -->
     <script src="assets/adminlte/dist/js/pages/dashboard.js"></script>
-    <!-- Table with Search  -->
+    <!-- Datatables -->
     <script src="https://cdn.datatables.net/v/bs4/dt-1.13.8/b-2.4.2/b-colvis-2.4.2/b-print-2.4.2/fh-3.4.0/r-2.5.0/rg-1.4.1/sb-1.6.0/sp-2.2.0/datatables.min.js"></script>
+    <script src="https:////code.jquery.com/jquery-3.7.0.js"></script>
+    <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.html5.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.print.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.bootstrap4.min.js"></script>
+
 
     <script>
         $(document).ready(function() {
-            $('#tableBahan').DataTable({
+            var table = $('#tableBahan').DataTable({
                 responsive: true,
                 language: {
                     lengthMenu: 'Tampilkan _MENU_ data per halaman',
                     zeroRecords: 'Data tidak ditemukan',
                     info: 'Menampilkan _START_ sampai _END_ dari _TOTAL_ data',
-                    search: 'Cari:',
                 },
+                dom: 'Bfrtip',
+                lengthMenu: [
+                    [10, 25, 50, -1],
+                    ['10 rows', '25 rows', '50 rows', 'Show all']
+                ],
+                buttons: [
+                    'pageLength', 'copy',
+                    {
+                        extend: 'spacer',
+                        style: 'bar',
+                        text: 'Export files:'
+                    },
+                    'csv', 'excel', 'pdf', 'print'
+                ],
+
             });
+
+            table.buttons().container()
+                .appendTo('wrapper .col-md-6:eq(0)');
+
         });
     </script>
 
