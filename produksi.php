@@ -38,58 +38,68 @@ if (isset($_POST['selectedDevice'])) {
         $resultProduksi[] = array('namaBahan' => $namaBahan, 'stokDibutuhkan' => $stokDibutuhkan);
     }
     $stmt->close();
-}
 
-if (isset($_POST['quantity'])) {
-    $submittedQuantity = $_POST['quantity'];
+    if (isset($_POST['quantity'])) {
+        $submittedQuantity = $_POST['quantity'];
 
-    if ($submittedQuantity == "") {
-        echo json_encode(array('error' => 'Quantity is required.'));
-        exit();
-    } elseif ($submittedQuantity <= 0) {
-        echo json_encode(array('error' => 'Quantity must be greater than 0.'));
-        exit();
-    }
-
-    // Initialize the array to store updated stock quantities
-    $updatedStockQuantities = array();
-
-    // Loop through $resultProduksi and update stock accordingly
-    foreach ($resultProduksi as $row) {
-        $namaBahan = $row['namaBahan'];
-        $stokDibutuhkan = $row['stokDibutuhkan'];
-
-        // Fetch current stock from masterbahan
-        $queryCurrentStock = "SELECT quantity FROM masterbahan WHERE nama = ?";
-        $stmtCurrentStock = $conn->prepare($queryCurrentStock);
-        $stmtCurrentStock->bind_param("s", $namaBahan);
-        $stmtCurrentStock->execute();
-        $stmtCurrentStock->bind_result($currentStock);
-        $stmtCurrentStock->fetch();
-        $stmtCurrentStock->close();
-
-        // Update the database with the new stock quantity
-        $newStock = $currentStock - ($submittedQuantity * $stokDibutuhkan);
-        $updatedStockQuantities[] = array('namaBahan' => $namaBahan, 'stokDibutuhkan' => $stokDibutuhkan, 'currentStock' => $currentStock, 'newStock' => $newStock);
-
-        if ($newStock < 0) {
-            echo json_encode(array('error' => 'Stok bahan tidak mencukupi untuk keperluan produksi.'));
+        if ($submittedQuantity == "") {
+            echo json_encode(array('error' => 'Quantity is required.'));
+            exit();
+        } elseif ($submittedQuantity <= 0) {
+            echo json_encode(array('error' => 'Quantity must be greater than 0.'));
             exit();
         }
 
-        $updateQueryStock = "UPDATE masterbahan SET quantity = ? WHERE nama = ?";
-        $updateStmt = $conn->prepare($updateQueryStock);
-        $updateStmt->bind_param("is", $newStock, $namaBahan);
-        $updateStmt->execute();
-        $updateStmt->close();
+        // Initialize the array to store updated stock quantities
+        $updatedStockQuantities = array();
 
+        // Loop through $resultProduksi and update stock accordingly
+        foreach ($resultProduksi as $row) {
+            $namaBahan = $row['namaBahan'];
+            $stokDibutuhkan = $row['stokDibutuhkan'];
+
+            // Fetch current stock from masterbahan
+            $queryCurrentStock = "SELECT quantity FROM masterbahan WHERE nama = ?";
+            $stmtCurrentStock = $conn->prepare($queryCurrentStock);
+            $stmtCurrentStock->bind_param("s", $namaBahan);
+            $stmtCurrentStock->execute();
+            $stmtCurrentStock->bind_result($currentStock);
+            $stmtCurrentStock->fetch();
+            $stmtCurrentStock->close();
+
+            // Update the database with the new stock quantity
+            $newStock = $currentStock - ($submittedQuantity * $stokDibutuhkan);
+
+            // Store the updated stock quantities in the array
+            $updatedStockQuantities[] = array('namaBahan' => $namaBahan, 'stokDibutuhkan' => $stokDibutuhkan, 'currentStock' => $currentStock, 'newStock' => $newStock);
+        }
+
+        if (isset($_POST['submitForm'])) {
+            // Update the masterbahan table
+            $updateQueryStock = "UPDATE masterbahan SET quantity = ? WHERE nama = ?";
+            $updateStmt = $conn->prepare($updateQueryStock);
+
+            foreach ($updatedStockQuantities as $updatedStock) {
+                $newStock = $updatedStock['newStock'];
+                $namaBahan = $updatedStock['namaBahan'];
+
+                $updateStmt->bind_param("is", $newStock, $namaBahan);
+                $updateStmt->execute();
+            }
+
+            $updateStmt->close();
+        }
+        // Return the updated stock quantities
+        $responseArray = array('resultProduksi' => $resultProduksi, 'updatedStockQuantities' => $updatedStockQuantities);
+
+        if (!isset($_POST['submitForm'])) {
+            echo json_encode($responseArray);
+            exit();
+        }
     }
-
-    // Return the updated stock quantities
-    $responseArray = array('resultProduksi' => $resultProduksi, 'updatedStockQuantities' => $updatedStockQuantities);
-    echo json_encode($responseArray);
-    exit();
 }
+
+
 ?> 
 
 <!DOCTYPE html>
@@ -270,7 +280,7 @@ if (isset($_POST['quantity'])) {
                         </div>
                         <!-- /.card-header -->
                         <!-- form start -->
-                        <form id="produksiForm" onsubmit="return validateForm()">
+                        <form id="produksiForm" onsubmit="return validateForm()" method ="post"> 
                             <div class="card-body">
                                 <div class="form-group">
                                     <label for="exampleSelectBorderWidth2">Pilih Device <span style="color: red;">*</span></label>
@@ -324,10 +334,11 @@ if (isset($_POST['quantity'])) {
                                 </div>
                             </div>
                             <!-- /.card-body -->
+                            <div class="card-footer d-flex justify-content-end">
+                                <button type="submit" class="btn btn-primary" name="submitForm" onclick="submitForm()">Submit</button>
+                            </div>
                         </form>
-                        <div class="card-footer d-flex justify-content-end">
-                            <button type="submit" class="btn btn-primary" onclick="validateSuccess()">Submit</button>
-                        </div>
+
                     </div>
                     <!-- general form elements -->
                     <!-- /.card -->
@@ -446,6 +457,32 @@ if (isset($_POST['quantity'])) {
             quantityInput.placeholder = "Masukkan jumlah produksi device";
             quantityInput.disabled = false;
         });
+        function submitForm() {
+            // Assuming validateForm() is the function you want to call for validation
+            if (validateForm()) {
+                document.getElementById("produksiForm").submit();
+                
+            } else {
+                alert("Validation failed. Please check your input.");
+            }
+        }
+
+        function validateForm() {
+            // Add your validation logic here
+            // Return true if the form is valid, false otherwise
+            var selectedDevice = document.getElementById("pilihProduksiDevice").value;
+            var quantity = document.getElementById("quantity").value;
+
+            // Example validation: Check if the selected device and quantity are not empty
+            if (selectedDevice === "" || quantity === "") {
+                alert("Please fill in all required fields.");
+                return false;
+            }
+
+            // Add more validation as needed...
+
+            return true; // If all validations pass
+        }
     </script>
 
 </body>
