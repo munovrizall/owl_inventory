@@ -188,6 +188,14 @@ if (isset($_POST['quantity'])) {
                             </a>
                         </li>
                         <li class="nav-item">
+                            <a href="prototype.php" class="nav-link">
+                                <i class="nav-icon fas fa-screwdriver"></i>
+                                <p>
+                                    Prototype
+                                </p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
                             <a href="restock.php" class="nav-link">
                                 <i class="nav-icon fas fa-shopping-cart"></i>
                                 <p>
@@ -505,7 +513,7 @@ if (isset($_POST['quantity'])) {
         var quantityInput = document.getElementById('quantity');
         quantityInput.addEventListener('keyup', function(event) {
             if (event.keyCode === 13) {
-                submitForm(); 
+                submitForm();
             }
         });
 

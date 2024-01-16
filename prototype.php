@@ -11,75 +11,8 @@ $conn = new mysqli($serverName, $userName, $password, $dbName);
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
-
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // Check which fields are provided
-    $kelompok = isset($_POST["kelompok"]) ? $_POST["kelompok"] : null;
-    $nama = isset($_POST["nama"]) ? $_POST["nama"] : null;
-    $quantity = isset($_POST["quantity"]) ? $_POST["quantity"] : null;
-    $deskripsi = isset($_POST["deskripsi"]) ? $_POST["deskripsi"] : null;
-
-    $namaKelompokBaru = isset($_POST["namaKelompokBaru"]) ? $_POST["namaKelompokBaru"] : null;
-
-    // Check if the material name already exists
-    if ($nama !== null) {
-        $checkQuery = "SELECT COUNT(*) FROM masterbahan WHERE nama = ?";
-        $checkStmt = $conn->prepare($checkQuery);
-        $checkStmt->bind_param("s", $nama);
-        $checkStmt->execute();
-        $checkStmt->bind_result($count);
-        $checkStmt->fetch();
-        $checkStmt->close();
-
-        // If the material name already exists, display an error
-        if ($count > 0) {
-            echo "Error: Material name '$nama' already exists in the database.";
-            exit; // Stop further execution
-        }
-    }
-
-    // Check if the group name already exists
-    if ($namaKelompokBaru !== null) {
-        $checkQueryKB = "SELECT COUNT(*) FROM masterkelompok WHERE nama_kelompok = ?";
-        $checkStmtKB = $conn->prepare($checkQueryKB);
-        $checkStmtKB->bind_param("s", $namaKelompokBaru);
-        $checkStmtKB->execute();
-        $checkStmtKB->bind_result($countKB);
-        $checkStmtKB->fetch();
-        $checkStmtKB->close();
-
-        // If the group name already exists, display an error
-        if ($countKB > 0) {
-            echo "Error: Group name '$namaKelompokBaru' already exists in the database.";
-            exit; // Stop further execution
-        }
-        // Insert the new record for the group
-        $insertQueryKB = "INSERT INTO masterkelompok (nama_kelompok) VALUES (?)";
-        $insertStmtKB = $conn->prepare($insertQueryKB);
-        $insertStmtKB->bind_param("s", $namaKelompokBaru);
-
-        if ($insertStmtKB->execute()) {
-            echo "Data berhasil ditambahkan ke tabel masterkelompok.";
-        } else {
-            echo "Error: " . $insertStmtKB->error;
-        }
-
-        $insertStmtKB->close();
-    } elseif ($kelompok !== null) {
-        // Insert the new record for material
-        $insertQuery = "INSERT INTO masterbahan (kelompok, nama, quantity, deskripsi) VALUES (?, ?, ?, ?)";
-        $insertStmt = $conn->prepare($insertQuery);
-        $insertStmt->bind_param("ssis", $kelompok, $nama, $quantity, $deskripsi);
-
-        if ($insertStmt->execute()) {
-            echo "Data berhasil ditambahkan ke tabel masterbahan.";
-        } else {
-            echo "Error: " . $insertStmt->error;
-        }
-
-        $insertStmt->close();
-    }
-}
+$queryBahan = "SELECT * FROM masterbahan ORDER BY nama";
+$resultBahan = $conn->query($queryBahan);
 
 // Fetch data from masterkelompok table
 $queryKelompok = "SELECT kelompok_id, nama_kelompok FROM masterkelompok ORDER BY nama_kelompok";
@@ -89,6 +22,61 @@ if (!$resultKelompok) {
     die("Error fetching kelompok data: " . $conn->error);
 }
 
+$stockQuantity = ""; // Default value, replace it with the actual stock quantity based on the selected item from the database
+$newStockQuantity = "";
+
+if (isset($_POST['quantity'])) {
+    $selectedItemId = $_POST['selectedItem'];
+
+    // Fetch the username from the POST data
+    $pengguna = isset($_SESSION['username']) ? $_SESSION['username'] : '';
+
+
+    // Fetch the stock quantity from the database based on the selected item
+    $query = "SELECT quantity FROM masterbahan WHERE stok_id = ?";
+    $stmt = $conn->prepare($query);
+    $stmt->bind_param("i", $selectedItemId);
+    $stmt->execute();
+    $stmt->bind_result($stockQuantity);
+    $stmt->fetch();
+    $stmt->close();
+
+    $submittedQuantity = $_POST['quantity'];
+    if ($submittedQuantity == "") {
+        echo json_encode(array('currentStock' => $stockQuantity, 'newStock' => $newStockQuantity));
+        exit();
+    } elseif ($submittedQuantity <= 0) {
+        echo "Kuantitas yang dimasukkan harus lebih besar dari 0";
+        exit();
+    }
+
+    // Update the database with the new stock quantity
+    $newStockQuantity = $stockQuantity - $submittedQuantity;
+
+    if ($newStockQuantity < 0) {
+        echo "Stok bahan tidak mencukupi untuk keperluan prototype.";
+        exit();
+    }
+
+    $updateQueryStock = "UPDATE masterbahan SET quantity = ? WHERE stok_id = ?";
+    $updateStmt = $conn->prepare($updateQueryStock);
+    $updateStmt->bind_param("ii", $newStockQuantity, $selectedItemId);
+    $updateStmt->execute();
+    $updateStmt->close();
+
+    // Insert a new record into the 'historis' table
+    $insertQueryHistoris = "INSERT INTO historis (pengguna, stok_id, waktu, quantity, activity, deskripsi) VALUES (?, ?, NOW(), ?, 'Prototype', ?)";
+    $insertStmt = $conn->prepare($insertQueryHistoris);
+    $insertStmt->bind_param("siis", $pengguna, $selectedItemId, $submittedQuantity, $_POST['deskripsi']);
+
+    $insertStmt->execute();
+    $insertStmt->close();
+
+    // Return the updated stock quantity
+    echo json_encode(array('currentStock' => $stockQuantity, 'newStock' => $newStockQuantity));
+    exit();
+}
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -96,7 +84,7 @@ if (!$resultKelompok) {
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Master Bahan</title>
+    <title>Prototype</title>
 
     <link rel="icon" href="assets/adminlte/dist/img/OWLlogo.png" type="image/x-icon">
     <!-- Google Font: Source Sans Pro -->
@@ -105,14 +93,16 @@ if (!$resultKelompok) {
     <link rel="stylesheet" href="assets/adminlte/plugins/fontawesome-free/css/all.min.css">
     <!-- Theme style -->
     <link rel="stylesheet" href="assets/adminlte/dist/css/adminlte.min.css">
-    <!-- Ionicons -->
-    <link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+
     <!-- Sweetalert2 -->
     <link rel="stylesheet" href="assets/adminlte/plugins/sweetalert2-theme-bootstrap-4/bootstrap-4.min.css">
+    <!-- Ionicons -->
+    <link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
 
     <style>
-        .input-group-append label {
-            margin-right: 24px;
+        #successMessage {
+            display: none;
+            /* Hide the success message initially */
         }
 
         .gray-italic-text {
@@ -142,7 +132,6 @@ if (!$resultKelompok) {
             appearance: none;
         }
     </style>
-
 
 </head>
 
@@ -199,7 +188,7 @@ if (!$resultKelompok) {
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="prototype.php" class="nav-link">
+                            <a href="prototype.php" class="nav-link active">
                                 <i class="nav-icon fas fa-screwdriver"></i>
                                 <p>
                                     Prototype
@@ -216,7 +205,7 @@ if (!$resultKelompok) {
                         </li>
                         <li class="nav-header">TAMBAH DATA</li>
                         <li class="nav-item">
-                            <a href="master_bahan.php" class="nav-link active">
+                            <a href="master_bahan.php" class="nav-link">
                                 <i class="nav-icon fa fa-pen"></i>
                                 <p>
                                     Master Bahan
@@ -262,12 +251,12 @@ if (!$resultKelompok) {
                 <div class="container-fluid">
                     <div class="row mb-2">
                         <div class="col-sm-6">
-                            <h1>Master Bahan</h1>
+                            <h1>Prototype</h1>
                         </div>
                         <div class="col-sm-6">
                             <ol class="breadcrumb float-sm-right">
                                 <li class="breadcrumb-item"><a href="homepage.php">Home</a></li>
-                                <li class="breadcrumb-item active">Master Bahan</li>
+                                <li class="breadcrumb-item active">Prototype</li>
                             </ol>
                         </div>
                     </div>
@@ -281,17 +270,17 @@ if (!$resultKelompok) {
                     <!-- general form elements -->
                     <div class="card card-primary">
                         <div class="card-header">
-                            <h3 class="card-title">Menambah Jenis Master Bahan</h3>
+                            <h3 class="card-title">Mengurangi Bahan Untuk Keperluan Prototype</h3>
                         </div>
                         <!-- /.card-header -->
                         <!-- form start -->
-                        <form id="masterBahanForm">
+                        <form id="prototypeForm">
                             <div class="card-body">
                                 <div class="form-group">
                                     <div>
-                                        <label for="pilihNamaKelompok">Pilih Kelompok <span style="color: red;">*</span></label>
+                                        <label for="pilihNamaKelompok">Pilih Kelompok<span class="gray-italic-text"> (opsional)</span></label>
                                     </div>
-                                    <select class="form-select" id="pilihNamaKelompok" name="kelompok" searchable="Search here...">
+                                    <select class="form-select" id="pilihNamaKelompok" name="kelompok">
                                         <option value="">Pilih Kelompok</option>
                                         <?php
                                         while ($row = $resultKelompok->fetch_assoc()) {
@@ -299,29 +288,37 @@ if (!$resultKelompok) {
                                         }
                                         ?>
                                     </select>
-                                    <button type="button" class="btn btn-outline-info btn-block" data-toggle="modal" data-target="#modalBuatKelompok" style="margin-top: 10px; max-width: 180px;">+ Kelompok Baru</button>
                                 </div>
                                 <div class="form-group">
-                                    <label for="nama">Nama Bahan <span style="color: red;">*</span></label>
-                                    <input type="text" class="form-control form-control-border border-width-2" id="nama" name="nama" placeholder="Contoh : R060310k">
+                                    <label for="exampleSelectBorderWidth2">Pilih Bahan <span style="color: red;">*</span></label>
+                                    <select class="form-select" id="pilihBahanPrototype" name="selectedItem">
+                                        <option value="">Pilih Bahan</option>
+                                        <?php
+                                        while ($row = $resultBahan->fetch_assoc()) {
+                                            echo '<option value="' . $row['stok_id'] . '">' . $row['nama'] . '</option>';
+                                        }
+                                        ?>
+                                    </select>
                                 </div>
                                 <div class="form-group">
                                     <label for="quantity">Kuantitas <span style="color: red;">*</span></label>
                                     <div class="input-group">
                                         <!-- Input untuk kuantitas -->
-                                        <input type="number" class="form-control" id="quantity" name="quantity" min="0" value="" placeholder="Masukkan jumlah stok bahan">
-
+                                        <input type="number" class="form-control" id="quantity" name="quantity" min="0" value="">
                                     </div>
                                 </div>
+                                <p id="stockMessage">Stok Bahan Tersisa: <?php echo $stockQuantity; ?></p>
+                                <p id="successMessage">Stok Bahan Terkini: <?php echo $newStockQuantity; ?></p>
                                 <div class="form-group">
-                                    <label>Deskripsi<span class="gray-italic-text"> (opsional)</span></label>
-                                    <textarea class="form-control" id="deskripsi" name="deskripsi" rows="3" placeholder="Masukkan keterangan bahan ..."></textarea>
+                                    <label for="deksripsi">Deskripsi<span class="gray-italic-text"> (opsional)</span></label>
+                                    <textarea class="form-control" id="deskripsi" name="deskripsi" rows="3" placeholder="Masukkan keterangan penggunaan bahan ..."></textarea>
                                 </div>
                             </div>
+
                             <!-- /.card-body -->
                         </form>
                         <div class="card-footer d-flex justify-content-end">
-                            <button type="button" id="submitButton" class="btn btn-primary" onclick="if(validateForm()) { validateSuccess(); resetForm(); }">Submit</button>
+                            <button type="submit" id="submitButton" class="btn btn-primary" onclick="if(validateForm()) { validateSuccess();}">Submit</button>
                         </div>
                     </div>
                     <!-- general form elements -->
@@ -333,34 +330,11 @@ if (!$resultKelompok) {
         </div>
         <!-- /.content-wrapper -->
 
-
         <!-- Control Sidebar -->
         <aside class="control-sidebar control-sidebar-dark">
             <!-- Control sidebar content goes here -->
         </aside>
         <!-- /.control-sidebar -->
-
-        <!-- Modal menambahkan kelompok baru -->
-        <form id="tambahKelompokForm">
-            <div class="modal fade" id="modalBuatKelompok" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
-                <div class="modal-dialog modal-dialog-centered" role="document">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="exampleModalCenterTitle">Buat Kelompok Baru</h5>
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                            </button>
-                        </div>
-                        <div class="modal-body">
-                            <div class="form-group">
-                                <label for="namaKelompokBaru">Nama Kelompok <span style="color: red;">*</span></label>
-                                <input type="text" class="form-control form-control-border border-width-2" id="namaKelompokBaru" name="namaKelompokBaru" placeholder="Masukkan nama kelompok yang ingin dibuat">
-                            </div>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                            <button type="button" class="btn btn-primary" onclick="if(validateFormKB()) { validateSuccessKB(); resetForm(); }">Submit</button>
-        </form>
     </div>
     <!-- ./wrapper -->
 
@@ -379,12 +353,20 @@ if (!$resultKelompok) {
     <script src="assets/dselect.js"></script>
     <!-- Page specific script -->
     <script>
+        $(function() {
+            bsCustomFileInput.init();
+
+            // Add an event listener to the select element
+            $("#pilihBahanPrototype").change(function() {
+                validateCurrentStock();
+            });
+        });
+
         function validateForm() {
-            var selectedItem = document.getElementById("pilihNamaKelompok").value;
-            var nama = document.getElementById("nama").value;
+            var selectedItem = document.getElementById("pilihBahanPrototype").value;
             var quantity = document.getElementById("quantity").value;
 
-            if (selectedItem === "" || nama === "" || quantity === "" || quantity <= 0) {
+            if (selectedItem === "" || quantity === "" || quantity <= 0) {
                 Swal.fire({
                     icon: 'error',
                     title: 'Oops...',
@@ -403,19 +385,54 @@ if (!$resultKelompok) {
             return true;
         }
 
+        function updateStockMessage() {
+            var stockMessage = document.getElementById("stockMessage");
+            var selectedQuantity = parseInt(document.getElementById("quantity").value, 10);
+
+            // Update stock message dynamically based on the selected item's stock quantity
+            stockMessage.innerText = "Stok Bahan Tersisa: " + (<?php echo $stockQuantity; ?> - selectedQuantity);
+        }
+
+        function validateCurrentStock() {
+            // Get the form data
+            var formData = $("#prototypeForm").serialize();
+
+            // Use AJAX to submit the form data and fetch the updated stock quantity
+            $.ajax({
+                type: "POST",
+                url: "prototype.php",
+                data: formData,
+                dataType: "json",
+                success: function(response) {
+                    // Hide the stock message
+                    document.getElementById("successMessage").style.display = "none";
+                    // Update the stock message with the fetched quantity
+                    document.getElementById("stockMessage").innerText = "Stok Bahan Tersisa: " + response.currentStock;
+                },
+                error: function(error) {
+                    alert("Error, refresh the page!");
+                }
+            });
+        }
 
         function validateSuccess() {
             // Get the form data
-            var formData = $("#masterBahanForm").serialize();
+            var formData = $("#prototypeForm").serialize();
 
+            // Use AJAX to submit the form data and fetch the updated stock quantity
             $.ajax({
                 type: "POST",
-                url: "master_bahan.php",
+                url: "prototype.php",
                 data: formData,
+                dataType: "json",
                 success: function(response) {
+                    // Hide the stock message
+                    document.getElementById("stockMessage").innerText = "Stok Bahan Tersisa: ";
+
                     Swal.fire({
                         icon: 'success',
-                        title: 'Bahan berhasil didaftarkan!',
+                        title: 'Stok berhasil diambil!',
+                        text: 'Stok terbaru adalah ' + response.newStock + ' bahan',
                         showCancelButton: false,
                         confirmButtonColor: '#3085d6',
                         confirmButtonText: 'OK (enter)'
@@ -425,66 +442,34 @@ if (!$resultKelompok) {
                         }
                     });
 
+                    resetForm();
+
                 },
                 error: function(error) {
-                    alert("Error mendaftarkan barang.");
-                }
-            });
-        }
-
-        function validateFormKB() {
-            var namaKB = document.getElementById("namaKelompokBaru").value;
-
-            if (namaKB === "") {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Oops...',
-                    text: 'Harap lengkapi semua formulir!',
-                });
-                return false;
-            }
-
-            return true;
-        }
-
-        function validateSuccessKB() {
-            // Get the form data
-            var formDataKB = $("#tambahKelompokForm").serialize();
-
-            $.ajax({
-                type: "POST",
-                url: "master_bahan.php",
-                data: formDataKB,
-                success: function(response) {
                     Swal.fire({
-                        icon: 'success',
-                        title: 'Kelompok berhasil didaftarkan!',
+                        icon: 'error',
+                        title: 'Stok Kurang',
+                        text: 'Kurangi kuantitas yang diinput!',
+                        showCancelButton: false,
+                        confirmButtonColor: '#3085d6',
+                        confirmButtonText: 'OK (enter)'
                     }).then((result) => {
                         if (result.isConfirmed) {
-                            location.reload();
+                            resetForm();
                         }
                     });
-
-
-                },
-                error: function(error) {
-                    alert("Error mendaftarkan kelompok.");
                 }
             });
-        }
-
-        function addNewKelompok() {
-
         }
 
         function resetForm() {
-            document.getElementById("masterBahanForm").reset();
-            document.getElementById("tambahKelompokForm").reset();
+            document.getElementById("prototypeForm").reset();
             resetDropdown();
+            disableQuantityInput();
         }
 
         function resetDropdown() {
-            const dropdown = document.getElementById("pilihNamaKelompok");
+            const dropdown = document.getElementById("pilihBahanPrototype");
             dropdown.selectedIndex = 0; // reset ke pilihan pertama
 
             // jika multiple selection
@@ -498,8 +483,30 @@ if (!$resultKelompok) {
 
         // Searchable dropdown
         var select_box_element = document.querySelector('#pilihNamaKelompok');
+        var select_box_element2 = document.querySelector('#pilihBahanPrototype');
+
         dselect(select_box_element, {
             search: true,
+        });
+        dselect(select_box_element2, {
+            search: true,
+        });
+
+        // Quantity input disabled to prevent bugs
+        document.addEventListener("DOMContentLoaded", function() {
+            disableQuantityInput();
+        });
+
+        function disableQuantityInput() {
+            const quantityInput = document.getElementById("quantity");
+            quantityInput.placeholder = "Pilih bahan terlebih dahulu";
+            quantityInput.disabled = true;
+        }
+
+        $("#pilihBahanPrototype").change(function() {
+            const quantityInput = document.getElementById("quantity");
+            quantityInput.placeholder = "Masukkan jumlah stok bahan yang ingin digunakan";
+            quantityInput.disabled = false;
         });
 
         // When user press enter on keyboard

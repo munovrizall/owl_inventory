@@ -222,6 +222,14 @@ if (isset($_POST['selectedDevice'])) {
                             </a>
                         </li>
                         <li class="nav-item">
+                            <a href="prototype.php" class="nav-link">
+                                <i class="nav-icon fas fa-screwdriver"></i>
+                                <p>
+                                    Prototype
+                                </p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
                             <a href="restock.php" class="nav-link">
                                 <i class="nav-icon fas fa-shopping-cart"></i>
                                 <p>

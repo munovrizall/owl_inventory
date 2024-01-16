@@ -152,6 +152,14 @@ if (!$result) {
               </a>
             </li>
             <li class="nav-item">
+              <a href="prototype.php" class="nav-link">
+                <i class="nav-icon fas fa-screwdriver"></i>
+                <p>
+                  Prototype
+                </p>
+              </a>
+            </li>
+            <li class="nav-item">
               <a href="restock.php" class="nav-link">
                 <i class="nav-icon fas fa-shopping-cart"></i>
                 <p>
@@ -254,6 +262,19 @@ if (!$result) {
             <!-- ./col -->
             <div class="col-lg-3 col-6">
               <!-- small box -->
+              <div class="small-box bg-warning">
+                <div class="inner">
+                  <h3><sup style="font-size: 24px">Prototype</sup></h3>
+                  <p>Prototype device</p>
+                </div>
+                <div class="icon">
+                  <i class="fas fa-screwdriver"></i>
+                </div>
+                <a href="prototype.php" class="small-box-footer">Go <i class="fas fa-arrow-circle-right"></i></a>
+              </div>
+            </div>
+            <div class="col-lg-3 col-6">
+              <!-- small box -->
               <div class="small-box bg-success">
                 <div class="inner">
                   <h3><sup style="font-size: 24px">Restock</sup></h3>
@@ -266,19 +287,6 @@ if (!$result) {
               </div>
             </div>
             <!-- ./col -->
-            <div class="col-lg-3 col-6">
-              <!-- small box -->
-              <div class="small-box bg-warning">
-                <div class="inner">
-                  <h3><sup style="font-size: 24px">Laporan Stok</sup></h3>
-                  <p>Cek ketersediaan stok bahan</p>
-                </div>
-                <div class="icon">
-                  <i class="ion ion-pie-graph"></i>
-                </div>
-                <a href="laporan_stok.php" class="small-box-footer">Go <i class="fas fa-arrow-circle-right"></i></a>
-              </div>
-            </div>
 
             <!-- ./col -->
           </div>
@@ -318,6 +326,10 @@ if (!$result) {
                               break;
                             case "Maintenance":
                               $badgeClass = "badge bg-danger";
+                              $row["quantity"] = "-" . $row["quantity"];
+                              break;
+                            case "Prototype":
+                              $badgeClass = "badge bg-warning";
                               $row["quantity"] = "-" . $row["quantity"];
                               break;
                             default:

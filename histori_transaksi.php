@@ -142,6 +142,14 @@ if (!$result) {
                             </a>
                         </li>
                         <li class="nav-item">
+                            <a href="prototype.php" class="nav-link">
+                                <i class="nav-icon fas fa-screwdriver"></i>
+                                <p>
+                                    Prototype
+                                </p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
                             <a href="restock.php" class="nav-link">
                                 <i class="nav-icon fas fa-shopping-cart"></i>
                                 <p>
@@ -253,9 +261,13 @@ if (!$result) {
                                                             $badgeClass = "badge bg-danger";
                                                             $row["quantity"] = "-" . $row["quantity"];
                                                             break;
+                                                        case "Prototype":
+                                                            $badgeClass = "badge bg-warning";
+                                                            $row["quantity"] = "-" . $row["quantity"];
+                                                            break;
                                                         default:
                                                             // Set kelas default jika nilai activity tidak sesuai dengan kasus di atas
-                                                            $badgeClass = "badge bg-secondary";
+                                                            $badgeClass = "badge bg-warning";
                                                             break;
                                                     }
                                             ?>

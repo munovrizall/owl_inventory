@@ -27,7 +27,6 @@ if (isset($_GET["getDropdownOptions"])) {
     }
     echo $options;
     exit();
-
 } elseif ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     // Handle the POST request for submitting form data
@@ -187,6 +186,14 @@ if (isset($_GET["getDropdownOptions"])) {
                                 <i class="nav-icon fas fa-wrench"></i>
                                 <p>
                                     Maintenance
+                                </p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="prototype.php" class="nav-link">
+                                <i class="nav-icon fas fa-screwdriver"></i>
+                                <p>
+                                    Prototype
                                 </p>
                             </a>
                         </li>
@@ -352,7 +359,7 @@ if (isset($_GET["getDropdownOptions"])) {
                 addRow();
             });
 
-            $("table.order-list").on("click", ".ibtnDel", function (event) {
+            $("table.order-list").on("click", ".ibtnDel", function(event) {
                 $(this).closest("tr").remove();
                 calculateGrandTotal();
             });
@@ -431,7 +438,7 @@ if (isset($_GET["getDropdownOptions"])) {
                 data: formData,
                 processData: false,
                 contentType: false,
-                success: function (response) {
+                success: function(response) {
                     Swal.fire({
                         icon: 'success',
                         title: 'Device berhasil didaftarkan!',
@@ -441,7 +448,7 @@ if (isset($_GET["getDropdownOptions"])) {
                         }
                     });
                 },
-                error: function (error) {
+                error: function(error) {
                     // ... existing code ...
                 }
             });
