@@ -100,7 +100,7 @@ if (isset($_POST['selectedDevice'])) {
 }
 
 
-?> 
+?>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -146,6 +146,26 @@ if (isset($_POST['selectedDevice'])) {
             -webkit-appearance: none;
             -moz-appearance: none;
             appearance: none;
+        }
+
+        .lebar-kolom1 {
+            width: 5%;
+        }
+
+        .lebar-kolom2 {
+            width: 40%;
+        }
+
+        .lebar-kolom3 {
+            width: 20%;
+        }
+
+        .lebar-kolom4 {
+            width: 20%;
+        }
+
+        .lebar-kolom5 {
+            width: 15%;
         }
     </style>
 </head>
@@ -280,7 +300,7 @@ if (isset($_POST['selectedDevice'])) {
                         </div>
                         <!-- /.card-header -->
                         <!-- form start -->
-                        <form id="produksiForm" onsubmit="return validateForm()" method ="post"> 
+                        <form id="produksiForm" onsubmit="return validateForm()" method="post">
                             <div class="card-body">
                                 <div class="form-group">
                                     <label for="exampleSelectBorderWidth2">Pilih Device <span style="color: red;">*</span></label>
@@ -299,9 +319,7 @@ if (isset($_POST['selectedDevice'])) {
                                         <!-- Input untuk kuantitas -->
                                         <input type="number" class="form-control" id="quantity" name="quantity" min="0" value="">
                                     </div>
-                                    <button type="button" class="btn btn-outline-info btn-block" id ="cekButton" name="cekButton" 
-                                    style="margin-top: 10px; max-width: 180px;"><i class="fas fa-sync-alt" style="margin-right: 8px;" 
-                                    onclick="cekProduksi()"></i>Cek</button>
+                                    <button type="button" class="btn btn-outline-info btn-block" id="cekButton" name="cekButton" style="margin-top: 10px; max-width: 180px;"><i class="fas fa-sync-alt" style="margin-right: 8px;" onclick="cekProduksi()"></i>Cek</button>
                                 </div>
                                 <div class="card">
                                     <div class="card-header">
@@ -313,11 +331,11 @@ if (isset($_POST['selectedDevice'])) {
                                             <table class="table table-striped">
                                                 <thead>
                                                     <tr>
-                                                        <th style="width: 10px">No</th>
-                                                        <th>Nama Bahan</th>
-                                                        <th>Stok yang Dibutuhkan</th>
-                                                        <th>Stok Tersisa</th>
-                                                        <th>Cukup?</th>
+                                                        <th class="text-center lebar-kolom1">No</th>
+                                                        <th class="text-center lebar-kolom2">Nama Bahan</th>
+                                                        <th class="text-center lebar-kolom3">Stok yang Dibutuhkan</th>
+                                                        <th class="text-center lebar-kolom4">Stok Tersisa</th>
+                                                        <th class="text-center lebar-kolom5">Cukup?</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody id="produksiTable">
@@ -371,7 +389,7 @@ if (isset($_POST['selectedDevice'])) {
     <!-- Page specific script -->
     <!-- Page specific script -->
     <script>
-        $(function () {
+        $(function() {
             bsCustomFileInput.init();
 
             // Searchable dropdown
@@ -381,7 +399,7 @@ if (isset($_POST['selectedDevice'])) {
             });
 
             // Event listener for "Cek" button click
-            document.getElementById("cekButton").addEventListener("click", function () {
+            document.getElementById("cekButton").addEventListener("click", function() {
                 console.log("Cek button clicked"); // Debugging statement
                 cekProduksi();
             });
@@ -411,7 +429,7 @@ if (isset($_POST['selectedDevice'])) {
                     quantity: quantity
                 },
                 dataType: "json",
-                success: function (response) {
+                success: function(response) {
                     console.log("AJAX request successful"); // Debugging statement
                     if (response.resultProduksi.length === 0) {
                         alert("Tidak ada data produksi untuk produk yang dipilih.");
@@ -422,27 +440,31 @@ if (isset($_POST['selectedDevice'])) {
                     tableBody.innerHTML = ""; // Clear existing rows
                     // Add new rows based on the response array
                     for (var i = 0; i < response.resultProduksi.length; i++) {
+                        var isStockSufficient = response.updatedStockQuantities[i].currentStock >= (quantity * response.resultProduksi[i].stokDibutuhkan);
+                        var badgeClass = isStockSufficient ? 'bg-success' : 'bg-danger';
+
+
                         var newRow = "<tr>" +
-                            "<td>" + (i + 1) + "</td>" +
-                            "<td>" + response.resultProduksi[i].namaBahan + "</td>" +
-                            "<td>" + response.resultProduksi[i].stokDibutuhkan * quantity + "</td>" +
-                            "<td>" + response.updatedStockQuantities[i].currentStock + "</td>" +
-                            "<td>" + (response.updatedStockQuantities[i].currentStock >= (quantity * response.resultProduksi[i].stokDibutuhkan) ? "Ya" : "Tidak") + "</td>" +
+                            "<td style='text-align: center;'>" + (i + 1) + "</td>" +
+                            "<td style='text-align: center;'>" + response.resultProduksi[i].namaBahan + "</td>" +
+                            "<td style='text-align: center;'>" + response.resultProduksi[i].stokDibutuhkan * quantity + "</td>" +
+                            "<td style='text-align: center;'>" + response.updatedStockQuantities[i].currentStock + "</td>" +
+                            "<td style='text-align: center;'><span class='badge " + badgeClass + "'>" + (isStockSufficient ? "Ya" : "Tidak") + "</span></td>" +
                             "</tr>";
                         tableBody.innerHTML += newRow;
                     }
 
                     // Show the table
-                    tableBody.style.display = "table";
+                    tableBody.style.display = "table table-striped";
                 },
-                error: function (error) {
+                error: function(error) {
                     console.error("Error fetching produksi data:", error);
                 }
             });
         }
 
         // Quantity input disabled to prevent bugs
-        document.addEventListener("DOMContentLoaded", function () {
+        document.addEventListener("DOMContentLoaded", function() {
             disableQuantityInput();
         });
 
@@ -452,16 +474,17 @@ if (isset($_POST['selectedDevice'])) {
             quantityInput.disabled = true;
         }
 
-        $("#pilihProduksiDevice").change(function () {
+        $("#pilihProduksiDevice").change(function() {
             const quantityInput = document.getElementById("quantity");
             quantityInput.placeholder = "Masukkan jumlah produksi device";
             quantityInput.disabled = false;
         });
+
         function submitForm() {
             // Assuming validateForm() is the function you want to call for validation
             if (validateForm()) {
                 document.getElementById("produksiForm").submit();
-                
+
             } else {
                 alert("Validation failed. Please check your input.");
             }

@@ -57,7 +57,7 @@ if (!$result) {
 
   <style>
     .lebar-kolom1 {
-      width: 10;
+      width: 10%;
     }
 
     .lebar-kolom2 {
