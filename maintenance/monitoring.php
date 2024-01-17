@@ -316,7 +316,7 @@ if (isset($_POST['selectedDevice'])) {
                 <div class="container-fluid">
                     <div class="row mb-2">
                         <div class="col-sm-6">
-                            <h1>Produksi</h1>
+                            <h1>Monitoring Transaksi Maintenance</h1>
                         </div>
                         <div class="col-sm-6">
                             <ol class="breadcrumb float-sm-right">
@@ -337,19 +337,19 @@ if (isset($_POST['selectedDevice'])) {
 
                         <div class="card">
                             <div class="card-header">
-                                <h3 class="card-title"><b>List Bahan</b></h3>
+                                <h3 class="card-title"><b>List Transaksi</b></h3>
                             </div>
                             <!-- /.card-header -->
                             <div class="card-body p-0">
                                 <div class="table-responsive card-padding">
-                                    <table id="tableTransaksi" class="table table-striped table-bordered">
+                                    <table id="tableTransaksi" class="table table order-list table-striped table-bordered">
                                         <thead>
                                             <tr>
                                                 <th class="text-center lebar-kolom1">ID Transaksi</th>
                                                 <th class="text-center lebar-kolom2">Tanggal</th>
                                                 <th class="text-center lebar-kolom3">Nama PT</th>
                                                 <th class="text-center lebar-kolom4">Status</th>
-                                                <th class="text-center lebar-kolom5">Aksi</th>
+                                                <th class="text-center lebar-kolom5 aksi-column">Aksi</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -358,14 +358,14 @@ if (isset($_POST['selectedDevice'])) {
                                                 <td>17/01/2024</td>
                                                 <td>Origin Wiracipta Lestari</td>
                                                 <td><span class="badge bg-success">Selesai</span></td>
-                                                <td><input type="button" class="ibtnDel btn btn-info btn-block" value="Edit"></td>
+                                                <td><input type="button" class="ibtnEdit btn btn-info btn-block" value="Edit"></td>
                                             </tr>
                                             <tr>
                                                 <td>124</td>
                                                 <td>17/01/2024</td>
                                                 <td>Origin Wiracipta Lestari</td>
                                                 <td><span class="badge bg-danger">Belum</span></td>
-                                                <td><input type="button" class="ibtnDel btn btn-info btn-block" value="Edit"></td>
+                                                <td><input type="button" class="ibtnEdit btn btn-info btn-block" value="Edit"></td>
                                             </tr>
                                         </tbody>
                                     </table>
@@ -433,19 +433,60 @@ if (isset($_POST['selectedDevice'])) {
                     ['10 rows', '25 rows', '50 rows', 'Show all']
                 ],
                 buttons: [
-                    'pageLength', 'copy',
+                    'pageLength', 
+                    {
+                        extend: 'copy',
+                        title: 'Monitoring Transaksi Maintenance',
+                        exportOptions: {
+                            columns: ':visible:not(.aksi-column)'
+                        }
+                    },
                     {
                         extend: 'spacer',
                         style: 'bar',
                         text: 'Export files:'
                     },
-                    'csv', 'excel', 'pdf', 'print'
+                    {
+                        extend: 'csv',
+                        title: 'Monitoring Transaksi Maintenance',
+                        exportOptions: {
+                            columns: ':visible:not(.aksi-column)'
+                        }
+                    },
+                    {
+                        extend: 'excel',
+                        title: 'Monitoring Transaksi Maintenance',
+                        exportOptions: {
+                            columns: ':visible:not(.aksi-column)'
+                        }
+                    },
+                    {
+                        extend: 'pdf',
+                        title: 'Monitoring Transaksi Maintenance',
+                        exportOptions: {
+                            columns: ':visible:not(.aksi-column)'
+                        }
+                    },
+                    {
+                        extend: 'print',
+                        title: 'Monitoring Transaksi Maintenance',
+                        exportOptions: {
+                            columns: ':visible:not(.aksi-column)'
+                        }
+                    },
                 ],
-                order: [1, 'asc'],
+                order: [],
             });
 
             table.buttons().container()
                 .appendTo('wrapper .col-md-6:eq(0)');
+
+            $("table.order-list").on("click", ".ibtnEdit", function(event) {
+                var idToEdit = 123;
+
+                // Lakukan redirect dengan menyertakan ID sebagai parameter
+                window.location.href = 'edit/edit.php?id=' + idToEdit;
+            });
 
         });
     </script>

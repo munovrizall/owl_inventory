@@ -73,7 +73,7 @@ if (isset($_POST['selectedDevice'])) {
             // Store the updated stock quantities in the array
             $updatedStockQuantities[] = array('namaBahan' => $namaBahan, 'stokDibutuhkan' => $stokDibutuhkan, 'currentStock' => $currentStock, 'newStock' => $newStock);
         }
-        
+
         $queryCurrentProductStock = "SELECT quantity FROM masterbahan WHERE nama = ?";
         $stmtCurrentProductStock = $conn->prepare($queryCurrentProductStock);
         $stmtCurrentProductStock->bind_param("s", $selectedDeviceName);
@@ -88,7 +88,7 @@ if (isset($_POST['selectedDevice'])) {
             // Update the masterbahan table
             $updateQueryStock = "UPDATE masterbahan SET quantity = ? WHERE nama = ?";
             $updateStmt = $conn->prepare($updateQueryStock);
-            
+
 
             foreach ($updatedStockQuantities as $updatedStock) {
                 $newStock = $updatedStock['newStock'];
@@ -115,13 +115,13 @@ if (isset($_POST['selectedDevice'])) {
 
             // Update Produk quantity pada masterbahan
             $updateQueryMasterBahan = "UPDATE masterbahan SET quantity = ? WHERE nama = ?";
-            $updateStmtMasterBahan = $conn->prepare($updateQueryMasterBahan);            
+            $updateStmtMasterBahan = $conn->prepare($updateQueryMasterBahan);
             $updateStmtMasterBahan->bind_param("is", $newProductStock, $selectedDeviceName);
             $updateStmtMasterBahan->execute();
-            
-            
-            $updateStmtMasterBahan->close();            
-            
+
+
+            $updateStmtMasterBahan->close();
+
             $updateStmt->close();
         }
         // Return the updated stock quantities
@@ -249,12 +249,33 @@ if (isset($_POST['selectedDevice'])) {
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="maintenance.php" class="nav-link">
+                            <a href="../maintenance.php" class="nav-link">
                                 <i class="nav-icon fas fa-wrench"></i>
                                 <p>
                                     Maintenance
+                                    <i class="right fas fa-angle-left"></i>
                                 </p>
                             </a>
+                            <ul class="nav nav-treeview">
+                                <li class="nav-item">
+                                    <a href="maintenance/input.php" class="nav-link">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>Input</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="maintenance/monitoring.php" class="nav-link">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>Monitoring</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="maintenance/update.php" class="nav-link">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>Update</p>
+                                    </a>
+                                </li>
+                            </ul>
                         </li>
                         <li class="nav-item">
                             <a href="prototype.php" class="nav-link">
@@ -543,7 +564,7 @@ if (isset($_POST['selectedDevice'])) {
             if (selectedDevice === "" || quantity === "") {
                 alert("Please fill in all required fields.");
                 return false;
-            } else if (quantity == "0"){
+            } else if (quantity == "0") {
                 alert("Quantity has to be bigger than 0");
                 return false;
             } else {
@@ -553,8 +574,8 @@ if (isset($_POST['selectedDevice'])) {
                     if (badge.length > 0) {
                         alert("Bahan tidak mencukupi");
                         return false;
-                        }
                     }
+                }
             }
             // Add more validation as needed...
 
