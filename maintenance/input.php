@@ -123,14 +123,22 @@ if (isset($_GET["getDropdownOptions"])) {
         }
 
         .lebar-kolom1 {
-            width: 78%;
+            width: 30%;
         }
 
         .lebar-kolom2 {
-            width: 12%;
+            width: 15%;
         }
 
         .lebar-kolom3 {
+            width: 15%;
+        }
+
+        .lebar-kolom4 {
+            width: 30%;
+        }
+
+        .lebar-kolom5 {
             width: 10%;
         }
     </style>
@@ -315,22 +323,25 @@ if (isset($_GET["getDropdownOptions"])) {
                                 </div>
                                 <div class="form-group">
                                     <div class="col">
-                                        <label for="namaTransaksiMaintenance">Pilih PT <span style="color: red;">*</span></label>
-                                        <select class="form-select" id="pilihNamaKelompok" name="kelompok" searchable="Search here...">
-                                            <option value="">Pilih Kelompok</option>
-                                            <option value="">Pilih Kelompok</option>
-                                            <option value="">Pilih Kelompok</option>
+                                        <label for="pilihNamaPT">Pilih PT <span style="color: red;">*</span></label>
+                                        <select class="form-select" id="pilihNamaPT" name="kelompok">
+                                            <option value="">Pilih PT</option>
+                                            <option value="2">PT 1</option>
+                                            <option value="3">PT 2</option>
                                         </select>
+                                        <button type="button" class="btn btn-outline-info btn-block" data-toggle="modal" data-target="#modalBuatPT" style="margin-top: 10px; max-width: 180px;"><i class="fas fa-plus" style="margin-right: 8px;" onclick=""></i>Tambah PT</button>
                                     </div>
                                 </div>
                                 <div class="card-body p-0">
                                     <div class="table-responsive">
-                                        <table id="myTable" class=" table order-list table-striped">
+                                        <table id="tableDetail" class=" table order-list table-striped">
                                             <thead>
                                                 <tr>
-                                                    <td class="text-center lebar-kolom1"><b>Nama Bahan <span style="color: red;">*</span></b></td>
-                                                    <td class="text-center lebar-kolom2"><b>Kuantitas <span style="color: red;">*</span></b></td>
-                                                    <td class="text-center lebar-kolom3"><b>Aksi</b></td>
+                                                    <td class="text-center lebar-kolom1"><b>Nama Produk <span style="color: red;">*</span></b></td>
+                                                    <td class="text-center lebar-kolom2"><b>Nomor SN <span style="color: red;">*</span></b></td>
+                                                    <td class="text-center lebar-kolom3"><b>Garansi? <span style="color: red;">*</span></b></td>
+                                                    <td class="text-center lebar-kolom4"><b>Kerusakan <span style="color: red;">*</span></b></td>
+                                                    <td class="text-center lebar-kolom5"><b>Aksi</b></td>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -341,7 +352,7 @@ if (isset($_GET["getDropdownOptions"])) {
                                             <tfoot>
                                                 <tr>
                                                     <td colspan="5" style="text-align: left;">
-                                                        <input type="button" class="btn btn-outline-info btn-block" id="addrow" value="+  Tambah Bahan" />
+                                                        <input type="button" class="btn btn-outline-info btn-block" id="addrow" value="+  Tambah Detail" />
                                                     </td>
                                                 </tr>
                                             </tfoot>
@@ -371,6 +382,27 @@ if (isset($_GET["getDropdownOptions"])) {
             <!-- Control sidebar content goes here -->
         </aside>
         <!-- /.control-sidebar -->
+
+        <form id="tambahPTForm">
+            <div class="modal fade" id="modalBuatPT" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalCenterTitle">Buat PT Baru</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="form-group">
+                                <label for="namaKelompokBaru">Nama PT <span style="color: red;">*</span></label>
+                                <input type="text" class="form-control form-control-border border-width-2" id="namaPTBaru" name="namaPTBaru" placeholder="Masukkan nama PT yang ingin dibuat">
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-primary" onclick="if(validateFormKB()) { validateSuccessKB(); resetForm(); }">Submit</button>
+        </form>
     </div>
     <!-- ./wrapper -->
 
@@ -416,15 +448,19 @@ if (isset($_GET["getDropdownOptions"])) {
 
                 // Make an AJAX request to fetch dropdown options
                 $.ajax({
-                    url: 'master_device.php?getDropdownOptions',
+                    url: '../master_device.php?getDropdownOptions',
                     type: 'GET',
                     success: function(dropdownOptions) {
-
+                        var dropdownGaransi = '<option value="" selected disabled>Garansi</option>' +
+                            '<option value="1">Ya</option>' +
+                            '<option value="0">Tidak</option>';
                         var newRow = $("<tr>");
                         var cols = "";
 
-                        cols += '<td><select class="form-select pilihNamaBahan" name="pilihNamaBahan[]">' + dropdownOptions + '</select></td>';
-                        cols += '<td><input type="number" class="form-control quantity" name="quantity[]" min="0" value="" placeholder="0"/></td>';
+                        cols += '<td><select class="form-select pilihNamaProduk" name="pilihNamaProduk[]">' + dropdownOptions + '</select></td>';
+                        cols += '<td><input type="text" class="form-control" name="numberSN[]" value="" placeholder="Nomor SN"/></td>';
+                        cols += '<td><select class="form-select" id="pilihGaransi ' + counter + '" name="pilihGaransi' + counter + '">' + dropdownGaransi + '</select></td>';
+                        cols += '<td><input type="text" class="form-control" name="inputKerusakan[]" value="" placeholder="Kerusakan Device"/></td>';
                         cols += '<td><input type="button" class="ibtnDel btn btn-md btn-danger"  value="Delete"></td>';
 
                         newRow.append(cols);
@@ -501,6 +537,12 @@ if (isset($_GET["getDropdownOptions"])) {
                 }
             });
         }
+
+        // Searchable dropdown
+        var select_box_element = document.querySelector('#pilihNamaPT');
+        dselect(select_box_element, {
+            search: true,
+        });
 
 
         function resetForm() {

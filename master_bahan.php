@@ -291,7 +291,7 @@ if (!$resultKelompok) {
                                     <div>
                                         <label for="pilihNamaKelompok">Pilih Kelompok <span style="color: red;">*</span></label>
                                     </div>
-                                    <select class="form-select" id="pilihNamaKelompok" name="kelompok" searchable="Search here...">
+                                    <select class="form-select" id="pilihNamaKelompok" name="kelompok">
                                         <option value="">Pilih Kelompok</option>
                                         <?php
                                         while ($row = $resultKelompok->fetch_assoc()) {
@@ -299,7 +299,7 @@ if (!$resultKelompok) {
                                         }
                                         ?>
                                     </select>
-                                    <button type="button" class="btn btn-outline-info btn-block" data-toggle="modal" data-target="#modalBuatKelompok" style="margin-top: 10px; max-width: 180px;">+ Kelompok Baru</button>
+                                    <button type="button" class="btn btn-outline-info btn-block" data-toggle="modal" data-target="#modalBuatKelompok" style="margin-top: 10px; max-width: 180px;"><i class="fas fa-plus" style="margin-right: 8px;"></i>Kelompok Baru</button>
                                 </div>
                                 <div class="form-group">
                                     <label for="nama">Nama Bahan <span style="color: red;">*</span></label>
@@ -471,10 +471,6 @@ if (!$resultKelompok) {
                     alert("Error mendaftarkan kelompok.");
                 }
             });
-        }
-
-        function addNewKelompok() {
-
         }
 
         function resetForm() {
