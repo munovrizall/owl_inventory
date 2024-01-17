@@ -191,12 +191,33 @@ if (!$resultKelompok) {
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="maintenance.php" class="nav-link">
+                            <a href="../maintenance.php" class="nav-link">
                                 <i class="nav-icon fas fa-wrench"></i>
                                 <p>
                                     Maintenance
+                                    <i class="right fas fa-angle-left"></i>
                                 </p>
                             </a>
+                            <ul class="nav nav-treeview">
+                                <li class="nav-item">
+                                    <a href="maintenance/input.php" class="nav-link">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>Input</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="maintenance/monitoring.php" class="nav-link">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>Monitoring</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="maintenance/update.php" class="nav-link">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>Update</p>
+                                    </a>
+                                </li>
+                            </ul>
                         </li>
                         <li class="nav-item">
                             <a href="prototype.php" class="nav-link">
@@ -291,7 +312,7 @@ if (!$resultKelompok) {
                                     <div>
                                         <label for="pilihNamaKelompok">Pilih Kelompok <span style="color: red;">*</span></label>
                                     </div>
-                                    <select class="form-select" id="pilihNamaKelompok" name="kelompok" searchable="Search here...">
+                                    <select class="form-select" id="pilihNamaKelompok" name="kelompok">
                                         <option value="">Pilih Kelompok</option>
                                         <?php
                                         while ($row = $resultKelompok->fetch_assoc()) {
@@ -299,7 +320,7 @@ if (!$resultKelompok) {
                                         }
                                         ?>
                                     </select>
-                                    <button type="button" class="btn btn-outline-info btn-block" data-toggle="modal" data-target="#modalBuatKelompok" style="margin-top: 10px; max-width: 180px;">+ Kelompok Baru</button>
+                                    <button type="button" class="btn btn-outline-info btn-block" data-toggle="modal" data-target="#modalBuatKelompok" style="margin-top: 10px; max-width: 180px;"><i class="fas fa-plus" style="margin-right: 8px;"></i>Kelompok Baru</button>
                                 </div>
                                 <div class="form-group">
                                     <label for="nama">Nama Bahan <span style="color: red;">*</span></label>
@@ -471,10 +492,6 @@ if (!$resultKelompok) {
                     alert("Error mendaftarkan kelompok.");
                 }
             });
-        }
-
-        function addNewKelompok() {
-
         }
 
         function resetForm() {

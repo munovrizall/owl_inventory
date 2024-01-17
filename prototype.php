@@ -180,12 +180,33 @@ if (isset($_POST['quantity'])) {
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="maintenance.php" class="nav-link">
+                            <a href="../maintenance.php" class="nav-link">
                                 <i class="nav-icon fas fa-wrench"></i>
                                 <p>
                                     Maintenance
+                                    <i class="right fas fa-angle-left"></i>
                                 </p>
                             </a>
+                            <ul class="nav nav-treeview">
+                                <li class="nav-item">
+                                    <a href="maintenance/input.php" class="nav-link">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>Input</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="maintenance/monitoring.php" class="nav-link">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>Monitoring</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="maintenance/update.php" class="nav-link">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>Update</p>
+                                    </a>
+                                </li>
+                            </ul>
                         </li>
                         <li class="nav-item">
                             <a href="prototype.php" class="nav-link active">
