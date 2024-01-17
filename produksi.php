@@ -543,8 +543,19 @@ if (isset($_POST['selectedDevice'])) {
             if (selectedDevice === "" || quantity === "") {
                 alert("Please fill in all required fields.");
                 return false;
+            } else if (quantity == "0"){
+                alert("Quantity has to be bigger than 0");
+                return false;
+            } else {
+                var tableRows = document.getElementById("produksiTable").getElementsByTagName("tr");
+                for (var i = 0; i < tableRows.length; i++) {
+                    var badge = tableRows[i].getElementsByClassName("bg-danger");
+                    if (badge.length > 0) {
+                        alert("Bahan tidak mencukupi");
+                        return false;
+                        }
+                    }
             }
-
             // Add more validation as needed...
 
             return true; // If all validations pass
