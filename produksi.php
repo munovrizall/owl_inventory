@@ -73,6 +73,16 @@ if (isset($_POST['selectedDevice'])) {
             // Store the updated stock quantities in the array
             $updatedStockQuantities[] = array('namaBahan' => $namaBahan, 'stokDibutuhkan' => $stokDibutuhkan, 'currentStock' => $currentStock, 'newStock' => $newStock);
         }
+        
+        $queryCurrentProductStock = "SELECT quantity FROM masterbahan WHERE nama = ?";
+        $stmtCurrentProductStock = $conn->prepare($queryCurrentProductStock);
+        $stmtCurrentProductStock->bind_param("s", $selectedDeviceName);
+        $stmtCurrentProductStock->execute();
+        $stmtCurrentProductStock->bind_result($currentProductStock);
+        $stmtCurrentProductStock->fetch();
+        $stmtCurrentProductStock->close();
+
+        $newProductStock = $currentProductStock + $submittedQuantity;
 
         $queryCurrentProductStock = "SELECT quantity FROM masterbahan WHERE nama = ?";
         $stmtCurrentProductStock = $conn->prepare($queryCurrentProductStock);
@@ -88,6 +98,7 @@ if (isset($_POST['selectedDevice'])) {
             // Update the masterbahan table
             $updateQueryStock = "UPDATE masterbahan SET quantity = ? WHERE nama = ?";
             $updateStmt = $conn->prepare($updateQueryStock);
+            
 
 
             foreach ($updatedStockQuantities as $updatedStock) {
@@ -115,13 +126,13 @@ if (isset($_POST['selectedDevice'])) {
 
             // Update Produk quantity pada masterbahan
             $updateQueryMasterBahan = "UPDATE masterbahan SET quantity = ? WHERE nama = ?";
-            $updateStmtMasterBahan = $conn->prepare($updateQueryMasterBahan);
+
+            $updateStmtMasterBahan = $conn->prepare($updateQueryMasterBahan);            
             $updateStmtMasterBahan->bind_param("is", $newProductStock, $selectedDeviceName);
             $updateStmtMasterBahan->execute();
-
-
-            $updateStmtMasterBahan->close();
-
+            
+            
+            $updateStmtMasterBahan->close();            
             $updateStmt->close();
         }
         // Return the updated stock quantities
@@ -564,7 +575,7 @@ if (isset($_POST['selectedDevice'])) {
             if (selectedDevice === "" || quantity === "") {
                 alert("Please fill in all required fields.");
                 return false;
-            } else if (quantity == "0") {
+            } else if (quantity == "0"){
                 alert("Quantity has to be bigger than 0");
                 return false;
             } else {
@@ -574,8 +585,9 @@ if (isset($_POST['selectedDevice'])) {
                     if (badge.length > 0) {
                         alert("Bahan tidak mencukupi");
                         return false;
+
+                        }
                     }
-                }
             }
             // Add more validation as needed...
 

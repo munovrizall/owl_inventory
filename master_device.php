@@ -59,7 +59,7 @@ if (isset($_GET["getDropdownOptions"])) {
                 $stmt->bind_param("ssi", $namaDevice, $bahan, $quantity);
 
                 if ($stmt->execute()) {
-                    echo "Data berhasil ditambahkan ke tabel produksi.";
+                    echo "Data berhasil ditambahkan ke tabel produksi dan tabel masterbahan.";
                 } else {
                     echo "Error: " . $stmt->error;
                 }
@@ -67,6 +67,13 @@ if (isset($_GET["getDropdownOptions"])) {
                 $stmt->close();
             }
         }
+
+        // Insert the new record into masterbahan table
+        $queryMasterBahan = "INSERT INTO masterbahan (kelompok, nama) VALUES ('Barang Jadi', ?)";
+        $stmtMasterBahan = $conn->prepare($queryMasterBahan);
+        $stmtMasterBahan->bind_param("s", $namaDevice);
+        $stmtMasterBahan->execute();
+        $stmtMasterBahan->close();
     } else {
         echo "Error: Bahan and Quantity arrays are not set.";
     }
