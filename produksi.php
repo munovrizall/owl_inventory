@@ -73,11 +73,22 @@ if (isset($_POST['selectedDevice'])) {
             // Store the updated stock quantities in the array
             $updatedStockQuantities[] = array('namaBahan' => $namaBahan, 'stokDibutuhkan' => $stokDibutuhkan, 'currentStock' => $currentStock, 'newStock' => $newStock);
         }
+        
+        $queryCurrentProductStock = "SELECT quantity FROM masterbahan WHERE nama = ?";
+        $stmtCurrentProductStock = $conn->prepare($queryCurrentProductStock);
+        $stmtCurrentProductStock->bind_param("s", $selectedDeviceName);
+        $stmtCurrentProductStock->execute();
+        $stmtCurrentProductStock->bind_result($currentProductStock);
+        $stmtCurrentProductStock->fetch();
+        $stmtCurrentProductStock->close();
+
+        $newProductStock = $currentProductStock + $submittedQuantity;
 
         if (isset($_POST['submitForm'])) {
             // Update the masterbahan table
             $updateQueryStock = "UPDATE masterbahan SET quantity = ? WHERE nama = ?";
             $updateStmt = $conn->prepare($updateQueryStock);
+            
 
             foreach ($updatedStockQuantities as $updatedStock) {
                 $newStock = $updatedStock['newStock'];
@@ -87,6 +98,30 @@ if (isset($_POST['selectedDevice'])) {
                 $updateStmt->execute();
             }
 
+            $stokIdQuery = "SELECT stok_id FROM masterbahan WHERE nama = ?";
+            $stokIdStmt = $conn->prepare($stokIdQuery);
+            $stokIdStmt->bind_param("s", $selectedDeviceName);
+            $stokIdStmt->execute();
+            $stokIdStmt->bind_result($stokId);
+            $stokIdStmt->fetch();
+            $stokIdStmt->close();
+
+            // Insert into historis
+            $insertQueryHistoris = "INSERT INTO historis (pengguna, stok_id, waktu, quantity, activity, deskripsi) VALUES (?, ?, NOW(), ?, 'Produksi', ?)";
+            $insertStmt = $conn->prepare($insertQueryHistoris);
+            $insertStmt->bind_param("siis", $pengguna, $stokId, $submittedQuantity, $_POST['deskripsi']);
+            $insertStmt->execute();
+            $insertStmt->close();
+
+            // Update Produk quantity pada masterbahan
+            $updateQueryMasterBahan = "UPDATE masterbahan SET quantity = ? WHERE nama = ?";
+            $updateStmtMasterBahan = $conn->prepare($updateQueryMasterBahan);            
+            $updateStmtMasterBahan->bind_param("is", $newProductStock, $selectedDeviceName);
+            $updateStmtMasterBahan->execute();
+            
+            
+            $updateStmtMasterBahan->close();            
+            
             $updateStmt->close();
         }
         // Return the updated stock quantities
