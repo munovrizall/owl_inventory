@@ -326,7 +326,7 @@ $result = mysqli_query($conn, $query);
                     },
                     'csv', 'excel', 'pdf', 'print'
                 ],
-                order: [1, 'asc'],
+                order: [],
             });
 
             table.buttons().container()

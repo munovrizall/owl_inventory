@@ -119,6 +119,11 @@ if (isset($_POST['selectedDevice'])) {
     <link rel="stylesheet" href="../assets/adminlte/dist/css/adminlte.min.css">
     <!-- Ionicons -->
     <link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+    <!-- Table with search -->
+    <link href="https://cdn.datatables.net/v/bs4/dt-1.13.8/b-2.4.2/b-colvis-2.4.2/b-print-2.4.2/fh-3.4.0/r-2.5.0/rg-1.4.1/sb-1.6.0/sp-2.2.0/datatables.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.dataTables.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap4.min.css">
 
     <style>
         .gray-italic-text {
@@ -149,23 +154,27 @@ if (isset($_POST['selectedDevice'])) {
         }
 
         .lebar-kolom1 {
-            width: 5%;
+            width: 15%;
         }
 
         .lebar-kolom2 {
-            width: 40%;
+            width: 15%;
         }
 
         .lebar-kolom3 {
-            width: 20%;
+            width: 50%;
         }
 
         .lebar-kolom4 {
-            width: 20%;
+            width: 10%;
         }
 
         .lebar-kolom5 {
-            width: 15%;
+            width: 10%;
+        }
+
+        .card-padding {
+            padding: 10px 20px;
         }
     </style>
 </head>
@@ -324,76 +333,55 @@ if (isset($_POST['selectedDevice'])) {
             <section class="content">
                 <div class="container-fluid">
 
-                    <!-- general form elements -->
-                    <div class="card card-primary">
-                        <div class="card-header">
-                            <h3 class="card-title">Memproduksi Barang</h3>
-                        </div>
-                        <!-- /.card-header -->
-                        <!-- form start -->
-                        <form id="produksiForm" onsubmit="return validateForm()" method="post">
-                            <div class="card-body">
-                                <div class="form-group">
-                                    <label for="exampleSelectBorderWidth2">Pilih Device <span style="color: red;">*</span></label>
-                                    <select class="form-select" id="pilihProduksiDevice" name="selectedDevice">
-                                        <option value="">Pilih Produk</option>
-                                        <?php
-                                        while ($row = $resultProdukPilihan->fetch_assoc()) {
-                                            echo '<option value="' . $row['produk'] . '">' . $row['produk'] . '</option>';
-                                        }
-                                        ?>
-                                    </select>
-                                </div>
-                                <div class="form-group">
-                                    <label for="quantity">Kuantitas <span style="color: red;">*</span></label>
-                                    <div class="input-group">
-                                        <!-- Input untuk kuantitas -->
-                                        <input type="number" class="form-control" id="quantity" name="quantity" min="0" value="">
-                                    </div>
-                                    <button type="button" class="btn btn-outline-info btn-block" id="cekButton" name="cekButton" style="margin-top: 10px; max-width: 180px;"><i class="fas fa-sync-alt" style="margin-right: 8px;" onclick="cekProduksi()"></i>Cek</button>
-                                </div>
-                                <div class="card">
-                                    <div class="card-header">
-                                        <h3 class="card-title"><b>Bahan yang Diperlukan</b></h3>
-                                    </div>
-                                    <!-- /.card-header -->
-                                    <div class="card-body p-0">
-                                        <div class="table-responsive">
-                                            <table class="table table-striped">
-                                                <thead>
-                                                    <tr>
-                                                        <th class="text-center lebar-kolom1">No</th>
-                                                        <th class="text-center lebar-kolom2">Nama Bahan</th>
-                                                        <th class="text-center lebar-kolom3">Stok yang Dibutuhkan</th>
-                                                        <th class="text-center lebar-kolom4">Stok Tersisa</th>
-                                                        <th class="text-center lebar-kolom5">Cukup?</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody id="produksiTable">
+                    <section class="content">
 
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div>
-                                    <!-- /.card-body -->
-                                </div>
-                                <div class="form-group">
-                                    <label>Deskripsi<span class="gray-italic-text"> (opsional)</span></label>
-                                    <textarea class="form-control" rows="3" placeholder="Masukkan keterangan produksi device ..."></textarea>
-                                </div>
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title"><b>List Bahan</b></h3>
                             </div>
-                            <!-- /.card-body -->
-                            <div class="card-footer d-flex justify-content-end">
-                                <button type="submit" class="btn btn-primary" name="submitForm" onclick="submitForm()">Submit</button>
+                            <!-- /.card-header -->
+                            <div class="card-body p-0">
+                                <div class="table-responsive card-padding">
+                                    <table id="tableTransaksi" class="table table-striped table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th class="text-center lebar-kolom1">ID Transaksi</th>
+                                                <th class="text-center lebar-kolom2">Tanggal</th>
+                                                <th class="text-center lebar-kolom3">Nama PT</th>
+                                                <th class="text-center lebar-kolom4">Status</th>
+                                                <th class="text-center lebar-kolom5">Aksi</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>123</td>
+                                                <td>17/01/2024</td>
+                                                <td>Origin Wiracipta Lestari</td>
+                                                <td><span class="badge bg-success">Selesai</span></td>
+                                                <td><input type="button" class="ibtnDel btn btn-info btn-block" value="Edit"></td>
+                                            </tr>
+                                            <tr>
+                                                <td>124</td>
+                                                <td>17/01/2024</td>
+                                                <td>Origin Wiracipta Lestari</td>
+                                                <td><span class="badge bg-danger">Belum</span></td>
+                                                <td><input type="button" class="ibtnDel btn btn-info btn-block" value="Edit"></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+
+                                </div>
+                                <!-- /.card-body -->
                             </div>
-                        </form>
+                            <!-- general form elements -->
+                            <!-- /.card -->
+                            <!-- Pagination links -->
 
-                    </div>
-                    <!-- general form elements -->
-                    <!-- /.card -->
-
+                        </div><!-- /.container-fluid -->
+                    </section>
                 </div><!-- /.container-fluid -->
             </section>
+
             <!-- /.content -->
         </div>
         <!-- /.content-wrapper -->
@@ -417,126 +405,49 @@ if (isset($_POST['selectedDevice'])) {
     <!-- bootstrap searchable dropdown -->
     <script src="../assets/bootstrap-5/bootstrap.bundle.min.js"></script>
     <script src="../assets/dselect.js"></script>
-    <!-- Page specific script -->
+    <!-- Datatables -->
+    <script src="https://cdn.datatables.net/v/bs4/dt-1.13.8/b-2.4.2/b-colvis-2.4.2/b-print-2.4.2/fh-3.4.0/r-2.5.0/rg-1.4.1/sb-1.6.0/sp-2.2.0/datatables.min.js"></script>
+    <script src="https:////code.jquery.com/jquery-3.7.0.js"></script>
+    <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.html5.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.print.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.bootstrap4.min.js"></script>
+
     <!-- Page specific script -->
     <script>
-        $(function() {
-            bsCustomFileInput.init();
-
-            // Searchable dropdown
-            var select_box_element = document.querySelector('#pilihProduksiDevice');
-            dselect(select_box_element, {
-                search: true,
-            });
-
-            // Event listener for "Cek" button click
-            document.getElementById("cekButton").addEventListener("click", function() {
-                console.log("Cek button clicked"); // Debugging statement
-                cekProduksi();
-            });
-        });
-
-        function cekProduksi() {
-            console.log("Inside cekProduksi function"); // Debugging statement
-            var selectedDevice = document.getElementById("pilihProduksiDevice").value;
-            var quantity = document.getElementById("quantity").value;
-
-            // Check if a device is selected
-            if (selectedDevice === "") {
-                alert("Pilih produk terlebih dahulu.");
-                return;
-            }
-            // Check if quantity is provided
-            if (quantity === "") {
-                alert("Masukkan jumlah produksi device.");
-                return;
-            }
-            // Fetch and update the table
-            $.ajax({
-                type: "POST",
-                url: "monitoring.php",
-                data: {
-                    selectedDevice: selectedDevice,
-                    quantity: quantity
+        $(document).ready(function() {
+            var table = $('#tableTransaksi').DataTable({
+                responsive: true,
+                language: {
+                    lengthMenu: 'Tampilkan _MENU_ data per halaman',
+                    zeroRecords: 'Data tidak ditemukan',
+                    info: 'Menampilkan _START_ sampai _END_ dari _TOTAL_ data',
                 },
-                dataType: "json",
-                success: function(response) {
-                    console.log("AJAX request successful"); // Debugging statement
-                    if (response.resultProduksi.length === 0) {
-                        alert("Tidak ada data produksi untuk produk yang dipilih.");
-                        return;
-                    }
-                    // Update table rows dynamically
-                    var tableBody = document.getElementById("produksiTable");
-                    tableBody.innerHTML = ""; // Clear existing rows
-                    // Add new rows based on the response array
-                    for (var i = 0; i < response.resultProduksi.length; i++) {
-                        var isStockSufficient = response.updatedStockQuantities[i].currentStock >= (quantity * response.resultProduksi[i].stokDibutuhkan);
-                        var badgeClass = isStockSufficient ? 'bg-success' : 'bg-danger';
-
-
-                        var newRow = "<tr>" +
-                            "<td style='text-align: center;'>" + (i + 1) + "</td>" +
-                            "<td style='text-align: center;'>" + response.resultProduksi[i].namaBahan + "</td>" +
-                            "<td style='text-align: center;'>" + response.resultProduksi[i].stokDibutuhkan * quantity + "</td>" +
-                            "<td style='text-align: center;'>" + response.updatedStockQuantities[i].currentStock + "</td>" +
-                            "<td style='text-align: center;'><span class='badge " + badgeClass + "'>" + (isStockSufficient ? "Ya" : "Tidak") + "</span></td>" +
-                            "</tr>";
-                        tableBody.innerHTML += newRow;
-                    }
-
-                    // Show the table
-                    tableBody.style.display = "table table-striped";
-                },
-                error: function(error) {
-                    console.error("Error fetching produksi data:", error);
-                }
+                dom: 'Bfrtip',
+                lengthMenu: [
+                    [10, 25, 50, -1],
+                    ['10 rows', '25 rows', '50 rows', 'Show all']
+                ],
+                buttons: [
+                    'pageLength', 'copy',
+                    {
+                        extend: 'spacer',
+                        style: 'bar',
+                        text: 'Export files:'
+                    },
+                    'csv', 'excel', 'pdf', 'print'
+                ],
+                order: [1, 'asc'],
             });
-        }
 
-        // Quantity input disabled to prevent bugs
-        document.addEventListener("DOMContentLoaded", function() {
-            disableQuantityInput();
+            table.buttons().container()
+                .appendTo('wrapper .col-md-6:eq(0)');
+
         });
-
-        function disableQuantityInput() {
-            const quantityInput = document.getElementById("quantity");
-            quantityInput.placeholder = "Pilih produk terlebih dahulu";
-            quantityInput.disabled = true;
-        }
-
-        $("#pilihProduksiDevice").change(function() {
-            const quantityInput = document.getElementById("quantity");
-            quantityInput.placeholder = "Masukkan jumlah produksi device";
-            quantityInput.disabled = false;
-        });
-
-        function submitForm() {
-            // Assuming validateForm() is the function you want to call for validation
-            if (validateForm()) {
-                document.getElementById("produksiForm").submit();
-
-            } else {
-                alert("Validation failed. Please check your input.");
-            }
-        }
-
-        function validateForm() {
-            // Add your validation logic here
-            // Return true if the form is valid, false otherwise
-            var selectedDevice = document.getElementById("pilihProduksiDevice").value;
-            var quantity = document.getElementById("quantity").value;
-
-            // Example validation: Check if the selected device and quantity are not empty
-            if (selectedDevice === "" || quantity === "") {
-                alert("Please fill in all required fields.");
-                return false;
-            }
-
-            // Add more validation as needed...
-
-            return true; // If all validations pass
-        }
     </script>
 
 </body>
