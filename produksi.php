@@ -646,7 +646,7 @@ if (isset($_POST['selectedDevice'])) {
 
         document.getElementById('deskripsi').addEventListener('keyup', function(event) {
             if (event.keyCode === 13) {
-                submitForm();
+                document.querySelector('[name="submitForm"]').click();            
             }
         });
 
