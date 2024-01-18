@@ -377,10 +377,10 @@ if (isset($_POST['selectedDevice'])) {
                         </div>
                         <!-- /.card-header -->
                         <!-- form start -->
-                        <form id="produksiForm" onsubmit="return validateForm()" method="post">
+                        <form id="produksiForm" method="post">
                             <div class="card-body">
                                 <div class="form-group">
-                                    <label for="exampleSelectBorderWidth2">Pilih Device <span style="color: red;">*</span></label>
+                                    <label for="pilihProduksiDevice">Pilih Device <span style="color: red;">*</span></label>
                                     <select class="form-select" id="pilihProduksiDevice" name="selectedDevice">
                                         <option value="">Pilih Produk</option>
                                         <?php
@@ -425,12 +425,12 @@ if (isset($_POST['selectedDevice'])) {
                                 </div>
                                 <div class="form-group">
                                     <label>Deskripsi<span class="gray-italic-text"> (opsional)</span></label>
-                                    <textarea class="form-control" rows="3" id="deskripsi" placeholder="Masukkan keterangan produksi device ..."></textarea>
+                                    <textarea class="form-control" rows="3" id="deskripsi" name="deskripsi" placeholder="Masukkan keterangan produksi device ..."></textarea>
                                 </div>
                             </div>
                             <!-- /.card-body -->
                             <div class="card-footer d-flex justify-content-end">
-                                <button type="submit" class="btn btn-primary" name="submitForm" onclick="submitForm()">Submit</button>
+                                <button type="submit" class="btn btn-primary" name="submitForm">Submit</button>
                             </div>
                         </form>
 
@@ -481,10 +481,12 @@ if (isset($_POST['selectedDevice'])) {
                 console.log("Cek button clicked"); // Debugging statement
                 cekProduksi();
             });
+
+            document.querySelector('[name="submitForm"]').addEventListener('click', submitForm);
+
         });
 
         function cekProduksi() {
-            console.log("Inside cekProduksi function"); // Debugging statement
             var selectedDevice = document.getElementById("pilihProduksiDevice").value;
             var quantity = document.getElementById("quantity").value;
 
@@ -573,8 +575,9 @@ if (isset($_POST['selectedDevice'])) {
         function submitForm() {
             // Assuming validateForm() is the function you want to call for validation
             if (validateForm()) {
+                alert('Produksi berhasil!\nKlik OK atau ENTER');
                 document.getElementById("produksiForm").submit();
-
+                location.reload();
             } else {
                 Swal.fire({
                     icon: 'error',
@@ -632,7 +635,6 @@ if (isset($_POST['selectedDevice'])) {
                     }
                 }
             }
-            // Add more validation as needed...
 
             return true; // If all validations pass
         }
@@ -646,10 +648,9 @@ if (isset($_POST['selectedDevice'])) {
 
         document.getElementById('deskripsi').addEventListener('keyup', function(event) {
             if (event.keyCode === 13) {
-                document.querySelector('[name="submitForm"]').click();            
+                document.querySelector('[name="submitForm"]').click();
             }
         });
-
     </script>
 
 </body>
