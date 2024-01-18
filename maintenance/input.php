@@ -12,17 +12,24 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
+$queryClient = "SELECT * FROM client ORDER BY nama_client";
+$resultClient = $conn->query($queryClient);
+
+if (!$resultClient) {
+    die("Error fetching kelompok data: " . $conn->error);
+}
+
 if (isset($_GET["getDropdownOptions"])) {
 
-    $queryMasterBahan = "SELECT nama FROM masterbahan ORDER BY nama";
+    $queryProduk = "SELECT nama_produk FROM produk ORDER BY nama_produk";
 
-    $resultMasterBahan = $conn->query($queryMasterBahan);
+    $resultProduk = $conn->query($queryProduk);
 
-    $options = '<option value="" selected disabled>Pilih Bahan</option>';
+    $options = '<option value="" selected disabled>Pilih Produk</option>';
 
-    if ($resultMasterBahan && $resultMasterBahan->num_rows > 0) {
-        while ($row = $resultMasterBahan->fetch_assoc()) {
-            $options .= '<option value="' . $row['nama'] . '">' . $row['nama'] . '</option>';
+    if ($resultProduk && $resultProduk->num_rows > 0) {
+        while ($row = $resultProduk->fetch_assoc()) {
+            $options .= '<option value="' . $row['nama_produk'] . '">' . $row['nama_produk'] . '</option>';
         }
     }
     echo $options;
@@ -323,11 +330,14 @@ if (isset($_GET["getDropdownOptions"])) {
                                 </div>
                                 <div class="form-group">
                                     <div class="col">
-                                        <label for="pilihNamaPT">Pilih PT <span style="color: red;">*</span></label>
-                                        <select class="form-select" id="pilihNamaPT" name="kelompok">
+                                        <label for="pilihClient">Pilih PT <span style="color: red;">*</span></label>
+                                        <select class="form-select" id="pilihClient" name="client">
                                             <option value="">Pilih PT</option>
-                                            <option value="2">PT 1</option>
-                                            <option value="3">PT 2</option>
+                                            <?php
+                                            while ($row = $resultClient->fetch_assoc()) {
+                                                echo '<option value="' . $row['nama_client'] . '">' . $row['nama_client'] . '</option>';
+                                            }
+                                            ?>
                                         </select>
                                         <button type="button" class="btn btn-outline-info btn-block" data-toggle="modal" data-target="#modalBuatPT" style="margin-top: 10px; max-width: 180px;"><i class="fas fa-plus" style="margin-right: 8px;" onclick=""></i>Tambah PT</button>
                                     </div>
@@ -401,7 +411,7 @@ if (isset($_GET["getDropdownOptions"])) {
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                            <button type="button" class="btn btn-primary" onclick="if(validateFormKB()) { validateSuccessKB(); resetForm(); }">Submit</button>
+                            <button type="button" class="btn btn-primary" onclick="if(validateFormPT()) { validateSuccessKB(); resetForm(); }">Submit</button>
         </form>
     </div>
     <!-- ./wrapper -->
@@ -448,7 +458,7 @@ if (isset($_GET["getDropdownOptions"])) {
 
                 // Make an AJAX request to fetch dropdown options
                 $.ajax({
-                    url: '../master_device.php?getDropdownOptions',
+                    url: '../input.php?getDropdownOptions',
                     type: 'GET',
                     success: function(dropdownOptions) {
                         var dropdownGaransi = '<option value="" selected disabled>Garansi</option>' +
