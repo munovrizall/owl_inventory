@@ -15,7 +15,7 @@ if ($conn->connect_error) {
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Check which fields are provided
     $kelompok = isset($_POST["kelompok"]) ? $_POST["kelompok"] : null;
-    $nama = isset($_POST["nama"]) ? $_POST["nama"] : null;
+    $nama = isset($_POST["namaBahan"]) ? $_POST["namaBahan"] : null;
     $quantity = isset($_POST["quantity"]) ? $_POST["quantity"] : null;
     $deskripsi = isset($_POST["deskripsi"]) ? $_POST["deskripsi"] : null;
 
@@ -323,8 +323,8 @@ if (!$resultKelompok) {
                                     <button type="button" class="btn btn-outline-info btn-block" data-toggle="modal" data-target="#modalBuatKelompok" style="margin-top: 10px; max-width: 180px;"><i class="fas fa-plus" style="margin-right: 8px;"></i>Kelompok Baru</button>
                                 </div>
                                 <div class="form-group">
-                                    <label for="nama">Nama Bahan <span style="color: red;">*</span></label>
-                                    <input type="text" class="form-control form-control-border border-width-2" id="nama" name="nama" placeholder="Contoh : R060310k">
+                                    <label for="namaBahan">Nama Bahan <span style="color: red;">*</span></label>
+                                    <input type="text" class="form-control form-control-border border-width-2" id="namaBahan" name="namaBahan" placeholder="Contoh : R060310k">
                                 </div>
                                 <div class="form-group">
                                     <label for="quantity">Kuantitas <span style="color: red;">*</span></label>
@@ -402,7 +402,7 @@ if (!$resultKelompok) {
     <script>
         function validateForm() {
             var selectedItem = document.getElementById("pilihNamaKelompok").value;
-            var nama = document.getElementById("nama").value;
+            var nama = document.getElementById("namaBahan").value;
             var quantity = document.getElementById("quantity").value;
 
             if (selectedItem === "" || nama === "" || quantity === "" || quantity <= 0) {
@@ -522,6 +522,13 @@ if (!$resultKelompok) {
         // When user press enter on keyboard
         var quantityInput = document.getElementById('quantity');
         quantityInput.addEventListener('keyup', function(event) {
+            if (event.keyCode === 13) {
+                submitForm();
+            }
+        });
+
+        var deksripsiInput = document.getElementById('deskripsi');
+        deksripsiInput.addEventListener('keyup', function(event) {
             if (event.keyCode === 13) {
                 submitForm();
             }

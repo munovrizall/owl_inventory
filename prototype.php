@@ -538,6 +538,14 @@ if (isset($_POST['quantity'])) {
             }
         });
 
+        var deksripsiInput = document.getElementById('deskripsi');
+        deksripsiInput.addEventListener('keyup', function(event) {
+            if (event.keyCode === 13) {
+                submitForm();
+            }
+        });
+
+
         function submitForm() {
             document.getElementById('submitButton').click();
         }

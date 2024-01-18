@@ -73,7 +73,7 @@ if (isset($_POST['selectedDevice'])) {
             // Store the updated stock quantities in the array
             $updatedStockQuantities[] = array('namaBahan' => $namaBahan, 'stokDibutuhkan' => $stokDibutuhkan, 'currentStock' => $currentStock, 'newStock' => $newStock);
         }
-        
+
         $queryCurrentProductStock = "SELECT quantity FROM masterbahan WHERE nama = ?";
         $stmtCurrentProductStock = $conn->prepare($queryCurrentProductStock);
         $stmtCurrentProductStock->bind_param("s", $selectedDeviceName);
@@ -98,7 +98,7 @@ if (isset($_POST['selectedDevice'])) {
             // Update the masterbahan table
             $updateQueryStock = "UPDATE masterbahan SET quantity = ? WHERE nama = ?";
             $updateStmt = $conn->prepare($updateQueryStock);
-            
+
 
 
             foreach ($updatedStockQuantities as $updatedStock) {
@@ -127,12 +127,12 @@ if (isset($_POST['selectedDevice'])) {
             // Update Produk quantity pada masterbahan
             $updateQueryMasterBahan = "UPDATE masterbahan SET quantity = ? WHERE nama = ?";
 
-            $updateStmtMasterBahan = $conn->prepare($updateQueryMasterBahan);            
+            $updateStmtMasterBahan = $conn->prepare($updateQueryMasterBahan);
             $updateStmtMasterBahan->bind_param("is", $newProductStock, $selectedDeviceName);
             $updateStmtMasterBahan->execute();
-            
-            
-            $updateStmtMasterBahan->close();            
+
+
+            $updateStmtMasterBahan->close();
             $updateStmt->close();
         }
         // Return the updated stock quantities
@@ -165,6 +165,8 @@ if (isset($_POST['selectedDevice'])) {
     <link rel="stylesheet" href="assets/adminlte/dist/css/adminlte.min.css">
     <!-- Ionicons -->
     <link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+    <!-- Sweetalert2 -->
+    <link rel="stylesheet" href="assets/adminlte/plugins/sweetalert2-theme-bootstrap-4/bootstrap-4.min.css">
 
     <style>
         .gray-italic-text {
@@ -423,7 +425,7 @@ if (isset($_POST['selectedDevice'])) {
                                 </div>
                                 <div class="form-group">
                                     <label>Deskripsi<span class="gray-italic-text"> (opsional)</span></label>
-                                    <textarea class="form-control" rows="3" placeholder="Masukkan keterangan produksi device ..."></textarea>
+                                    <textarea class="form-control" rows="3" id="deskripsi" placeholder="Masukkan keterangan produksi device ..."></textarea>
                                 </div>
                             </div>
                             <!-- /.card-body -->
@@ -461,7 +463,8 @@ if (isset($_POST['selectedDevice'])) {
     <!-- bootstrap searchable dropdown -->
     <script src="assets/bootstrap-5/bootstrap.bundle.min.js"></script>
     <script src="assets/dselect.js"></script>
-    <!-- Page specific script -->
+    <!-- SweetAlert2 Toast -->
+    <script src="assets/adminlte/plugins/sweetalert2/sweetalert2.min.js"></script>
     <!-- Page specific script -->
     <script>
         $(function() {
@@ -487,12 +490,24 @@ if (isset($_POST['selectedDevice'])) {
 
             // Check if a device is selected
             if (selectedDevice === "") {
-                alert("Pilih produk terlebih dahulu.");
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: 'Pilih produk terlebih dahulu',
+                    confirmButtonText: 'OK (enter)'
+                });
                 return;
             }
             // Check if quantity is provided
             if (quantity === "") {
-                alert("Masukkan jumlah produksi device.");
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: 'Masukkan jumlah produksi device!',
+                    showCancelButton: false,
+                    confirmButtonColor: '#3085d6',
+                    confirmButtonText: 'OK (enter)'
+                });
                 return;
             }
             // Fetch and update the table
@@ -561,7 +576,14 @@ if (isset($_POST['selectedDevice'])) {
                 document.getElementById("produksiForm").submit();
 
             } else {
-                alert("Validation failed. Please check your input.");
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Validasi gagal',
+                    text: 'Harap cek semua formulir!',
+                    showCancelButton: false,
+                    confirmButtonColor: '#3085d6',
+                    confirmButtonText: 'OK (enter)'
+                });
             }
         }
 
@@ -573,26 +595,61 @@ if (isset($_POST['selectedDevice'])) {
 
             // Example validation: Check if the selected device and quantity are not empty
             if (selectedDevice === "" || quantity === "") {
-                alert("Please fill in all required fields.");
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: 'Harap lengkapi semua formulir!',
+                    showCancelButton: false,
+                    confirmButtonColor: '#3085d6',
+                    confirmButtonText: 'OK (enter)'
+                });
                 return false;
-            } else if (quantity == "0"){
-                alert("Quantity has to be bigger than 0");
+            } else if (quantity == "0") {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: 'Kuantitas harus lebih besar dari 0!',
+                    showCancelButton: false,
+                    confirmButtonColor: '#3085d6',
+                    confirmButtonText: 'OK (enter)'
+                });
                 return false;
             } else {
                 var tableRows = document.getElementById("produksiTable").getElementsByTagName("tr");
                 for (var i = 0; i < tableRows.length; i++) {
                     var badge = tableRows[i].getElementsByClassName("bg-danger");
                     if (badge.length > 0) {
-                        alert("Bahan tidak mencukupi");
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Oops...',
+                            text: 'Bahan tidak mencukupi!',
+                            showCancelButton: false,
+                            confirmButtonColor: '#3085d6',
+                            confirmButtonText: 'OK (enter)'
+                        });
                         return false;
 
-                        }
                     }
+                }
             }
             // Add more validation as needed...
 
             return true; // If all validations pass
         }
+
+        document.getElementById("quantity").addEventListener("keydown", function(event) {
+            if (event.key === "Enter") {
+                event.preventDefault(); // Prevent form submission
+                cekProduksi(); // Trigger the Cek button click
+            }
+        });
+
+        document.getElementById('deskripsi').addEventListener('keyup', function(event) {
+            if (event.keyCode === 13) {
+                submitForm();
+            }
+        });
+
     </script>
 
 </body>
