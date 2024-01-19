@@ -22,9 +22,7 @@ if (!$resultClient) {
 if (isset($_GET["getDropdownOptions"])) {
 
     $queryProduk = "SELECT nama_produk FROM produk ORDER BY nama_produk";
-
     $resultProduk = $conn->query($queryProduk);
-
     $options = '<option value="" selected disabled>Pilih Produk</option>';
 
     if ($resultProduk && $resultProduk->num_rows > 0) {
@@ -35,48 +33,89 @@ if (isset($_GET["getDropdownOptions"])) {
     echo $options;
     exit();
 } elseif ($_SERVER["REQUEST_METHOD"] == "POST") {
-
     // Handle the POST request for submitting form data
-    $namaDevice = $_POST["namaDevice"];
+    $tanggal = $_POST["tanggal"];
+    $nama_client = $_POST["client"];
 
-    // Check if 'bahan' and 'quantity' arrays are set in POST
-    if (isset($_POST["pilihNamaBahan"]) && isset($_POST["quantity"])) {
-        $bahanArray = $_POST["pilihNamaBahan"];
-        $quantityArray = $_POST["quantity"];
+    // Check if the client needs to be added
+    if (isset($_POST["namaPTBaru"]) && !empty($_POST["namaPTBaru"])) {
+        $newClientName = $_POST["namaPTBaru"];
+    
+        // Check if the client already exists in the database
+        $checkClientQuery = "SELECT nama_client FROM client WHERE nama_client = ?";
+        $stmtCheck = $conn->prepare($checkClientQuery);
+        $stmtCheck->bind_param("s", $newClientName);
+        $stmtCheck->execute();
+        $stmtCheck->store_result();
+    
+        // If the client already exists, show an error
+        if ($stmtCheck->num_rows > 0) {
+            echo "Client with the name '$newClientName' already exists in the database.";
+            $stmtCheck->close();
+            exit();
+        }
+    
+        $stmtCheck->close();
+    
+        // Perform insertion of a new client into the database
+        $insertClientQuery = "INSERT INTO client (nama_client) VALUES (?)";
+        $stmt = $conn->prepare($insertClientQuery);
+        $stmt->bind_param("s", $newClientName);
+    
+        if ($stmt->execute()) {
+            // Insert successful, continue with the transaction maintenance
+            $stmt->close();
+        } else {
+            echo "Error adding a new client: " . $stmt->error;
+            exit();
+        }
+    }        
 
-        // Loop through the arrays and insert records
-        foreach ($bahanArray as $key => $bahan) {
-            $quantity = $quantityArray[$key];
+    // Continue with the transaction maintenance
+    $query = "INSERT INTO transaksi_maintenance (tanggal_terima, nama_client) VALUES (?, ?)";
+    $stmt = $conn->prepare($query);
+    $stmt->bind_param("ss", $tanggal, $nama_client);
 
-            // Use prepared statements
-            $checkQuery = "SELECT COUNT(*) FROM produksi WHERE produk = ? AND nama_bahan = ?";
-            $checkStmt = $conn->prepare($checkQuery);
-            $checkStmt->bind_param("ss", $namaDevice, $bahan);
-            $checkStmt->execute();
-            $checkStmt->bind_result($count);
-            $checkStmt->fetch();
-            $checkStmt->close();
+    if ($stmt->execute()) {
+        // Get the auto-generated transaksi_id
+        $transaksi_id = $conn->insert_id;
 
-            if ($count > 0) {
-                echo "Error: Device and Bahan combination already exists in the database.";
-            } else {
-                // Insert the new record
-                $query = "INSERT INTO produksi (produk, nama_bahan, quantity) VALUES (?, ?, ?)";
-                $stmt = $conn->prepare($query);
-                $stmt->bind_param("ssi", $namaDevice, $bahan, $quantity);
+        // Insert successful, continue with the detail maintenance
+        if (isset($_POST["pilihNamaProduk"]) && isset($_POST["numberSN"]) && isset($_POST["pilihGaransi"]) && isset($_POST["inputKerusakan"])) {
+            $produkArray = $_POST["pilihNamaProduk"];
+            $numberSNArray = $_POST["numberSN"];
+            $garansiArray = $_POST["pilihGaransi"];
+            $keteranganArray = $_POST["inputKerusakan"];
 
-                if ($stmt->execute()) {
-                    echo "Data berhasil ditambahkan ke tabel produksi.";
+            // Loop through the arrays and insert records
+            foreach ($produkArray as $key => $nama_produk) {
+                $no_sn = $numberSNArray[$key];
+                $garansi = $garansiArray[$key];
+                $keterangan = $keteranganArray[$key];
+
+                // Insert the new record into detail_maintenance table
+                echo "Produk: $nama_produk, SN: $no_sn, Garansi: $garansi, Keterangan: $keterangan";
+                $queryDetail = "INSERT INTO detail_maintenance (transaksi_id, produk_mt, no_sn, garansi, keterangan) VALUES (?, ?, ?, ?, ?)";
+                $stmtDetail = $conn->prepare($queryDetail);
+                $stmtDetail->bind_param("isiis", $transaksi_id, $nama_produk, $no_sn, $garansi, $keterangan);
+
+                if ($stmtDetail->execute()) {
+                    echo "Data berhasil ditambahkan ke tabel detail.";
                 } else {
-                    echo "Error: " . $stmt->error;
+                    echo "Error: " . $stmtDetail->error;
                 }
 
-                $stmt->close();
+                $stmtDetail->close();
             }
+        } else {
+            echo "Error: Products and other arrays are not set.";
         }
     } else {
-        echo "Error: Bahan and Quantity arrays are not set.";
+        echo "Error adding transaction maintenance: " . $stmt->error;
     }
+
+    $stmt->close();
+
 }
 
 ?>
@@ -314,14 +353,14 @@ if (isset($_GET["getDropdownOptions"])) {
                         </div>
                         <!-- /.card-header -->
                         <!-- form start -->
-                        <form id="masterDeviceForm">
+                        <form id="inputMaintenanceForm">
                             <div class="card-body">
                                 <div class="col">
                                     <p id="idTransaksi">ID Transaksi: 1/1/FP301T/001</p>
                                     <div class="form-group">
                                         <label>Tanggal Transaksi <span style="color: red;">*</span></label>
                                         <div class="input-group date" id="datepicker" data-target-input="nearest">
-                                            <input type="text" class="form-control datetimepicker-input" data-target="#datepicker" placeholder="Masukkan tanggal transaksi" />
+                                            <input type="date" class="form-control datetimepicker-input" data-target="#datepicker" id="tanggal" name="tanggal" placeholder="Masukkan tanggal transaksi" />
                                             <div class="input-group-append" data-target="#datepicker" data-toggle="datetimepicker">
                                                 <div class="input-group-text"><i class="far fa-calendar-alt"></i></div>
                                             </div>
@@ -405,13 +444,13 @@ if (isset($_GET["getDropdownOptions"])) {
                         </div>
                         <div class="modal-body">
                             <div class="form-group">
-                                <label for="namaKelompokBaru">Nama PT <span style="color: red;">*</span></label>
+                                <label for="namaClientBaru">Nama PT <span style="color: red;">*</span></label>
                                 <input type="text" class="form-control form-control-border border-width-2" id="namaPTBaru" name="namaPTBaru" placeholder="Masukkan nama PT yang ingin dibuat">
                             </div>
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                            <button type="button" class="btn btn-primary" onclick="if(validateFormPT()) { validateSuccessKB(); resetForm(); }">Submit</button>
+                            <button type="button" class="btn btn-primary" onclick="if(validateFormPT()) { validateSuccessPT(); resetForm(); }">Submit</button>
         </form>
     </div>
     <!-- ./wrapper -->
@@ -437,7 +476,7 @@ if (isset($_GET["getDropdownOptions"])) {
     <script>
         $(function() {
             $('#datepicker').datetimepicker({
-                format: 'DD-MM-YYYY',
+                format: 'YYYY-MM-DD',
                 locale: 'id',
             });
         });
@@ -458,7 +497,7 @@ if (isset($_GET["getDropdownOptions"])) {
 
                 // Make an AJAX request to fetch dropdown options
                 $.ajax({
-                    url: '../input.php?getDropdownOptions',
+                    url: 'input.php?getDropdownOptions',
                     type: 'GET',
                     success: function(dropdownOptions) {
                         var dropdownGaransi = '<option value="" selected disabled>Garansi</option>' +
@@ -469,7 +508,7 @@ if (isset($_GET["getDropdownOptions"])) {
 
                         cols += '<td><select class="form-select pilihNamaProduk" name="pilihNamaProduk[]">' + dropdownOptions + '</select></td>';
                         cols += '<td><input type="text" class="form-control" name="numberSN[]" value="" placeholder="Nomor SN"/></td>';
-                        cols += '<td><select class="form-select" id="pilihGaransi ' + counter + '" name="pilihGaransi' + counter + '">' + dropdownGaransi + '</select></td>';
+                        cols += '<td><select class="form-select" id="pilihGaransi ' + counter + '" name="pilihGaransi[]' + counter + '">' + dropdownGaransi + '</select></td>';
                         cols += '<td><input type="text" class="form-control" name="inputKerusakan[]" value="" placeholder="Kerusakan Device"/></td>';
                         cols += '<td><input type="button" class="ibtnDel btn btn-md btn-danger"  value="Delete"></td>';
 
@@ -477,8 +516,11 @@ if (isset($_GET["getDropdownOptions"])) {
                         $("table.order-list").append(newRow);
                         counter++;
                     },
-                    error: function(error) {
-                        console.log("Error fetching dropdown options: " + error);
+                    error: function (xhr, status, error) {
+                        console.log("Error fetching dropdown options:");
+                        console.log("Status: " + status);
+                        console.log("Error: " + error);
+                        console.log("Response Text: " + xhr.responseText);
                     }
                 });
             }
@@ -498,18 +540,22 @@ if (isset($_GET["getDropdownOptions"])) {
         }
 
         function validateForm() {
-            var selectedItem = document.getElementById("namaDevice").value;
+            var tanggal = document.getElementById("tanggal").value;
 
             // Use classes for dynamic elements
-            var namaElements = document.querySelectorAll(".pilihNamaBahan");
-            var quantityElements = document.querySelectorAll(".quantity");
+            var namaElements = document.querySelectorAll(".pilihNamaProduk");
+            var numberSNElements = document.querySelectorAll("[name^='numberSN']");
+            var garansiElements = document.querySelectorAll("[name^='pilihGaransi']");
+            var keteranganElements = document.querySelectorAll("[name^='inputKerusakan']");
 
             // Check each row
             for (var i = 0; i < namaElements.length; i++) {
                 var nama = namaElements[i].value;
-                var quantity = quantityElements[i].value;
+                var numberSN = numberSNElements[i].value;
+                var garansi = garansiElements[i].value;
+                var keterangan = keteranganElements[i].value;
 
-                if (selectedItem === "" || nama === "" || quantity === "" || quantity <= 0) {
+                if (nama === "" || numberSN === "" || garansi === "" || keterangan === "") {
                     Swal.fire({
                         icon: 'error',
                         title: 'Oops...',
@@ -522,20 +568,20 @@ if (isset($_GET["getDropdownOptions"])) {
             return true;
         }
 
-
         function validateSuccess() {
-            var formData = new FormData(document.getElementById("masterDeviceForm"));
+            var formData = new FormData(document.getElementById("inputMaintenanceForm"));
+            formData.append('getDropdownOptions', '1');
 
             $.ajax({
                 type: "POST",
-                url: "master_device.php",
+                url: "input.php",
                 data: formData,
                 processData: false,
                 contentType: false,
                 success: function(response) {
                     Swal.fire({
                         icon: 'success',
-                        title: 'Device berhasil didaftarkan!',
+                        title: 'Transaksi Maintenance berhasil didaftarkan!',
                     }).then((result) => {
                         if (result.isConfirmed) {
                             location.reload();
@@ -543,35 +589,88 @@ if (isset($_GET["getDropdownOptions"])) {
                     });
                 },
                 error: function(error) {
-                    // ... existing code ...
+                    console.log("Error:", error);
                 }
             });
         }
 
         // Searchable dropdown
-        var select_box_element = document.querySelector('#pilihNamaPT');
+        var select_box_element = document.querySelector('#pilihClient');
         dselect(select_box_element, {
             search: true,
         });
 
+        function validateFormPT() {
+            var namaKB = document.getElementById("namaPTBaru").value;
 
+            if (namaKB === "") {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: 'Harap lengkapi semua formulir!',
+                });
+                return false;
+            }
+
+            return true;
+        }
+
+        function validateSuccessPT() {
+            // Get the form data
+            var formDataKB = $("#tambahPTForm").serialize();
+
+            $.ajax({
+                type: "POST",
+                url: "input.php",
+                data: formDataKB,
+                success: function(response) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Client berhasil didaftarkan!',
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            location.reload();
+                        }
+                    });
+
+
+                },
+                error: function(error) {
+                    alert("Error mendaftarkan Client.");
+                }
+            });
+        }
+
+        
         function resetForm() {
-            document.getElementById("masterDeviceForm").reset();
+            document.getElementById("inputMaintenanceForm").reset();
             resetDropdown();
         }
 
         function resetDropdown() {
-            const dropdown = document.getElementById("pilihNamaBahan");
-            dropdown.selectedIndex = 0; // reset ke pilihan pertama
+            const dropdown = document.getElementById("pilihNamaProduk");
 
-            // jika multiple selection
-            dropdown.querySelectorAll("option:checked").forEach(option => {
-                option.selected = false;
-            });
+            // Check if the dropdown element exists
+            if (dropdown) {
+                // Reset to the first option if it's a single-selection dropdown
+                if (dropdown.selectedIndex !== undefined) {
+                    dropdown.selectedIndex = 0;
+                }
 
-            // memicu event change 
-            dropdown.dispatchEvent(new Event('change'));
+                // If it's a multiple selection dropdown
+                if (dropdown.options) {
+                    dropdown.options.forEach(option => {
+                        option.selected = false;
+                    });
+                }
+
+                // Trigger the change event
+                dropdown.dispatchEvent(new Event('change'));
+            } else {
+                console.error("Dropdown element with ID 'pilihNamaProduk' not found.");
+            }
         }
+
     </script>
 </body>
 
