@@ -75,7 +75,6 @@ if (isset($_POST['submitForm'])) {
     <link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
 
     <style>
-
         .lebar-kolom1 {
             width: 20%;
         }
@@ -89,7 +88,7 @@ if (isset($_POST['submitForm'])) {
         }
 
         .lebar-kolom4 {
-            width: 30%;
+            width: 20%;
         }
 
         .lebar-kolom5 {
@@ -97,18 +96,21 @@ if (isset($_POST['submitForm'])) {
         }
 
         .lebar-kolom10 {
-            width: 10%;
+            width: 20%;
         }
 
-        .tableKeterangan {
-            width: 40%;
-            border-collapse: collapse;
+        th {
+            text-align: center;
+            vertical-align: middle;
         }
 
-        .tableKeterangan th,
-        .tableKeterangan td {
-            border: 1px solid black;
-            padding: 8px;
+        .column-name {
+            font-weight: bold;
+        }
+
+        .column-description {
+            font-size: 10px;
+            color: #888;
         }
     </style>
 </head>
@@ -287,19 +289,35 @@ if (isset($_POST['submitForm'])) {
                                             <table class="table table-striped table-bordered">
                                                 <thead>
                                                     <tr>
-                                                        <th class="text-center lebar-kolom1">Nama Barang</th>
-                                                        <th class="text-center lebar-kolom2">Nama SN</th>
-                                                        <th class="text-center lebar-kolom3">Garansi?</th>
-                                                        <th class="text-center lebar-kolom4">Kerusakan</th>
-                                                        <th class="text-center lebar-kolom5">DTG</th>
-                                                        <th class="text-center lebar-kolom5">CEK</th>
-                                                        <th class="text-center lebar-kolom5">BA</th>
-                                                        <th class="text-center lebar-kolom5">ADM</th>
-                                                        <th class="text-center lebar-kolom5">P</th>
+                                                        <th class="lebar-kolom1">Nama Barang</th>
+                                                        <th class="lebar-kolom2">Nama SN</th>
+                                                        <th class="lebar-kolom3">Garansi?</th>
+                                                        <th class="lebar-kolom4">Kerusakan</th>
+                                                        <th class="lebar-kolom5">
+                                                            <div class="column-name">DTG</div>
+                                                            <div class="column-description">Barang Datang</div>
+                                                        </th>
+                                                        <th class="lebar-kolom5">
+                                                            <div class="column-name">CEK</div>
+                                                            <div class="column-description">Cek Masalah</div>
+                                                        </th>
+                                                        <th class="lebar-kolom5">
+                                                            <div class="column-name">BA</div>
+                                                            <div class="column-description">Berita Acara</div>
+                                                        </th>
+                                                        <th class="lebar-kolom5">
+                                                            <div class="column-name">ADM</div>
+                                                            <div class="column-description">Proses Administrasi</div>
+                                                        </th>
+                                                        <th class="lebar-kolom5">
+                                                            <div class="column-name">P</div>
+                                                            <div class="column-description">Pengiriman Barang</div>
+                                                        </th>
                                                         <th class="text-center lebar-kolom10">No. Resi</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody id="transaksiTable">
+
                                                     <?php
                                                     while ($row = mysqli_fetch_assoc($result)) {
                                                     ?>
@@ -342,40 +360,12 @@ if (isset($_POST['submitForm'])) {
                                                     <?php
                                                     }
                                                     ?>
+====
                                                 </tbody>
                                             </table>
                                         </div>
                                     </div>
                                     <!-- /.card-body -->
-                                </div>
-                                <div class="table-responsive">
-                                    <table class="tableKeterangan">
-                                        <tr>
-                                            <th>Keterangan</th>
-                                            <th>Deskripsi</th>
-                                        </tr>
-                                        <tr>
-                                            <td>DTG</td>
-                                            <td>Barang Datang</td>
-                                        </tr>
-                                        <tr>
-                                            <td>CEK</td>
-                                            <td>Cek Masalah Barang</td>
-                                        </tr>
-                                        <tr>
-                                            <td>BA</td>
-                                            <td>Pembuatan Berita Acara Service</td>
-                                        </tr>
-                                        <tr>
-                                            <td>ADM</td>
-                                            <td>Pengurusan Administrasi</td>
-                                        </tr>
-                                        <tr>
-                                            <td>P</td>
-                                            <td>Pengiriman Barang</td>
-                                        </tr>
-                                    </table>
-
                                 </div>
                             </div>
                             <!-- /.card-body -->
@@ -416,6 +406,7 @@ if (isset($_POST['submitForm'])) {
     <!-- Page specific script -->
     <!-- Page specific script -->
     <script>
+
         document.addEventListener('DOMContentLoaded', function () {
             var checkbox = document.getElementById('checkboxBarangDatang');
             var checkbox = document.getElementById('checkboxCekMasalah');
