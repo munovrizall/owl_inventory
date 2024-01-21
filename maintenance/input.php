@@ -92,21 +92,37 @@ if (isset($_GET["getDropdownOptions"])) {
                 $no_sn = $numberSNArray[$key];
                 $garansi = $garansiArray[$key];
                 $keterangan = $keteranganArray[$key];
-
+            
                 // Insert the new record into detail_maintenance table
                 echo "Produk: $nama_produk, SN: $no_sn, Garansi: $garansi, Keterangan: $keterangan";
                 $queryDetail = "INSERT INTO detail_maintenance (transaksi_id, produk_mt, no_sn, garansi, keterangan) VALUES (?, ?, ?, ?, ?)";
                 $stmtDetail = $conn->prepare($queryDetail);
                 $stmtDetail->bind_param("isiis", $transaksi_id, $nama_produk, $no_sn, $garansi, $keterangan);
-
+            
                 if ($stmtDetail->execute()) {
                     echo "Data berhasil ditambahkan ke tabel detail.";
+            
+                    // Retrieve the generated detail_id
+                    $detail_id = $stmtDetail->insert_id;
+            
+                    // Insert the corresponding record into prg_maintenance table
+                    $queryPrgMaintenance = "INSERT INTO prg_maintenance (detail_id) VALUES (?)";
+                    $stmtPrgMaintenance = $conn->prepare($queryPrgMaintenance);
+                    $stmtPrgMaintenance->bind_param("i", $detail_id);
+            
+                    if ($stmtPrgMaintenance->execute()) {
+                        echo "Data berhasil ditambahkan ke tabel prg_maintenance.";
+                    } else {
+                        echo "Error: " . $stmtPrgMaintenance->error;
+                    }
+            
+                    $stmtPrgMaintenance->close();
                 } else {
                     echo "Error: " . $stmtDetail->error;
                 }
-
+            
                 $stmtDetail->close();
-            }
+            }            
         } else {
             echo "Error: Products and other arrays are not set.";
         }

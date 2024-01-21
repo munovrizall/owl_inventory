@@ -15,6 +15,45 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
+if (isset($_GET['id'])) {
+    $transaksi_id = $_GET['id'];
+
+    $query = "SELECT * FROM detail_maintenance WHERE transaksi_id = $transaksi_id";
+    $result = mysqli_query($conn, $query);
+} else {
+    echo "ID not provided.";
+}
+
+if (isset($_POST['submitForm'])) {
+    // Get values from the form
+    $checkboxBarangDatang = isset($_POST['checkboxBarangDatang']) ? 1 : 0;
+    $checkboxCekMasalah = isset($_POST['checkboxCekMasalah']) ? 1 : 0;
+    $checkboxBeritaAcara = isset($_POST['checkboxBeritaAcara']) ? 1 : 0;
+    $checkboxAdministrasi = isset($_POST['checkboxAdministrasi']) ? 1 : 0;
+    $checkboxPengiriman = isset($_POST['checkboxPengiriman']) ? 1 : 0;
+    $no_resi = $_POST['no_resi'];
+
+    // Assuming you have an 'id' column as the unique identifier
+    $id = $_POST['id'];
+
+    // Update data in the database
+    $updateQuery = "UPDATE prg_maintenance SET
+                    kedatangan = '$checkboxBarangDatang',
+                    cek_barang = '$checkboxCekMasalah',
+                    berita_as = '$checkboxBeritaAcara',
+                    administrasi = '$checkboxAdministrasi',
+                    pengiriman = '$checkboxPengiriman',
+                    no_resi = '$no_resi'
+                    WHERE id = $id";
+
+    if ($conn->query($updateQuery) === TRUE) {
+        echo "Record updated successfully";
+    } else {
+        echo "Error: " . $updateQuery . "<br>" . $conn->error;
+    }
+}
+
+
 ?>
 
 <!DOCTYPE html>
@@ -261,70 +300,48 @@ if ($conn->connect_error) {
                                                     </tr>
                                                 </thead>
                                                 <tbody id="transaksiTable">
-                                                    <tr>
-                                                        <td>Satelit</td>
-                                                        <td>0031</td>
-                                                        <td style="text-align: center;"><span class="badge bg-danger">Tidak</span></td>
-                                                        <td>Roket rusak</td>
-                                                        <td style="text-align: center;">
-                                                            <div class="form-check">
-                                                                <input class="form-check-input" type="checkbox" value="" id="checkboxBarangDatang">
-                                                            </div>
-                                                        </td>
-                                                        <td style="text-align: center;">
-                                                            <div class="form-check">
-                                                                <input class="form-check-input" type="checkbox" value="" id="checkboxCekMasalah">
-                                                            </div>
-                                                        </td>
-                                                        <td style="text-align: center;">
-                                                            <div class="form-check">
-                                                                <input class="form-check-input" type="checkbox" value="" id="checkboxBeritaAcara">
-                                                            </div>
-                                                        </td>
-                                                        <td style="text-align: center;">
-                                                            <div class="form-check">
-                                                                <input class="form-check-input" type="checkbox" value="" id="checkboxAdministrasi">
-                                                            </div>
-                                                        </td>
-                                                        <td style="text-align: center;">
-                                                            <div class="form-check">
-                                                                <input class="form-check-input" type="checkbox" value="" id="checkboxPengiriman">
-                                                            </div>
-                                                        </td>
-                                                        <td>00148003341</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>FP301T</td>
-                                                        <td>0021</td>
-                                                        <td style="text-align: center;"><span class="badge bg-success">Ya</span></td>
-                                                        <td>Sensor rusak</td>
-                                                        <td style="text-align: center;">
-                                                            <div class="form-check">
-                                                                <input class="form-check-input" type="checkbox" value="" id="checkboxBarangDatang">
-                                                            </div>
-                                                        </td>
-                                                        <td style="text-align: center;">
-                                                            <div class="form-check">
-                                                                <input class="form-check-input" type="checkbox" value="" id="checkboxCekMasalah">
-                                                            </div>
-                                                        </td>
-                                                        <td style="text-align: center;">
-                                                            <div class="form-check">
-                                                                <input class="form-check-input" type="checkbox" value="" id="checkboxBeritaAcara">
-                                                            </div>
-                                                        </td>
-                                                        <td style="text-align: center;">
-                                                            <div class="form-check">
-                                                                <input class="form-check-input" type="checkbox" value="" id="checkboxAdministrasi">
-                                                            </div>
-                                                        </td>
-                                                        <td style="text-align: center;">
-                                                            <div class="form-check">
-                                                                <input class="form-check-input" type="checkbox" value="" id="checkboxPengiriman">
-                                                            </div>
-                                                        </td>
-                                                        <td>00148003628</td>
-                                                    </tr>
+                                                    <?php
+                                                    while ($row = mysqli_fetch_assoc($result)) {
+                                                    ?>
+                                                        <tr>
+                                                            <td><?php echo $row["produk_mt"]; ?></td>
+                                                            <td><?php echo $row["no_sn"]; ?></td>
+                                                            <td><?php echo $row["garansi"]; ?></td>
+                                                            <td><?php echo $row["keterangan"]; ?></td>
+                                                            <td style="text-align: center;">
+                                                                <div class="form-check">
+                                                                    <input class="form-check-input" type="checkbox" value="" id="checkboxBarangDatang" name ="checkboxBarangDatang">
+                                                                </div>
+                                                            </td>
+                                                            <td style="text-align: center;">
+                                                                <div class="form-check">
+                                                                    <input class="form-check-input" type="checkbox" value="" id="checkboxCekMasalah" name ="checkboxCekMasalah">
+                                                                </div>
+                                                            </td>
+                                                            <td style="text-align: center;">
+                                                                <div class="form-check">
+                                                                    <input class="form-check-input" type="checkbox" value="" id="checkboxBeritaAcara" name ="checkboxBeritaAcara">
+                                                                </div>
+                                                            </td>
+                                                            <td style="text-align: center;">
+                                                                <div class="form-check">
+                                                                    <input class="form-check-input" type="checkbox" value="" id="checkboxAdministrasi" name ="checkboxAdministrasi">
+                                                                </div>
+                                                            </td>
+                                                            <td style="text-align: center;">
+                                                                <div class="form-check">
+                                                                    <input class="form-check-input" type="checkbox" value="" id="checkboxPengiriman" name ="checkboxPengiriman">
+                                                                </div>
+                                                            </td>
+                                                            <td>
+                                                                <div class="input-group">
+                                                                    <input type="number" class="form-control" id="no_resi" name="no_resi" min="0" value="">
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                    <?php
+                                                    }
+                                                    ?>
                                                 </tbody>
                                             </table>
                                         </div>
@@ -399,11 +416,25 @@ if ($conn->connect_error) {
     <!-- Page specific script -->
     <!-- Page specific script -->
     <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var checkbox = document.getElementById('checkboxBarangDatang');
+            var checkbox = document.getElementById('checkboxCekMasalah');
+            var checkbox = document.getElementById('checkboxBeritaAcara');
+            var checkbox = document.getElementById('checkboxAdministrasi');
+            var checkbox = document.getElementById('checkboxPengiriman');
+
+
+            // Add an event listener to the checkbox
+            checkbox.addEventListener('change', function () {
+                // Set the value to 1 when checked, and 0 when unchecked
+                checkbox.value = this.checked ? 1 : 0;
+            });
+        });
 
         function submitForm() {
             // Assuming validateForm() is the function you want to call for validation
             if (validateForm()) {
-                document.getElementById("produksiForm").submit();
+                document.getElementById("monitoringForm").submit();
 
             } else {
                 alert("Validation failed. Please check your input.");

@@ -15,90 +15,8 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-$resultProduksi = "";
-$stokDibutuhkan = "";
-$currentStock = "";
-
-// Fetch data from produksi table
-$queryProdukPilihan = "SELECT DISTINCT produk FROM produksi ORDER BY produk";
-$resultProdukPilihan = $conn->query($queryProdukPilihan);
-
-if (isset($_POST['selectedDevice'])) {
-    $selectedDeviceName = $_POST['selectedDevice'];
-    $pengguna = isset($_SESSION['username']) ? $_SESSION['username'] : '';
-
-    // Milih bahan untuk produksi
-    $query = "SELECT nama_bahan, quantity FROM produksi WHERE produk = ?";
-    $stmt = $conn->prepare($query);
-    $stmt->bind_param("s", $selectedDeviceName);
-    $stmt->execute();
-    $stmt->bind_result($namaBahan, $stokDibutuhkan);
-    $resultProduksi = array();
-    while ($stmt->fetch()) {
-        $resultProduksi[] = array('namaBahan' => $namaBahan, 'stokDibutuhkan' => $stokDibutuhkan);
-    }
-    $stmt->close();
-
-    if (isset($_POST['quantity'])) {
-        $submittedQuantity = $_POST['quantity'];
-
-        if ($submittedQuantity == "") {
-            echo json_encode(array('error' => 'Quantity is required.'));
-            exit();
-        } elseif ($submittedQuantity <= 0) {
-            echo json_encode(array('error' => 'Quantity must be greater than 0.'));
-            exit();
-        }
-
-        // Initialize the array to store updated stock quantities
-        $updatedStockQuantities = array();
-
-        // Loop through $resultProduksi and update stock accordingly
-        foreach ($resultProduksi as $row) {
-            $namaBahan = $row['namaBahan'];
-            $stokDibutuhkan = $row['stokDibutuhkan'];
-
-            // Fetch current stock from masterbahan
-            $queryCurrentStock = "SELECT quantity FROM masterbahan WHERE nama = ?";
-            $stmtCurrentStock = $conn->prepare($queryCurrentStock);
-            $stmtCurrentStock->bind_param("s", $namaBahan);
-            $stmtCurrentStock->execute();
-            $stmtCurrentStock->bind_result($currentStock);
-            $stmtCurrentStock->fetch();
-            $stmtCurrentStock->close();
-
-            // Update the database with the new stock quantity
-            $newStock = $currentStock - ($submittedQuantity * $stokDibutuhkan);
-
-            // Store the updated stock quantities in the array
-            $updatedStockQuantities[] = array('namaBahan' => $namaBahan, 'stokDibutuhkan' => $stokDibutuhkan, 'currentStock' => $currentStock, 'newStock' => $newStock);
-        }
-
-        if (isset($_POST['submitForm'])) {
-            // Update the masterbahan table
-            $updateQueryStock = "UPDATE masterbahan SET quantity = ? WHERE nama = ?";
-            $updateStmt = $conn->prepare($updateQueryStock);
-
-            foreach ($updatedStockQuantities as $updatedStock) {
-                $newStock = $updatedStock['newStock'];
-                $namaBahan = $updatedStock['namaBahan'];
-
-                $updateStmt->bind_param("is", $newStock, $namaBahan);
-                $updateStmt->execute();
-            }
-
-            $updateStmt->close();
-        }
-        // Return the updated stock quantities
-        $responseArray = array('resultProduksi' => $resultProduksi, 'updatedStockQuantities' => $updatedStockQuantities);
-
-        if (!isset($_POST['submitForm'])) {
-            echo json_encode($responseArray);
-            exit();
-        }
-    }
-}
-
+$query = "SELECT * FROM transaksi_maintenance ORDER BY tanggal_terima";
+$result = mysqli_query($conn, $query);
 
 ?>
 
@@ -353,20 +271,21 @@ if (isset($_POST['selectedDevice'])) {
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <tr>
-                                                <td>123</td>
-                                                <td>17/01/2024</td>
-                                                <td>Origin Wiracipta Lestari</td>
-                                                <td><span class="badge bg-success">Selesai</span></td>
-                                                <td><input type="button" class="ibtnEdit btn btn-info btn-block" value="Edit"></td>
-                                            </tr>
-                                            <tr>
-                                                <td>124</td>
-                                                <td>17/01/2024</td>
-                                                <td>Origin Wiracipta Lestari</td>
-                                                <td><span class="badge bg-danger">Belum</span></td>
-                                                <td><input type="button" class="ibtnEdit btn btn-info btn-block" value="Edit"></td>
-                                            </tr>
+                                            <?php
+                                            while ($row = mysqli_fetch_assoc($result)) {
+                                            ?>
+                                                <tr>
+                                                    <td><?php echo $row["transaksi_id"]; ?></td>
+                                                    <td><?php echo $row["tanggal_terima"]; ?></td>
+                                                    <td><?php echo $row["nama_client"]; ?></td>
+                                                    <td><span class="badge bg-success">Selesai</span></td>
+                                                    <td>
+                                                        <a href='edit/edit.php?id=<?php echo $row["transaksi_id"]; ?>' class="btn btn-info btn-block">Edit</a>
+                                                    </td>
+                                                </tr>
+                                            <?php
+                                            }
+                                            ?>
                                         </tbody>
                                     </table>
 
