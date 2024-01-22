@@ -31,7 +31,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             $noResi = isset($_POST['no_resi'][$detail_id]) ? $_POST['no_resi'][$detail_id] : null;
 
             // Update the database with the new values for each row
-            $updateStmt->bind_param("iiiiiii", $checkboxBarangDatang, $checkboxCekMasalah, $checkboxBeritaAcara, $checkboxAdministrasi, $checkboxPengiriman, $noResi, $detail_id);
+            $updateStmt->bind_param("iiiiisi", $checkboxBarangDatang, $checkboxCekMasalah, $checkboxBeritaAcara, $checkboxAdministrasi, $checkboxPengiriman, $noResi, $detail_id);
             $updateStmt->execute();
         }
         exit();
@@ -337,7 +337,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                                                         </td>
                                                         <td>
                                                             <div class="input-group">
-                                                                <input type="number" class="form-control" id="no_resi" name="no_resi[<?php echo $row['detail_id']; ?>]" min="0" value="<?php echo $row["no_resi"]; ?>">
+                                                                <input type="text" class="form-control" id="no_resi" name="no_resi[<?php echo $row['detail_id']; ?>]" min="0" value="<?php echo $row["no_resi"]; ?>">
                                                             </div>
                                                         </td>
                                                     </tr>
