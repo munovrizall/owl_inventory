@@ -1,55 +1,51 @@
 <?php
-// Check if the user is logged in
-session_start();
+include("../../connection.php");
 
-$serverName = "localhost";
-$userNameDb = "root";
-$password = "";
-$dbName = "databaseinventory";
-
-mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
-
-$conn = new mysqli($serverName, $userNameDb, $password, $dbName);
-
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
-}
 
 if (isset($_GET['id'])) {
     $transaksi_id = $_GET['id'];
 
-    $query = "SELECT * FROM detail_maintenance WHERE transaksi_id = $transaksi_id";
-    $result = mysqli_query($conn, $query);
+    // Selecting data from detail_maintenance table based on transaksi_id
+    $query = "SELECT * FROM detail_maintenance WHERE transaksi_id = ?";
+    $stmt = $conn->prepare($query);
+    $stmt->bind_param("i", $transaksi_id);
+    $stmt->execute();
+
+    $result = $stmt->get_result();
+
+    // You can also fetch data from the transaksi_maintenance table
+    $transaksiQuery = "SELECT nama_client FROM transaksi_maintenance WHERE transaksi_id = ?";
+    $transaksiStmt = $conn->prepare($transaksiQuery);
+    $transaksiStmt->bind_param("i", $transaksi_id);
+    $transaksiStmt->execute();
+
+    $transaksiResult = $transaksiStmt->get_result();
+
 } else {
     echo "ID not provided.";
 }
 
-if (isset($_POST['submitForm'])) {
-    // Get values from the form
-    $checkboxBarangDatang = isset($_POST['checkboxBarangDatang']) ? 1 : 0;
-    $checkboxCekMasalah = isset($_POST['checkboxCekMasalah']) ? 1 : 0;
-    $checkboxBeritaAcara = isset($_POST['checkboxBeritaAcara']) ? 1 : 0;
-    $checkboxAdministrasi = isset($_POST['checkboxAdministrasi']) ? 1 : 0;
-    $checkboxPengiriman = isset($_POST['checkboxPengiriman']) ? 1 : 0;
-    $no_resi = $_POST['no_resi'];
+$updateQuery = "UPDATE detail_maintenance SET kedatangan=?, cek_barang=?, berita_as=?, administrasi=?, pengiriman=?, no_resi=? WHERE detail_id=?";
+$updateStmt = $conn->prepare($updateQuery);
 
-    // Assuming you have an 'id' column as the unique identifier
-    $id = $_POST['id'];
+if ($_SERVER["REQUEST_METHOD"] === "POST") {
+    // Check if the form is submitted
+    if (isset($_POST['submitForm'])) {
+        // Loop through the submitted data and update the database
+        foreach ($_POST['checkboxBarangDatang'] as $key => $value) {
+            $detail_id = intval($key); // Convert to integer for security
+            $checkboxBarangDatang = isset($_POST['checkboxBarangDatang'][$detail_id]) ? 1 : 0;
+            $checkboxCekMasalah = isset($_POST['checkboxCekMasalah'][$detail_id]) ? 1 : 0;
+            $checkboxBeritaAcara = isset($_POST['checkboxBeritaAcara'][$detail_id]) ? 1 : 0;
+            $checkboxAdministrasi = isset($_POST['checkboxAdministrasi'][$detail_id]) ? 1 : 0;
+            $checkboxPengiriman = isset($_POST['checkboxPengiriman'][$detail_id]) ? 1 : 0;
+            $noResi = isset($_POST['no_resi'][$detail_id]) ? $_POST['no_resi'][$detail_id] : null;
 
-    // Update data in the database
-    $updateQuery = "UPDATE prg_maintenance SET
-                    kedatangan = '$checkboxBarangDatang',
-                    cek_barang = '$checkboxCekMasalah',
-                    berita_as = '$checkboxBeritaAcara',
-                    administrasi = '$checkboxAdministrasi',
-                    pengiriman = '$checkboxPengiriman',
-                    no_resi = '$no_resi'
-                    WHERE id = $id";
-
-    if ($conn->query($updateQuery) === TRUE) {
-        echo "Record updated successfully";
-    } else {
-        echo "Error: " . $updateQuery . "<br>" . $conn->error;
+            // Update the database with the new values for each row
+            $updateStmt->bind_param("iiiiisi", $checkboxBarangDatang, $checkboxCekMasalah, $checkboxBeritaAcara, $checkboxAdministrasi, $checkboxPengiriman, $noResi, $detail_id);
+            $updateStmt->execute();
+        }
+        exit();
     }
 }
 
@@ -252,7 +248,15 @@ if (isset($_POST['submitForm'])) {
                 <div class="container-fluid">
                     <div class="row mb-2">
                         <div class="col-sm-6">
-                            <h1>Monitoring Transaksi #123</h1>
+                            <?php
+                            if (isset($_GET['id'])) {
+                                $transaksi_id = $_GET['id'];
+                                echo "<h1>Monitoring Transaksi #{$transaksi_id}</h1>";
+                            } else {
+                                echo "<h1>Monitoring Transaksi</h1>";
+                                echo "ID not provided.";
+                            }
+                            ?>
                         </div>
                         <div class="col-sm-6">
                             <ol class="breadcrumb float-sm-right">
@@ -273,11 +277,22 @@ if (isset($_POST['submitForm'])) {
                     <!-- general form elements -->
                     <div class="card card-primary">
                         <div class="card-header">
-                            <h3 class="card-title">Monitoring Transaksi PT. Origin Wiracipta Lestari</h3>
+                            <?php
+                            if (isset($_GET['id'])) {
+                                $transaksi_id = $_GET['id'];
+                                // Assuming $result contains data from the query
+                                $row = mysqli_fetch_assoc($transaksiResult);
+                                $nama_client = $row["nama_client"];
+                                echo "<h3 class='card-title'>Monitoring Transaksi {$nama_client} </h3>";
+                            } else {
+                                echo "<h3 class='card-title'>Monitoring Transaksi PT. Origin Wiracipta Lestari</h3>";
+                                echo "ID not provided.";
+                            }
+                            ?>
                         </div>
                         <!-- /.card-header -->
                         <!-- form start -->
-                        <form id="monitoringForm" onsubmit="return validateForm()" method="post">
+                        <form id="monitoringForm" onsubmit="return submitForm()" method="post">
                             <div class="card-body">
                                 <div class="card">
                                     <div class="card-header">
@@ -317,50 +332,48 @@ if (isset($_POST['submitForm'])) {
                                                     </tr>
                                                 </thead>
                                                 <tbody id="transaksiTable">
-
-                                                    <?php
-                                                    while ($row = mysqli_fetch_assoc($result)) {
-                                                    ?>
-                                                        <tr>
-                                                            <td><?php echo $row["produk_mt"]; ?></td>
-                                                            <td><?php echo $row["no_sn"]; ?></td>
-                                                            <td><?php echo $row["garansi"]; ?></td>
-                                                            <td><?php echo $row["keterangan"]; ?></td>
-                                                            <td style="text-align: center;">
-                                                                <div class="form-check">
-                                                                    <input class="form-check-input" type="checkbox" value="" id="checkboxBarangDatang" name ="checkboxBarangDatang">
-                                                                </div>
-                                                            </td>
-                                                            <td style="text-align: center;">
-                                                                <div class="form-check">
-                                                                    <input class="form-check-input" type="checkbox" value="" id="checkboxCekMasalah" name ="checkboxCekMasalah">
-                                                                </div>
-                                                            </td>
-                                                            <td style="text-align: center;">
-                                                                <div class="form-check">
-                                                                    <input class="form-check-input" type="checkbox" value="" id="checkboxBeritaAcara" name ="checkboxBeritaAcara">
-                                                                </div>
-                                                            </td>
-                                                            <td style="text-align: center;">
-                                                                <div class="form-check">
-                                                                    <input class="form-check-input" type="checkbox" value="" id="checkboxAdministrasi" name ="checkboxAdministrasi">
-                                                                </div>
-                                                            </td>
-                                                            <td style="text-align: center;">
-                                                                <div class="form-check">
-                                                                    <input class="form-check-input" type="checkbox" value="" id="checkboxPengiriman" name ="checkboxPengiriman">
-                                                                </div>
-                                                            </td>
-                                                            <td>
-                                                                <div class="input-group">
-                                                                    <input type="number" class="form-control" id="no_resi" name="no_resi" min="0" value="">
-                                                                </div>
-                                                            </td>
-                                                        </tr>
-                                                    <?php
-                                                    }
-                                                    ?>
-====
+                                                <?php
+                                                while ($row = mysqli_fetch_assoc($result)) {
+                                                ?>
+                                                    <tr>
+                                                        <td><?php echo $row["produk_mt"]; ?></td>
+                                                        <td><?php echo $row["no_sn"]; ?></td>
+                                                        <td><?php echo $row["garansi"] == 1 ? 'Yes' : 'No'; ?></td>
+                                                        <td><?php echo $row["keterangan"]; ?></td>
+                                                        <td style="text-align: center;">
+                                                            <div class="form-check">
+                                                                <input class="form-check-input" type="checkbox" value="1" name="checkboxBarangDatang[<?php echo $row['detail_id']; ?>]" <?php echo $row["kedatangan"] == 1 ? 'checked' : ''; ?>>
+                                                            </div>
+                                                        </td>
+                                                        <td style="text-align: center;">
+                                                            <div class="form-check">
+                                                                <input class="form-check-input" type="checkbox" value="1" name="checkboxCekMasalah[<?php echo $row['detail_id']; ?>]" <?php echo $row["cek_barang"] == 1 ? 'checked' : ''; ?>>
+                                                            </div>
+                                                        </td>
+                                                        <td style="text-align: center;">
+                                                            <div class="form-check">
+                                                                <input class="form-check-input" type="checkbox" value="1" name="checkboxBeritaAcara[<?php echo $row['detail_id']; ?>]" <?php echo $row["berita_as"] == 1 ? 'checked' : ''; ?>>
+                                                            </div>
+                                                        </td>
+                                                        <td style="text-align: center;">
+                                                            <div class="form-check">
+                                                                <input class="form-check-input" type="checkbox" value="1" name="checkboxAdministrasi[<?php echo $row['detail_id']; ?>]" <?php echo $row["administrasi"] == 1 ? 'checked' : ''; ?>>
+                                                            </div>
+                                                        </td>
+                                                        <td style="text-align: center;">
+                                                            <div class="form-check">
+                                                                <input class="form-check-input" type="checkbox" value="1" name="checkboxPengiriman[<?php echo $row['detail_id']; ?>]" <?php echo $row["pengiriman"] == 1 ? 'checked' : ''; ?>>
+                                                            </div>
+                                                        </td>
+                                                        <td>
+                                                            <div class="input-group">
+                                                                <input type="text" class="form-control" id="no_resi" name="no_resi[<?php echo $row['detail_id']; ?>]" min="0" value="<?php echo $row["no_resi"]; ?>">
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                <?php
+                                                }
+                                                ?>
                                                 </tbody>
                                             </table>
                                         </div>
@@ -408,45 +421,17 @@ if (isset($_POST['submitForm'])) {
     <script>
 
         document.addEventListener('DOMContentLoaded', function () {
-            var checkbox = document.getElementById('checkboxBarangDatang');
-            var checkbox = document.getElementById('checkboxCekMasalah');
-            var checkbox = document.getElementById('checkboxBeritaAcara');
-            var checkbox = document.getElementById('checkboxAdministrasi');
-            var checkbox = document.getElementById('checkboxPengiriman');
+            var checkboxes = document.querySelectorAll('.form-check-input');
 
-
-            // Add an event listener to the checkbox
-            checkbox.addEventListener('change', function () {
-                // Set the value to 1 when checked, and 0 when unchecked
-                checkbox.value = this.checked ? 1 : 0;
+            checkboxes.forEach(function (checkbox) {
+                checkbox.addEventListener('change', function () {
+                    this.value = this.checked ? 1 : 0;
+                });
             });
         });
 
         function submitForm() {
-            // Assuming validateForm() is the function you want to call for validation
-            if (validateForm()) {
-                document.getElementById("monitoringForm").submit();
-
-            } else {
-                alert("Validation failed. Please check your input.");
-            }
-        }
-
-        function validateForm() {
-            // Add your validation logic here
-            // Return true if the form is valid, false otherwise
-            var selectedDevice = document.getElementById("pilihProduksiDevice").value;
-            var quantity = document.getElementById("quantity").value;
-
-            // Example validation: Check if the selected device and quantity are not empty
-            if (selectedDevice === "" || quantity === "") {
-                alert("Please fill in all required fields.");
-                return false;
-            }
-
-            // Add more validation as needed...
-
-            return true; // If all validations pass
+            return true;
         }
     </script>
 
