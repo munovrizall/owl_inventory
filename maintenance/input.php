@@ -1,16 +1,6 @@
 <?php
-session_start();
 
-$serverName = "localhost";
-$userName = "root";
-$password = "";
-$dbName = "databaseinventory";
-
-$conn = new mysqli($serverName, $userName, $password, $dbName);
-
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
-}
+include "../connection.php";
 
 $queryClient = "SELECT * FROM client ORDER BY nama_client";
 $resultClient = $conn->query($queryClient);
@@ -95,7 +85,8 @@ if (isset($_GET["getDropdownOptions"])) {
 
                 // Insert the new record into detail_maintenance table
                 echo "Produk: $nama_produk, SN: $no_sn, Garansi: $garansi, Keterangan: $keterangan";
-                $queryDetail = "INSERT INTO detail_maintenance (transaksi_id, produk_mt, no_sn, garansi, keterangan) VALUES (?, ?, ?, ?, ?)";
+                $queryDetail = "INSERT INTO detail_maintenance (transaksi_id, produk_mt, no_sn, garansi, 
+                keterangan, kedatangan, cek_barang, berita_as, administrasi, pengiriman, no_resi) VALUES (?, ?, ?, ?, ?, '1', '0','0','0','0', '0')";
                 $stmtDetail = $conn->prepare($queryDetail);
                 $stmtDetail->bind_param("isiis", $transaksi_id, $nama_produk, $no_sn, $garansi, $keterangan);
 
@@ -117,6 +108,7 @@ if (isset($_GET["getDropdownOptions"])) {
                     }
 
                     $stmtPrgMaintenance->close();
+
                 } else {
                     echo "Error: " . $stmtDetail->error;
                 }

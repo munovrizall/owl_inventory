@@ -1,16 +1,6 @@
 <?php
-session_start();
 
-$serverName = "localhost";
-$userName = "root";
-$password = "";
-$dbName = "databaseinventory";
-
-$conn = new mysqli($serverName, $userName, $password, $dbName);
-
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
-}
+include "connection.php";
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Check which fields are provided

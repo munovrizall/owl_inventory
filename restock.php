@@ -1,16 +1,6 @@
 <?php
-session_start();
 
-$serverName = "localhost";
-$userName = "root";
-$password = "";
-$dbName = "databaseinventory";
-
-$conn = new mysqli($serverName, $userName, $password, $dbName);
-
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
-}
+include "connection.php";
 
 $queryBahan = "SELECT * FROM masterbahan ORDER BY nama";
 $resultBahan = $conn->query($queryBahan);
