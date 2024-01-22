@@ -70,7 +70,6 @@ if (isset($_GET["getDropdownOptions"])) {
         $stmtproduk->bind_param("s", $namaDevice);
         $stmtproduk->execute();
         $stmtproduk->close();
-
     } else {
         echo "Error: Bahan and Quantity arrays are not set.";
     }
@@ -97,32 +96,13 @@ if (isset($_GET["getDropdownOptions"])) {
     <link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
     <!-- Sweetalert2 -->
     <link rel="stylesheet" href="assets/adminlte/plugins/sweetalert2-theme-bootstrap-4/bootstrap-4.min.css">
+    <!-- Select2 -->
+    <link rel="stylesheet" href="assets/adminlte/plugins/select2/css/select2.min.css">
+    <link rel="stylesheet" href="assets/adminlte/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css">
 
     <style>
         .input-group-append label {
             margin-right: 24px;
-        }
-
-        .form-select {
-            display: block;
-            width: 100%;
-            padding: 0.375rem 2.25rem 0.375rem 0.75rem;
-            -moz-padding-start: calc(0.75rem - 3px);
-            font-size: 1rem;
-            font-weight: 400;
-            line-height: 1.5;
-            color: #212529;
-            background-color: #fff;
-            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e");
-            background-repeat: no-repeat;
-            background-position: right 0.75rem center;
-            background-size: 16px 12px;
-            border: 1px solid #ced4da;
-            border-radius: 0.25rem;
-            transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
-            -webkit-appearance: none;
-            -moz-appearance: none;
-            appearance: none;
         }
 
         .lebar-kolom1 {
@@ -372,9 +352,9 @@ if (isset($_GET["getDropdownOptions"])) {
     <script src="assets/adminlte/dist/js/adminlte.min.js"></script>
     <!-- SweetAlert2 Toast -->
     <script src="assets/adminlte/plugins/sweetalert2/sweetalert2.min.js"></script>
-    <!-- bootstrap searchable dropdown -->
-    <script src="assets/bootstrap-5/bootstrap.bundle.min.js"></script>
-    <script src="assets/dselect.js"></script>
+    <!-- Select2 -->
+    <script src="assets/adminlte/plugins/select2/js/select2.full.min.js"></script>
+
     <!-- Page specific script -->
     <script>
         $(document).ready(function() {
@@ -400,7 +380,7 @@ if (isset($_GET["getDropdownOptions"])) {
                         var newRow = $("<tr>");
                         var cols = "";
 
-                        cols += '<td><select class="form-select pilihNamaBahan" name="pilihNamaBahan[]">' + dropdownOptions + '</select></td>';
+                        cols += '<td><select class="form-control select2 pilihNamaBahan" name="pilihNamaBahan[]">' + dropdownOptions + '</select></td>';
                         cols += '<td><input type="number" class="form-control quantity" name="quantity[]" min="0" value="" placeholder="0"/></td>';
                         cols += '<td><input type="button" class="ibtnDel btn btn-md btn-danger"  value="Delete"></td>';
 

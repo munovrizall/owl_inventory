@@ -82,6 +82,9 @@ if (isset($_POST['quantity'])) {
     <link rel="stylesheet" href="assets/adminlte/plugins/sweetalert2-theme-bootstrap-4/bootstrap-4.min.css">
     <!-- Ionicons -->
     <link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+    <!-- Select2 -->
+    <link rel="stylesheet" href="assets/adminlte/plugins/select2/css/select2.min.css">
+    <link rel="stylesheet" href="assets/adminlte/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css">
 
     <style>
         #successMessage {
@@ -94,27 +97,6 @@ if (isset($_POST['quantity'])) {
             font-style: italic;
         }
 
-        .form-select {
-            display: block;
-            width: 100%;
-            padding: 0.375rem 2.25rem 0.375rem 0.75rem;
-            -moz-padding-start: calc(0.75rem - 3px);
-            font-size: 1rem;
-            font-weight: 400;
-            line-height: 1.5;
-            color: #212529;
-            background-color: #fff;
-            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e");
-            background-repeat: no-repeat;
-            background-position: right 0.75rem center;
-            background-size: 16px 12px;
-            border: 1px solid #ced4da;
-            border-radius: 0.25rem;
-            transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
-            -webkit-appearance: none;
-            -moz-appearance: none;
-            appearance: none;
-        }
     </style>
 
 </head>
@@ -283,10 +265,11 @@ if (isset($_POST['quantity'])) {
                             <div class="card-body">
                                 <div class="form-group">
                                     <div>
-                                        <label for="pilihNamaKelompok">Pilih Kelompok<span class="gray-italic-text"> (opsional)</span></label>
+                                        <label for="pilihNamaKelompok">Pilih Kelompok<span class="gray-italic-text">
+                                                (opsional)</span></label>
                                     </div>
-                                    <select class="form-select" id="pilihNamaKelompok" name="kelompok">
-                                        <option value="">Pilih Kelompok</option>
+                                    <select class="form-control select2" id="pilihNamaKelompok" name="kelompok">
+                                        <option value="">--- Pilih Kelompok ---</option>
                                         <?php
                                         while ($row = $resultKelompok->fetch_assoc()) {
                                             echo '<option value="' . $row['nama_kelompok'] . '">' . $row['nama_kelompok'] . '</option>';
@@ -295,9 +278,9 @@ if (isset($_POST['quantity'])) {
                                     </select>
                                 </div>
                                 <div class="form-group">
-                                    <label for="exampleSelectBorderWidth2">Pilih Bahan <span style="color: red;">*</span></label>
-                                    <select class="form-select" id="pilihBahanRestock" name="selectedItem">
-                                        <option value="">Pilih Bahan</option>
+                                    <label for="pilihBahanRestock">Pilih Bahan <span style="color: red;">*</span></label>
+                                    <select class="form-control select2" id="pilihBahanRestock" name="selectedItem">
+                                        <option value="">--- Pilih Bahan ---</option>
                                         <?php
                                         while ($row = $resultBahan->fetch_assoc()) {
                                             echo '<option value="' . $row['stok_id'] . '">' . $row['nama'] . '</option>';
@@ -316,7 +299,7 @@ if (isset($_POST['quantity'])) {
                                 <p id="stockMessage">Stok Bahan Tersisa: <?php echo $stockQuantity; ?></p>
                                 <p id="successMessage">Stok Bahan Terkini: <?php echo $newStockQuantity; ?></p>
                                 <div class="form-group">
-                                    <label for="deksripsi">Deskripsi<span class="gray-italic-text"> (opsional)</span>
+                                    <label for="deskripsi">Deskripsi<span class="gray-italic-text"> (opsional)</span>
                                     </label>
                                     <textarea class="form-control" id="deskripsi" name="deskripsi" rows="3" placeholder="Masukkan keterangan pembelian bahan ..."></textarea>
                                 </div>
@@ -355,11 +338,25 @@ if (isset($_POST['quantity'])) {
     <script src="assets/adminlte/dist/js/adminlte.min.js"></script>
     <!-- SweetAlert2 Toast -->
     <script src="assets/adminlte/plugins/sweetalert2/sweetalert2.min.js"></script>
-    <!-- bootstrap searchable dropdown -->
-    <script src="assets/bootstrap-5/bootstrap.bundle.min.js"></script>
-    <script src="assets/dselect.js"></script>
+    <!-- Select2 -->
+    <script src="assets/adminlte/plugins/select2/js/select2.full.min.js"></script>
+
     <!-- Page specific script -->
     <script>
+        // Select2 Dropdown
+        $(document).on('select2:open', () => {
+            document.querySelector('.select2-search__field').focus();
+        });
+
+        $(document).ready(function() {
+            //Initialize Select2 Elements
+            $('.select2').select2({
+                theme: 'bootstrap4',
+                width: '100%',
+                containerCssClass: 'height-40px',
+            });
+        });
+
         $(function() {
             bsCustomFileInput.init();
 
@@ -414,7 +411,8 @@ if (isset($_POST['quantity'])) {
                     // Hide the stock message
                     document.getElementById("successMessage").style.display = "none";
                     // Update the stock message with the fetched quantity
-                    document.getElementById("stockMessage").innerText = "Stok Bahan Tersisa: " + response.currentStock;
+                    document.getElementById("stockMessage").innerText = "Stok Bahan Tersisa: " + response
+                        .currentStock;
                 },
                 error: function(error) {
                     alert("Error, refresh the page!");
@@ -474,18 +472,6 @@ if (isset($_POST['quantity'])) {
             dropdown.dispatchEvent(new Event('change'));
         }
 
-        // Searchable dropdown
-        var select_box_element = document.querySelector('#pilihNamaKelompok');
-        var select_box_element2 = document.querySelector('#pilihBahanRestock');
-
-        dselect(select_box_element, {
-            search: true,
-        });
-
-        dselect(select_box_element2, {
-            search: true,
-        });
-
         // Quantity input disabled to prevent bugs
         document.addEventListener("DOMContentLoaded", function() {
             disableQuantityInput();
@@ -505,15 +491,17 @@ if (isset($_POST['quantity'])) {
 
         // When user press enter on keyboard
         var quantityInput = document.getElementById('quantity');
-        quantityInput.addEventListener('keyup', function(event) {
+        quantityInput.addEventListener('keydown', function(event) {
             if (event.keyCode === 13) {
+                event.preventDefault();
                 submitForm();
             }
         });
 
         var deksripsiInput = document.getElementById('deskripsi');
-        deksripsiInput.addEventListener('keyup', function(event) {
+        deksripsiInput.addEventListener('keydown', function(event) {
             if (event.keyCode === 13) {
+                event.preventDefault();
                 submitForm();
             }
         });
