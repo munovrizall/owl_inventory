@@ -1,14 +1,6 @@
 <?php
-$serverName = "localhost";
-$userNameDb = "root";
-$password = "";
-$dbName = "databaseinventory";
 
-$conn = new mysqli($serverName, $userNameDb, $password, $dbName);
-
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
-}
+include "connection.php";
 
 $query = "SELECT * FROM masterbahan ORDER BY stok_id";
 $result = mysqli_query($conn, $query);

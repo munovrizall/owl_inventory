@@ -1,18 +1,6 @@
 <?php
-// Check if the user is logged in
-session_start();
-$username = $_SESSION['username'];
 
-$serverName = "localhost";
-$userNameDb = "root";
-$password = "";
-$dbName = "databaseinventory";
-
-$conn = new mysqli($serverName, $userNameDb, $password, $dbName);
-
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
-}
+include "connection.php";
 
 $query = "SELECT historis.ID, historis.pengguna, historis.waktu, historis.quantity, 
           historis.activity, historis.deskripsi, masterbahan.nama 
