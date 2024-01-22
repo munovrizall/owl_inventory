@@ -167,6 +167,9 @@ if (isset($_POST['selectedDevice'])) {
     <link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
     <!-- Sweetalert2 -->
     <link rel="stylesheet" href="assets/adminlte/plugins/sweetalert2-theme-bootstrap-4/bootstrap-4.min.css">
+    <!-- Select2 -->
+    <link rel="stylesheet" href="assets/adminlte/plugins/select2/css/select2.min.css">
+    <link rel="stylesheet" href="assets/adminlte/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css">
 
     <style>
         .gray-italic-text {
@@ -377,12 +380,12 @@ if (isset($_POST['selectedDevice'])) {
                         </div>
                         <!-- /.card-header -->
                         <!-- form start -->
-                        <form id="produksiForm" method="post">
+                        <form id="produksiForm" onsubmit="return validateForm()" method="post">
                             <div class="card-body">
                                 <div class="form-group">
-                                    <label for="pilihProduksiDevice">Pilih Device <span style="color: red;">*</span></label>
-                                    <select class="form-select" id="pilihProduksiDevice" name="selectedDevice">
-                                        <option value="">Pilih Produk</option>
+                                    <label for="exampleSelectBorderWidth2">Pilih Device <span style="color: red;">*</span></label>
+                                    <select class="form-control select2" id="pilihProduksiDevice" name="selectedDevice">
+                                        <option value="">--- Pilih Produk ---</option>
                                         <?php
                                         while ($row = $resultProdukPilihan->fetch_assoc()) {
                                             echo '<option value="' . $row['produk'] . '">' . $row['produk'] . '</option>';
@@ -430,7 +433,7 @@ if (isset($_POST['selectedDevice'])) {
                             </div>
                             <!-- /.card-body -->
                             <div class="card-footer d-flex justify-content-end">
-                                <button type="submit" class="btn btn-primary" name="submitForm">Submit</button>
+                                <button type="submit" class="btn btn-primary" name="submitForm" onclick="submitForm()">Submit</button>
                             </div>
                         </form>
 
@@ -460,33 +463,37 @@ if (isset($_POST['selectedDevice'])) {
     <script src="assets/adminlte/plugins/bs-custom-file-input/bs-custom-file-input.min.js"></script>
     <!-- AdminLTE App -->
     <script src="assets/adminlte/dist/js/adminlte.min.js"></script>
-    <!-- bootstrap searchable dropdown -->
-    <script src="assets/bootstrap-5/bootstrap.bundle.min.js"></script>
-    <script src="assets/dselect.js"></script>
     <!-- SweetAlert2 Toast -->
     <script src="assets/adminlte/plugins/sweetalert2/sweetalert2.min.js"></script>
+    <!-- Select2 -->
+    <script src="assets/adminlte/plugins/select2/js/select2.full.min.js"></script>
     <!-- Page specific script -->
     <script>
+        // Select2 Dropdown
+        $(document).on('select2:open', () => {
+            document.querySelector('.select2-search__field').focus();
+        });
+
+        $(document).ready(function() {
+            //Initialize Select2 Elements
+            $('.select2').select2({
+                theme: 'bootstrap4',
+                width: '100%',
+                containerCssClass: 'height-40px',
+            });
+        });
+
         $(function() {
             bsCustomFileInput.init();
 
-            // Searchable dropdown
-            var select_box_element = document.querySelector('#pilihProduksiDevice');
-            dselect(select_box_element, {
-                search: true,
-            });
-
             // Event listener for "Cek" button click
             document.getElementById("cekButton").addEventListener("click", function() {
-                console.log("Cek button clicked"); // Debugging statement
                 cekProduksi();
             });
-
-            document.querySelector('[name="submitForm"]').addEventListener('click', submitForm);
-
         });
 
         function cekProduksi() {
+            console.log("Inside cekProduksi function"); // Debugging statement
             var selectedDevice = document.getElementById("pilihProduksiDevice").value;
             var quantity = document.getElementById("quantity").value;
 
@@ -575,9 +582,8 @@ if (isset($_POST['selectedDevice'])) {
         function submitForm() {
             // Assuming validateForm() is the function you want to call for validation
             if (validateForm()) {
-                alert('Produksi berhasil!\nKlik OK atau ENTER');
                 document.getElementById("produksiForm").submit();
-                location.reload();
+
             } else {
                 Swal.fire({
                     icon: 'error',
@@ -635,6 +641,7 @@ if (isset($_POST['selectedDevice'])) {
                     }
                 }
             }
+            // Add more validation as needed...
 
             return true; // If all validations pass
         }

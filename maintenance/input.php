@@ -40,28 +40,28 @@ if (isset($_GET["getDropdownOptions"])) {
     // Check if the client needs to be added
     if (isset($_POST["namaPTBaru"]) && !empty($_POST["namaPTBaru"])) {
         $newClientName = $_POST["namaPTBaru"];
-    
+
         // Check if the client already exists in the database
         $checkClientQuery = "SELECT nama_client FROM client WHERE nama_client = ?";
         $stmtCheck = $conn->prepare($checkClientQuery);
         $stmtCheck->bind_param("s", $newClientName);
         $stmtCheck->execute();
         $stmtCheck->store_result();
-    
+
         // If the client already exists, show an error
         if ($stmtCheck->num_rows > 0) {
             echo "Client with the name '$newClientName' already exists in the database.";
             $stmtCheck->close();
             exit();
         }
-    
+
         $stmtCheck->close();
-    
+
         // Perform insertion of a new client into the database
         $insertClientQuery = "INSERT INTO client (nama_client) VALUES (?)";
         $stmt = $conn->prepare($insertClientQuery);
         $stmt->bind_param("s", $newClientName);
-    
+
         if ($stmt->execute()) {
             // Insert successful, continue with the transaction maintenance
             $stmt->close();
@@ -69,7 +69,7 @@ if (isset($_GET["getDropdownOptions"])) {
             echo "Error adding a new client: " . $stmt->error;
             exit();
         }
-    }        
+    }
 
     // Continue with the transaction maintenance
     $query = "INSERT INTO transaksi_maintenance (tanggal_terima, nama_client) VALUES (?, ?)";
@@ -92,37 +92,37 @@ if (isset($_GET["getDropdownOptions"])) {
                 $no_sn = $numberSNArray[$key];
                 $garansi = $garansiArray[$key];
                 $keterangan = $keteranganArray[$key];
-            
+
                 // Insert the new record into detail_maintenance table
                 echo "Produk: $nama_produk, SN: $no_sn, Garansi: $garansi, Keterangan: $keterangan";
                 $queryDetail = "INSERT INTO detail_maintenance (transaksi_id, produk_mt, no_sn, garansi, keterangan) VALUES (?, ?, ?, ?, ?)";
                 $stmtDetail = $conn->prepare($queryDetail);
                 $stmtDetail->bind_param("isiis", $transaksi_id, $nama_produk, $no_sn, $garansi, $keterangan);
-            
+
                 if ($stmtDetail->execute()) {
                     echo "Data berhasil ditambahkan ke tabel detail.";
-            
+
                     // Retrieve the generated detail_id
                     $detail_id = $stmtDetail->insert_id;
-            
+
                     // Insert the corresponding record into prg_maintenance table
                     $queryPrgMaintenance = "INSERT INTO prg_maintenance (detail_id) VALUES (?)";
                     $stmtPrgMaintenance = $conn->prepare($queryPrgMaintenance);
                     $stmtPrgMaintenance->bind_param("i", $detail_id);
-            
+
                     if ($stmtPrgMaintenance->execute()) {
                         echo "Data berhasil ditambahkan ke tabel prg_maintenance.";
                     } else {
                         echo "Error: " . $stmtPrgMaintenance->error;
                     }
-            
+
                     $stmtPrgMaintenance->close();
                 } else {
                     echo "Error: " . $stmtDetail->error;
                 }
-            
+
                 $stmtDetail->close();
-            }            
+            }
         } else {
             echo "Error: Products and other arrays are not set.";
         }
@@ -131,7 +131,6 @@ if (isset($_GET["getDropdownOptions"])) {
     }
 
     $stmt->close();
-
 }
 
 ?>
@@ -155,33 +154,13 @@ if (isset($_GET["getDropdownOptions"])) {
     <link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
     <!-- Sweetalert2 -->
     <link rel="stylesheet" href="../assets/adminlte/plugins/sweetalert2-theme-bootstrap-4/bootstrap-4.min.css">
-    <!-- Tempusdominus Bootstrap 4 -->
-    <link rel="stylesheet" href="../assets/adminlte/plugins/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css">
+    <!-- Select2 -->
+    <link rel="stylesheet" href="../assets/adminlte/plugins/select2/css/select2.min.css">
+    <link rel="stylesheet" href="../assets/adminlte/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css">
+
     <style>
         .input-group-append label {
             margin-right: 24px;
-        }
-
-        .form-select {
-            display: block;
-            width: 100%;
-            padding: 0.375rem 2.25rem 0.375rem 0.75rem;
-            -moz-padding-start: calc(0.75rem - 3px);
-            font-size: 1rem;
-            font-weight: 400;
-            line-height: 1.5;
-            color: #212529;
-            background-color: #fff;
-            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e");
-            background-repeat: no-repeat;
-            background-position: right 0.75rem center;
-            background-size: 16px 12px;
-            border: 1px solid #ced4da;
-            border-radius: 0.25rem;
-            transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
-            -webkit-appearance: none;
-            -moz-appearance: none;
-            appearance: none;
         }
 
         .lebar-kolom1 {
@@ -376,18 +355,15 @@ if (isset($_GET["getDropdownOptions"])) {
                                     <div class="form-group">
                                         <label>Tanggal Transaksi <span style="color: red;">*</span></label>
                                         <div class="input-group date" id="datepicker" data-target-input="nearest">
-                                            <input type="date" class="form-control datetimepicker-input" data-target="#datepicker" id="tanggal" name="tanggal" placeholder="Masukkan tanggal transaksi" />
-                                            <div class="input-group-append" data-target="#datepicker" data-toggle="datetimepicker">
-                                                <div class="input-group-text"><i class="far fa-calendar-alt"></i></div>
-                                            </div>
+                                            <input type="date" class="form-control datetimepicker-input" id="tanggal" name="tanggal" placeholder="Masukkan tanggal transaksi" />
                                         </div>
                                     </div>
                                 </div>
                                 <div class="form-group">
                                     <div class="col">
                                         <label for="pilihClient">Pilih PT <span style="color: red;">*</span></label>
-                                        <select class="form-select" id="pilihClient" name="client">
-                                            <option value="">Pilih PT</option>
+                                        <select class="form-control select2" id="pilihClient" name="client">
+                                            <option value="">--- Pilih PT ---</option>
                                             <?php
                                             while ($row = $resultClient->fetch_assoc()) {
                                                 echo '<option value="' . $row['nama_client'] . '">' . $row['nama_client'] . '</option>';
@@ -481,15 +457,15 @@ if (isset($_GET["getDropdownOptions"])) {
     <script src="../assets/adminlte/dist/js/adminlte.min.js"></script>
     <!-- SweetAlert2 Toast -->
     <script src="../assets/adminlte/plugins/sweetalert2/sweetalert2.min.js"></script>
-    <!-- bootstrap searchable dropdown -->
-    <script src="../assets/bootstrap-5/bootstrap.bundle.min.js"></script>
-    <script src="../assets/dselect.js"></script>
-    <!-- InputMask -->
-    <script src="../assets/adminlte/plugins/moment/moment.min.js"></script>
-    <script src="../assets/adminlte/plugins/inputmask/jquery.inputmask.min.js"></script>
-    <!-- Tempusdominus Bootstrap 4 -->
-    <script src="../assets/adminlte/plugins/tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js"></script>
+    <!-- Select2 -->
+    <script src="../assets/adminlte/plugins/select2/js/select2.full.min.js"></script>
+
     <script>
+        // Select2 Dropdown
+        $(document).on('select2:open', () => {
+            document.querySelector('.select2-search__field').focus();
+        });
+
         $(function() {
             $('#datepicker').datetimepicker({
                 format: 'YYYY-MM-DD',
@@ -498,6 +474,12 @@ if (isset($_GET["getDropdownOptions"])) {
         });
 
         $(document).ready(function() {
+            $('.select2').select2({
+                theme: 'bootstrap4',
+                width: '100%',
+                containerCssClass: 'height-40px',
+            });
+
             var counter = 0;
 
             $("#addrow").on("click", function() {
@@ -522,9 +504,9 @@ if (isset($_GET["getDropdownOptions"])) {
                         var newRow = $("<tr>");
                         var cols = "";
 
-                        cols += '<td><select class="form-select pilihNamaProduk" name="pilihNamaProduk[]">' + dropdownOptions + '</select></td>';
+                        cols += '<td><select class="form-control select2 pilihNamaProduk" name="pilihNamaProduk[]">' + dropdownOptions + '</select></td>';
                         cols += '<td><input type="text" class="form-control" name="numberSN[]" value="" placeholder="Nomor SN"/></td>';
-                        cols += '<td><select class="form-select" id="pilihGaransi ' + counter + '" name="pilihGaransi[]' + counter + '">' + dropdownGaransi + '</select></td>';
+                        cols += '<td><select class="form-control select2" id="pilihGaransi ' + counter + '" name="pilihGaransi[]' + counter + '">' + dropdownGaransi + '</select></td>';
                         cols += '<td><input type="text" class="form-control" name="inputKerusakan[]" value="" placeholder="Kerusakan Device"/></td>';
                         cols += '<td><input type="button" class="ibtnDel btn btn-md btn-danger"  value="Delete"></td>';
 
@@ -532,7 +514,7 @@ if (isset($_GET["getDropdownOptions"])) {
                         $("table.order-list").append(newRow);
                         counter++;
                     },
-                    error: function (xhr, status, error) {
+                    error: function(xhr, status, error) {
                         console.log("Error fetching dropdown options:");
                         console.log("Status: " + status);
                         console.log("Error: " + error);
@@ -610,12 +592,6 @@ if (isset($_GET["getDropdownOptions"])) {
             });
         }
 
-        // Searchable dropdown
-        var select_box_element = document.querySelector('#pilihClient');
-        dselect(select_box_element, {
-            search: true,
-        });
-
         function validateFormPT() {
             var namaKB = document.getElementById("namaPTBaru").value;
 
@@ -657,7 +633,7 @@ if (isset($_GET["getDropdownOptions"])) {
             });
         }
 
-        
+
         function resetForm() {
             document.getElementById("inputMaintenanceForm").reset();
             resetDropdown();
@@ -686,7 +662,6 @@ if (isset($_GET["getDropdownOptions"])) {
                 console.error("Dropdown element with ID 'pilihNamaProduk' not found.");
             }
         }
-
     </script>
 </body>
 
