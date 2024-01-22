@@ -1,15 +1,26 @@
 <?php
 include("../../connection.php");
 
+
 if (isset($_GET['id'])) {
     $transaksi_id = $_GET['id'];
 
+    // Selecting data from detail_maintenance table based on transaksi_id
     $query = "SELECT * FROM detail_maintenance WHERE transaksi_id = ?";
     $stmt = $conn->prepare($query);
     $stmt->bind_param("i", $transaksi_id);
     $stmt->execute();
 
     $result = $stmt->get_result();
+
+    // You can also fetch data from the transaksi_maintenance table
+    $transaksiQuery = "SELECT nama_client FROM transaksi_maintenance WHERE transaksi_id = ?";
+    $transaksiStmt = $conn->prepare($transaksiQuery);
+    $transaksiStmt->bind_param("i", $transaksi_id);
+    $transaksiStmt->execute();
+
+    $transaksiResult = $transaksiStmt->get_result();
+
 } else {
     echo "ID not provided.";
 }
@@ -237,7 +248,15 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 <div class="container-fluid">
                     <div class="row mb-2">
                         <div class="col-sm-6">
-                            <h1>Monitoring Transaksi #123</h1>
+                            <?php
+                            if (isset($_GET['id'])) {
+                                $transaksi_id = $_GET['id'];
+                                echo "<h1>Monitoring Transaksi #{$transaksi_id}</h1>";
+                            } else {
+                                echo "<h1>Monitoring Transaksi</h1>";
+                                echo "ID not provided.";
+                            }
+                            ?>
                         </div>
                         <div class="col-sm-6">
                             <ol class="breadcrumb float-sm-right">
@@ -258,7 +277,18 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                     <!-- general form elements -->
                     <div class="card card-primary">
                         <div class="card-header">
-                            <h3 class="card-title">Monitoring Transaksi PT. Origin Wiracipta Lestari</h3>
+                            <?php
+                            if (isset($_GET['id'])) {
+                                $transaksi_id = $_GET['id'];
+                                // Assuming $result contains data from the query
+                                $row = mysqli_fetch_assoc($transaksiResult);
+                                $nama_client = $row["nama_client"];
+                                echo "<h3 class='card-title'>Monitoring Transaksi {$nama_client} </h3>";
+                            } else {
+                                echo "<h3 class='card-title'>Monitoring Transaksi PT. Origin Wiracipta Lestari</h3>";
+                                echo "ID not provided.";
+                            }
+                            ?>
                         </div>
                         <!-- /.card-header -->
                         <!-- form start -->
