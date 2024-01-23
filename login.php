@@ -58,6 +58,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
               <option value="Riki">Riki</option>
               <option value="Ahmad">Ahmad</option>
               <option value="Tatang">Tatang</option>
+              <option value="Ella">Ella</option>
+              <option value="Ghilman">Ghilman</option>
+              <option value="Riri">Riri</option>
             </select>
             <div class="input-group-append">
               <div class="input-group-text">

@@ -11,13 +11,13 @@ if (!$resultClient) {
 
 if (isset($_GET["getDropdownOptions"])) {
 
-    $queryProduk = "SELECT nama_produk FROM produk ORDER BY nama_produk";
+    $queryProduk = "SELECT DISTINCT produk FROM produksi ORDER BY produk";
     $resultProduk = $conn->query($queryProduk);
     $options = '<option value="" selected disabled>Pilih Produk</option>';
 
     if ($resultProduk && $resultProduk->num_rows > 0) {
         while ($row = $resultProduk->fetch_assoc()) {
-            $options .= '<option value="' . $row['nama_produk'] . '">' . $row['nama_produk'] . '</option>';
+            $options .= '<option value="' . $row['produk'] . '">' . $row['produk'] . '</option>';
         }
     }
     echo $options;
