@@ -64,12 +64,6 @@ if (isset($_GET["getDropdownOptions"])) {
         $stmtMasterBahan->bind_param("s", $namaDevice);
         $stmtMasterBahan->execute();
         $stmtMasterBahan->close();
-
-        $queryproduk = "INSERT INTO produk (nama_produk) VALUES (?)";
-        $stmtproduk = $conn->prepare($queryproduk);
-        $stmtproduk->bind_param("s", $namaDevice);
-        $stmtproduk->execute();
-        $stmtproduk->close();
     } else {
         echo "Error: Bahan and Quantity arrays are not set.";
     }
