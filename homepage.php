@@ -1,6 +1,6 @@
 <?php
-
 include "connection.php";
+$username = $_SESSION['username'];
 
 $query = "SELECT historis.pengguna, historis.waktu, historis.quantity, 
           historis.activity, historis.deskripsi, masterbahan.nama 
