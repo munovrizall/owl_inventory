@@ -39,11 +39,11 @@ if (!$result) {
 
     <style>
         .lebar-kolom1 {
-            width: 16%;
+            width: 4%;
         }
 
         .lebar-kolom2 {
-            width: 4%;
+            width: 16%;
         }
 
         .lebar-kolom3 {
@@ -243,7 +243,7 @@ if (!$result) {
                                     <table id="tableTransaksi" class="table table-striped table-bordered">
                                         <thead>
                                             <tr>
-                                                <th class="text-center lebar-kolom1">Transaksi ID</th>
+                                                <th class="text-center lebar-kolom1">ID</th>
                                                 <th class="text-center lebar-kolom2">User</th>
                                                 <th class="text-center lebar-kolom3">Nama Barang</th>
                                                 <th class="text-center lebar-kolom4">Kuantitas</th>
