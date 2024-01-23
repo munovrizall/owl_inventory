@@ -9,6 +9,18 @@ $resultBahan = $conn->query($queryBahan);
 $queryKelompok = "SELECT kelompok_id, nama_kelompok FROM masterkelompok ORDER BY nama_kelompok";
 $resultKelompok = $conn->query($queryKelompok);
 
+$queryTransaksi = 
+"SELECT detail_maintenance.*, transaksi_maintenance.nama_client
+FROM detail_maintenance
+INNER JOIN transaksi_maintenance ON detail_maintenance.transaksi_id = transaksi_maintenance.transaksi_id
+WHERE cek_barang = 0 OR berita_as = 0 OR administrasi = 0 OR pengiriman = 0";
+$resultTransaksi = $conn->query($queryTransaksi);
+
+// Cek apakah hasil query kosong
+if (empty($resultTransaksi)) {
+    $resultTransaksi = "Tidak ada transaksi";
+}
+
 if (!$resultKelompok) {
     die("Error fetching kelompok data: " . $conn->error);
 }
@@ -283,7 +295,7 @@ if (isset($_POST['quantity'])) {
                                     </select>
                                 </div>
                                 <div class="form-group">
-                                    <label for="exampleSelectBorderWidth2">Pilih Bahan <span style="color: red;">*</span></label>
+                                    <label for="pilihBahanMaintenance">Pilih Bahan <span style="color: red;">*</span></label>
                                     <select class="form-control select2" id="pilihBahanMaintenance" name="selectedItem">
                                         <option value="">--- Pilih Bahan ---</option>
                                         <?php
@@ -302,6 +314,20 @@ if (isset($_POST['quantity'])) {
                                 </div>
                                 <p id="stockMessage">Stok Bahan Tersisa: <?php echo $stockQuantity; ?></p>
                                 <p id="successMessage">Stok Bahan Terkini: <?php echo $newStockQuantity; ?></p>
+                                <div class="form-group">
+                                    <label for="pilihTransaksi">Pilih Transaksi <span class="gray-italic-text"> (opsional)</span></label>
+                                    <select class="form-control select2" id="pilihTransaksi" name="selectedTransaksi">
+                                        <option value="">--- Pilih Transaksi ---</option>
+                                        <?php
+                                        while ($row = $resultTransaksi->fetch_assoc()) {
+                                            echo '<option
+                                            value="Maintenance/' . $row['nama_client'] . '/' . $row['transaksi_id'] . '/' . $row['detail_id'] . '/' . $row['produk_mt'] . '">
+                                            Maintenance/' . $row['nama_client'] . '/' . $row['transaksi_id'] . '/' . $row['detail_id'] . '/' . $row['produk_mt'] . '
+                                            </option>';
+                                        }
+                                        ?>
+                                    </select>
+                                </div>
                                 <div class="form-group">
                                     <label for="deksripsi">Deskripsi<span class="gray-italic-text"> (opsional)</span></label>
                                     <textarea class="form-control" id="deskripsi" name="deskripsi" rows="3" placeholder="Masukkan keterangan penggunaan bahan ..."></textarea>
@@ -357,6 +383,16 @@ if (isset($_POST['quantity'])) {
                 theme: 'bootstrap4',
                 width: '100%',
                 containerCssClass: 'height-40px',
+            });
+
+            $("#pilihTransaksi").change(function() {
+                var selectedTransaksi = $("#pilihTransaksi").val();
+                console.log(selectedTransaksi);
+                // Extract the value you want from the selectedTransaksi
+                var extractedValue = ""; // Update this based on your logic
+
+                // Update the deskripsi field
+                $("#deskripsi").val(selectedTransaksi);
             });
         });
 
@@ -477,15 +513,14 @@ if (isset($_POST['quantity'])) {
 
         function resetDropdown() {
             const dropdown = document.getElementById("pilihBahanMaintenance");
-            dropdown.selectedIndex = 0; // reset ke pilihan pertama
-
-            // jika multiple selection
-            dropdown.querySelectorAll("option:checked").forEach(option => {
-                option.selected = false;
-            });
+            dropdown.selectedIndex = 0;
+             // reset ke pilihan pertama
+            const dropdownTransaksi = document.getElementById("pilihTransaksi");
+            dropdownTransaksi.selectedIndex = 0; // reset ke pilihan pertama
 
             // memicu event change 
             dropdown.dispatchEvent(new Event('change'));
+            dropdownTransaksi.dispatchEvent(new Event('change'));
         }
 
         // Quantity input disabled to prevent bugs

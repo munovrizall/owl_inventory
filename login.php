@@ -55,12 +55,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
           <div class="input-group mb-3">
             <select class="form-control" placeholder="Username" id="usernameInput">
               <option value="" selected disabled>User</option>
-              <option value="Riki">Riki</option>
-              <option value="Ahmad">Ahmad</option>
-              <option value="Tatang">Tatang</option>
-              <option value="Ella">Ella</option>
-              <option value="Ghilman">Ghilman</option>
+              <option value="Riki Muhamad Rifai">Riki Muhamad Rifai</option>
+              <option value="Ahmad Sabhadi">Ahmad Sabhadi</option>
+              <option value="Moh Tatang Sutisna">Moh Tatang Sutisna</option>
+              <option value="Ella Oktaviani">Ella Oktaviani</option>
               <option value="Riri">Riri</option>
+              <option value="Ghilman">Ghilman</option>
             </select>
             <div class="input-group-append">
               <div class="input-group-text">
