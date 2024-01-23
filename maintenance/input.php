@@ -1,6 +1,8 @@
 <?php
 
 include "../connection.php";
+$queryTransaksiId = "SELECT MAX(transaksi_id) AS last_transaksi_id FROM transaksi_maintenance";
+$resultTransaksiId = $conn->query($queryTransaksiId);
 
 $queryClient = "SELECT * FROM client ORDER BY nama_client";
 $resultClient = $conn->query($queryClient);
@@ -89,30 +91,7 @@ if (isset($_GET["getDropdownOptions"])) {
                 keterangan, kedatangan, cek_barang, berita_as, administrasi, pengiriman, no_resi) VALUES (?, ?, ?, ?, ?, '1', '0','0','0','0', '0')";
                 $stmtDetail = $conn->prepare($queryDetail);
                 $stmtDetail->bind_param("isiis", $transaksi_id, $nama_produk, $no_sn, $garansi, $keterangan);
-
-                if ($stmtDetail->execute()) {
-                    echo "Data berhasil ditambahkan ke tabel detail.";
-
-                    // Retrieve the generated detail_id
-                    $detail_id = $stmtDetail->insert_id;
-
-                    // Insert the corresponding record into prg_maintenance table
-                    $queryPrgMaintenance = "INSERT INTO prg_maintenance (detail_id) VALUES (?)";
-                    $stmtPrgMaintenance = $conn->prepare($queryPrgMaintenance);
-                    $stmtPrgMaintenance->bind_param("i", $detail_id);
-
-                    if ($stmtPrgMaintenance->execute()) {
-                        echo "Data berhasil ditambahkan ke tabel prg_maintenance.";
-                    } else {
-                        echo "Error: " . $stmtPrgMaintenance->error;
-                    }
-
-                    $stmtPrgMaintenance->close();
-
-                } else {
-                    echo "Error: " . $stmtDetail->error;
-                }
-
+                $stmtDetail->execute();
                 $stmtDetail->close();
             }
         } else {
@@ -173,6 +152,17 @@ if (isset($_GET["getDropdownOptions"])) {
 
         .lebar-kolom5 {
             width: 10%;
+        }
+
+        @media (max-width: 200px) {
+
+            .lebar-kolom1,
+            .lebar-kolom2,
+            .lebar-kolom3,
+            .lebar-kolom4,
+            .lebar-kolom5 {
+                width: 100% !important;
+            }
         }
     </style>
 
@@ -343,11 +333,14 @@ if (isset($_GET["getDropdownOptions"])) {
                         <form id="inputMaintenanceForm">
                             <div class="card-body">
                                 <div class="col">
-                                    <p id="idTransaksi">ID Transaksi: 1/1/FP301T/001</p>
+                                    <p id="idTransaksi"><?php $row = $resultTransaksiId->fetch_assoc();
+                                                        $maxTransaksiId = $row['last_transaksi_id'] + 1;
+                                                        echo "ID Transaksi: Maintenance/" . $maxTransaksiId;
+                                                        ?>
                                     <div class="form-group">
-                                        <label>Tanggal Transaksi <span style="color: red;">*</span></label>
+                                        <label for="tanggal">Tanggal Transaksi <span style="color: red;">*</span></label>
                                         <div class="input-group date" id="datepicker" data-target-input="nearest">
-                                            <input type="date" class="form-control datetimepicker-input" id="tanggal" name="tanggal" placeholder="Masukkan tanggal transaksi" />
+                                            <input type="date" class="form-control" id="tanggal" name="tanggal" placeholder="Masukkan tanggal transaksi" />
                                         </div>
                                     </div>
                                 </div>
@@ -370,10 +363,10 @@ if (isset($_GET["getDropdownOptions"])) {
                                         <table id="tableDetail" class=" table order-list table-striped">
                                             <thead>
                                                 <tr>
-                                                    <td class="text-center lebar-kolom1"><b>Nama Produk <span style="color: red;">*</span></b></td>
-                                                    <td class="text-center lebar-kolom2"><b>Nomor SN <span style="color: red;">*</span></b></td>
-                                                    <td class="text-center lebar-kolom3"><b>Garansi? <span style="color: red;">*</span></b></td>
-                                                    <td class="text-center lebar-kolom4"><b>Kerusakan <span style="color: red;">*</span></b></td>
+                                                    <td class="text-center lebar-kolom1" style="min-width:180px;"><b>Nama Produk <span style="color: red;">*</span></b></td>
+                                                    <td class="text-center lebar-kolom2" style="min-width:120px;"><b>Nomor SN <span style="color: red;">*</span></b></td>
+                                                    <td class="text-center lebar-kolom3" style="min-width:130px;"><b>Garansi? <span style="color: red;">*</span></b></td>
+                                                    <td class="text-center lebar-kolom4" style="min-width:120px;"><b>Kerusakan <span style="color: red;">*</span></b></td>
                                                     <td class="text-center lebar-kolom5"><b>Aksi</b></td>
                                                 </tr>
                                             </thead>
@@ -428,7 +421,7 @@ if (isset($_GET["getDropdownOptions"])) {
                         </div>
                         <div class="modal-body">
                             <div class="form-group">
-                                <label for="namaClientBaru">Nama PT <span style="color: red;">*</span></label>
+                                <label for="namaPTBaru">Nama PT <span style="color: red;">*</span></label>
                                 <input type="text" class="form-control form-control-border border-width-2" id="namaPTBaru" name="namaPTBaru" placeholder="Masukkan nama PT yang ingin dibuat">
                             </div>
                         </div>
@@ -456,13 +449,6 @@ if (isset($_GET["getDropdownOptions"])) {
         // Select2 Dropdown
         $(document).on('select2:open', () => {
             document.querySelector('.select2-search__field').focus();
-        });
-
-        $(function() {
-            $('#datepicker').datetimepicker({
-                format: 'YYYY-MM-DD',
-                locale: 'id',
-            });
         });
 
         $(document).ready(function() {
@@ -616,43 +602,11 @@ if (isset($_GET["getDropdownOptions"])) {
                             location.reload();
                         }
                     });
-
-
                 },
                 error: function(error) {
                     alert("Error mendaftarkan Client.");
                 }
             });
-        }
-
-
-        function resetForm() {
-            document.getElementById("inputMaintenanceForm").reset();
-            resetDropdown();
-        }
-
-        function resetDropdown() {
-            const dropdown = document.getElementById("pilihNamaProduk");
-
-            // Check if the dropdown element exists
-            if (dropdown) {
-                // Reset to the first option if it's a single-selection dropdown
-                if (dropdown.selectedIndex !== undefined) {
-                    dropdown.selectedIndex = 0;
-                }
-
-                // If it's a multiple selection dropdown
-                if (dropdown.options) {
-                    dropdown.options.forEach(option => {
-                        option.selected = false;
-                    });
-                }
-
-                // Trigger the change event
-                dropdown.dispatchEvent(new Event('change'));
-            } else {
-                console.error("Dropdown element with ID 'pilihNamaProduk' not found.");
-            }
         }
     </script>
 </body>

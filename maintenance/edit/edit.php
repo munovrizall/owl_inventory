@@ -20,7 +20,6 @@ if (isset($_GET['id'])) {
     $transaksiStmt->execute();
 
     $transaksiResult = $transaksiStmt->get_result();
-
 } else {
     echo "ID not provided.";
 }
@@ -45,7 +44,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             $updateStmt->bind_param("iiiiisi", $checkboxBarangDatang, $checkboxCekMasalah, $checkboxBeritaAcara, $checkboxAdministrasi, $checkboxPengiriman, $noResi, $detail_id);
             $updateStmt->execute();
         }
-        exit();
+        header("Location: ../monitoring.php");
+        // exit();
     }
 }
 
@@ -72,7 +72,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
     <style>
         .lebar-kolom1 {
-            width: 20%;
+            width: 17%;
         }
 
         .lebar-kolom2 {
@@ -107,6 +107,11 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         .column-description {
             font-size: 10px;
             color: #888;
+        }
+
+        .larger-checkbox {
+            width: 20px;
+            height: 20px;
         }
     </style>
 </head>
@@ -292,7 +297,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                         </div>
                         <!-- /.card-header -->
                         <!-- form start -->
-                        <form id="monitoringForm" onsubmit="return submitForm()" method="post">
+                        <form id="monitoringForm" method="post">
                             <div class="card-body">
                                 <div class="card">
                                     <div class="card-header">
@@ -304,8 +309,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                                             <table class="table table-striped table-bordered">
                                                 <thead>
                                                     <tr>
-                                                        <th class="lebar-kolom1">Nama Barang</th>
-                                                        <th class="lebar-kolom2">Nama SN</th>
+                                                        <th class="lebar-kolom5">ID</th>
+                                                        <th class="lebar-kolom1" style="min-width:140px;">Nama Barang</th>
+                                                        <th class="lebar-kolom2" style="min-width:100px;">Nomor SN</th>
                                                         <th class="lebar-kolom3">Garansi?</th>
                                                         <th class="lebar-kolom4">Kerusakan</th>
                                                         <th class="lebar-kolom5">
@@ -314,66 +320,67 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                                                         </th>
                                                         <th class="lebar-kolom5">
                                                             <div class="column-name">CEK</div>
-                                                            <div class="column-description">Cek Masalah</div>
+                                                            <div class="column-description">Buat Berita</div>
                                                         </th>
                                                         <th class="lebar-kolom5">
-                                                            <div class="column-name">BA</div>
-                                                            <div class="column-description">Berita Acara</div>
+                                                            <div class="column-name">R</div>
+                                                            <div class="column-description">Reparasi Barang</div>
                                                         </th>
                                                         <th class="lebar-kolom5">
-                                                            <div class="column-name">ADM</div>
+                                                            <div class="column-name">SO/PO</div>
                                                             <div class="column-description">Proses Administrasi</div>
                                                         </th>
                                                         <th class="lebar-kolom5">
                                                             <div class="column-name">P</div>
                                                             <div class="column-description">Pengiriman Barang</div>
                                                         </th>
-                                                        <th class="text-center lebar-kolom10">No. Resi</th>
+                                                        <th class="text-center lebar-kolom10" style="min-width:150px;">No. Resi</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody id="transaksiTable">
-                                                <?php
-                                                while ($row = mysqli_fetch_assoc($result)) {
-                                                ?>
-                                                    <tr>
-                                                        <td><?php echo $row["produk_mt"]; ?></td>
-                                                        <td><?php echo $row["no_sn"]; ?></td>
-                                                        <td><?php echo $row["garansi"] == 1 ? 'Yes' : 'No'; ?></td>
-                                                        <td><?php echo $row["keterangan"]; ?></td>
-                                                        <td style="text-align: center;">
-                                                            <div class="form-check">
-                                                                <input class="form-check-input" type="checkbox" value="1" name="checkboxBarangDatang[<?php echo $row['detail_id']; ?>]" <?php echo $row["kedatangan"] == 1 ? 'checked' : ''; ?>>
-                                                            </div>
-                                                        </td>
-                                                        <td style="text-align: center;">
-                                                            <div class="form-check">
-                                                                <input class="form-check-input" type="checkbox" value="1" name="checkboxCekMasalah[<?php echo $row['detail_id']; ?>]" <?php echo $row["cek_barang"] == 1 ? 'checked' : ''; ?>>
-                                                            </div>
-                                                        </td>
-                                                        <td style="text-align: center;">
-                                                            <div class="form-check">
-                                                                <input class="form-check-input" type="checkbox" value="1" name="checkboxBeritaAcara[<?php echo $row['detail_id']; ?>]" <?php echo $row["berita_as"] == 1 ? 'checked' : ''; ?>>
-                                                            </div>
-                                                        </td>
-                                                        <td style="text-align: center;">
-                                                            <div class="form-check">
-                                                                <input class="form-check-input" type="checkbox" value="1" name="checkboxAdministrasi[<?php echo $row['detail_id']; ?>]" <?php echo $row["administrasi"] == 1 ? 'checked' : ''; ?>>
-                                                            </div>
-                                                        </td>
-                                                        <td style="text-align: center;">
-                                                            <div class="form-check">
-                                                                <input class="form-check-input" type="checkbox" value="1" name="checkboxPengiriman[<?php echo $row['detail_id']; ?>]" <?php echo $row["pengiriman"] == 1 ? 'checked' : ''; ?>>
-                                                            </div>
-                                                        </td>
-                                                        <td>
-                                                            <div class="input-group">
-                                                                <input type="text" class="form-control" id="no_resi" name="no_resi[<?php echo $row['detail_id']; ?>]" min="0" value="<?php echo $row["no_resi"]; ?>">
-                                                            </div>
-                                                        </td>
-                                                    </tr>
-                                                <?php
-                                                }
-                                                ?>
+                                                    <?php
+                                                    while ($row = mysqli_fetch_assoc($result)) {
+                                                    ?>
+                                                        <tr>
+                                                            <td><?php echo $row["detail_id"]; ?></td>
+                                                            <td><?php echo $row["produk_mt"]; ?></td>
+                                                            <td><?php echo $row["no_sn"]; ?></td>
+                                                            <td><?php echo $row["garansi"] == 1 ? 'Yes' : 'No'; ?></td>
+                                                            <td><?php echo $row["keterangan"]; ?></td>
+                                                            <td style="text-align: center;">
+                                                                <div class="form-check">
+                                                                    <input class="form-check-input larger-checkbox" type="checkbox" value="1" name="checkboxBarangDatang[<?php echo $row['detail_id']; ?>]" <?php echo $row["kedatangan"] == 1 ? 'checked' : ''; ?>>
+                                                                </div>
+                                                            </td>
+                                                            <td style="text-align: center;">
+                                                                <div class="form-check">
+                                                                    <input class="form-check-input larger-checkbox" type="checkbox" value="1" name="checkboxCekMasalah[<?php echo $row['detail_id']; ?>]" <?php echo $row["cek_barang"] == 1 ? 'checked' : ''; ?>>
+                                                                </div>
+                                                            </td>
+                                                            <td style="text-align: center;">
+                                                                <div class="form-check">
+                                                                    <input class="form-check-input larger-checkbox" type="checkbox" value="1" name="checkboxBeritaAcara[<?php echo $row['detail_id']; ?>]" <?php echo $row["berita_as"] == 1 ? 'checked' : ''; ?>>
+                                                                </div>
+                                                            </td>
+                                                            <td style="text-align: center;">
+                                                                <div class="form-check">
+                                                                    <input class="form-check-input larger-checkbox" type="checkbox" value="1" name="checkboxAdministrasi[<?php echo $row['detail_id']; ?>]" <?php echo $row["administrasi"] == 1 ? 'checked' : ''; ?>>
+                                                                </div>
+                                                            </td>
+                                                            <td style="text-align: center;">
+                                                                <div class="form-check">
+                                                                    <input class="form-check-input larger-checkbox" type="checkbox" value="1" name="checkboxPengiriman[<?php echo $row['detail_id']; ?>]" <?php echo $row["pengiriman"] == 1 ? 'checked' : ''; ?>>
+                                                                </div>
+                                                            </td>
+                                                            <td>
+                                                                <div class="input-group">
+                                                                    <input type="text" class="form-control" id="no_resi" name="no_resi[<?php echo $row['detail_id']; ?>]" min="0" value="<?php echo $row["no_resi"]; ?>">
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                    <?php
+                                                    }
+                                                    ?>
                                                 </tbody>
                                             </table>
                                         </div>
@@ -383,7 +390,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                             </div>
                             <!-- /.card-body -->
                             <div class="card-footer d-flex justify-content-end">
-                                <button type="submit" class="btn btn-primary" name="submitForm" onclick="submitForm()">Submit</button>
+                                <button type="submit" class="btn btn-primary" name="submitForm">Submit</button>
                             </div>
                         </form>
 
@@ -413,26 +420,18 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     <script src="../../assets/adminlte/plugins/bs-custom-file-input/bs-custom-file-input.min.js"></script>
     <!-- AdminLTE App -->
     <script src="../../assets/adminlte/dist/js/adminlte.min.js"></script>
-    <!-- bootstrap searchable dropdown -->
-    <script src="../../assets/bootstrap-5/bootstrap.bundle.min.js"></script>
-    <script src="../../assets/dselect.js"></script>
-    <!-- Page specific script -->
     <!-- Page specific script -->
     <script>
-
-        document.addEventListener('DOMContentLoaded', function () {
+        document.addEventListener('DOMContentLoaded', function() {
             var checkboxes = document.querySelectorAll('.form-check-input');
 
-            checkboxes.forEach(function (checkbox) {
-                checkbox.addEventListener('change', function () {
+            checkboxes.forEach(function(checkbox) {
+                checkbox.addEventListener('change', function() {
                     this.value = this.checked ? 1 : 0;
                 });
             });
         });
 
-        function submitForm() {
-            return true;
-        }
     </script>
 
 </body>
