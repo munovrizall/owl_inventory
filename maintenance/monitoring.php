@@ -260,12 +260,41 @@ $result = mysqli_query($conn, $query);
                                         <tbody>
                                             <?php
                                             while ($row = mysqli_fetch_assoc($result)) {
+                                                // Fetch detail_maintenance data based on transaksi_id
+                                                $transaksiId = $row["transaksi_id"];
+                                                $detailQuery = "SELECT * FROM detail_maintenance WHERE transaksi_id = $transaksiId";
+                                                $detailResult = mysqli_query($conn, $detailQuery);
+                                                $statusClass = 'bg-danger'; // Default class
+                                                $statusText = 'Belum'; // Default text
+
+                                                // Check conditions for bg-success
+                                                $allConditionsMet = true;
+                                                while ($detailRow = mysqli_fetch_assoc($detailResult)) {
+                                                    if (
+                                                        $detailRow['kedatangan'] != 1 ||
+                                                        $detailRow['cek_barang'] != 1 ||
+                                                        $detailRow['berita_as'] != 1 ||
+                                                        $detailRow['administrasi'] != 1 ||
+                                                        $detailRow['pengiriman'] != 1 ||
+                                                        $detailRow['no_resi'] == 0
+                                                    ) {
+                                                        $allConditionsMet = false;
+                                                        break;
+                                                    }
+                                                }
+
+                                                if ($allConditionsMet) {
+                                                    $statusClass = 'bg-success';
+                                                    $statusText = 'Selesai';
+                                                }
+
+                                                // Output table row with appropriate status class and text
                                             ?>
                                                 <tr>
                                                     <td><?php echo $row["transaksi_id"]; ?></td>
                                                     <td><?php echo $row["tanggal_terima"]; ?></td>
                                                     <td><?php echo $row["nama_client"]; ?></td>
-                                                    <td><span class="badge bg-success">Selesai</span></td>
+                                                    <td><span class="badge <?php echo $statusClass; ?>"><?php echo $statusText; ?></span></td>
                                                     <td>
                                                         <a href='edit/edit.php?id=<?php echo $row["transaksi_id"]; ?>' class="btn btn-info btn-block">Edit</a>
                                                     </td>
