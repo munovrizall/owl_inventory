@@ -13,6 +13,29 @@ if (!$resultKelompok) {
     die("Error fetching kelompok data: " . $conn->error);
 }
 
+if (isset($_POST['kelompok'])) {
+    $selectedKelompok = $_POST['kelompok'];
+
+    // Fetch bahan options based on the selected kelompok
+    $queryBahan = "SELECT * FROM masterbahan WHERE kelompok = ? ORDER BY nama";
+    $stmt = $conn->prepare($queryBahan);
+    $stmt->bind_param("s", $selectedKelompok);
+    $stmt->execute();
+    $resultBahan = $stmt->get_result();
+
+    $bahanOptions = array();
+
+    while ($row = $resultBahan->fetch_assoc()) {
+        $bahanOptions[] = $row;
+    }
+
+    $stmt->close();
+
+    // Return bahan options as JSON
+    echo json_encode($bahanOptions);
+    exit();
+}
+
 $stockQuantity = ""; // Default value, replace it with the actual stock quantity based on the selected item from the database
 $newStockQuantity = "";
 
@@ -277,7 +300,7 @@ if (isset($_POST['quantity'])) {
                                         ?>
                                     </select>
                                 </div>
-                                <div class="form-group">
+                                <div class="form-group" id="bahanDropdownContainer">
                                     <label for="pilihBahanRestock">Pilih Bahan <span style="color: red;">*</span></label>
                                     <select class="form-control select2" id="pilihBahanRestock" name="selectedItem">
                                         <option value="">--- Pilih Bahan ---</option>
@@ -354,6 +377,33 @@ if (isset($_POST['quantity'])) {
                 theme: 'bootstrap4',
                 width: '100%',
                 containerCssClass: 'height-40px',
+            });
+        });
+
+        $("#pilihNamaKelompok").change(function() {
+            var selectedKelompok = $(this).val();
+
+            // Use Ajax to fetch data based on the selected kelompok
+            $.ajax({
+                type: "POST",
+                url: "restock.php", // Replace with the actual file that fetches bahan based on kelompok
+                data: { kelompok: selectedKelompok },
+                dataType: "json",
+                success: function(response) {
+                    // Clear existing options
+                    $('#pilihBahanRestock').empty();
+
+                    // Add new options based on the fetched data
+                    $.each(response, function(index, value) {
+                        $('#pilihBahanRestock').append('<option value="' + value.stok_id + '">' + value.nama + '</option>');
+                    });
+
+                    // Trigger change event to update Select2
+                    $('#pilihBahanRestock').trigger('change');
+                },
+                error: function(error) {
+                    alert("Error fetching bahan data.");
+                }
             });
         });
 
@@ -479,7 +529,7 @@ if (isset($_POST['quantity'])) {
 
         function disableQuantityInput() {
             const quantityInput = document.getElementById("quantity");
-            quantityInput.placeholder = "Pilih bahan terlebih dahulu";
+            quantityInput.placeholder = "Pilih kelompok dan bahan terlebih dahulu";
             quantityInput.disabled = true;
         }
 
