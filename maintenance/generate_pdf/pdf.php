@@ -97,7 +97,7 @@ $pdf->SetMargins(20,0,20);
 
 //Cell(Width, Height, Text, Border, End Line, Align)
 
-$pdf->Cell(0,10,"$transaksi_id/Rnd/$currentYear",0,1,"R");
+$pdf->Cell(0,10,"$transaksi_id/RnD/$currentYear",0,1,"R");
 
 //Jarak
 $pdf->Cell(0,20,"",0,1,);
@@ -117,7 +117,7 @@ $pdf->WrapAndPrintAddress($alamat_perusahaan);
 $pdf->Cell(0,10,"",0,1,);
 
 $pdf->Cell(0,10,"Selanjutnya disebut PIHAK KEDUA",0,1);
-$pdf->MultiCell(0,5,"PIHAK PERTAMA menyerahkan barang kepada PIHAK KEDUA, dan PIHAK KEDUA menyatakan telah menerima barang dari PIHAK PERTAMA berupa datar terlampir:",0,1);
+$pdf->MultiCell(0,5,"PIHAK PERTAMA menyerahkan barang kepada PIHAK KEDUA, dan PIHAK KEDUA menyatakan telah menerima barang dari PIHAK PERTAMA berupa daftar terlampir:",0,1);
 
 //TABEL PRODUK dan Jarak
 $pdf->Cell(0,5,"",0,1,);
@@ -197,4 +197,4 @@ $pdf->Cell(0,10,"$username",0,0, 'L');
 $pdf->Cell(0,10,"$nama_korespondensi",0,1, 'R');
 
 
-$pdf->Output();
+$pdf->Output('I',"Berita Acara $nama_client.pdf");

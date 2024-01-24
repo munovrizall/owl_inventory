@@ -235,7 +235,7 @@ $result = mysqli_query($conn, $query);
                                                 <th class="text-center lebar-kolom2">Tanggal</th>
                                                 <th class="text-center lebar-kolom3">Nama PT</th>
                                                 <th class="text-center lebar-kolom4">Status</th>
-                                                <th class="text-center lebar-kolom5">Aksi</th>
+                                                <th class="text-center lebar-kolom5 aksi-column">Aksi</th>
                                             </tr>
                                         </thead>
                                         <tbody>
