@@ -176,7 +176,8 @@ while ($row = $result->fetch_assoc()) {
     $pdf->Cell(10, ($line * $cellHeight), $counter++, 1, 0, 'C'); // increment and display the counter, adapt height to the number of lines
     $pdf->Cell(45, ($line * $cellHeight), $row['produk_mt'], 1, 0); // adapt height to the number of lines
     $pdf->Cell(35, ($line * $cellHeight), $row['no_sn'], 1, 0); // adapt height to the number of lines
-    $pdf->Cell(15, ($line * $cellHeight), $row['garansi'], 1, 0, 'C'); // adapt height to the number of lines
+    $garansiText = ($row['garansi'] == 1) ? "Ya" : "Tidak";
+    $pdf->Cell(15, ($line * $cellHeight), $garansiText, 1, 0, 'C');
     $pdf->MultiCell($cellWidth, $cellHeight, $row['keterangan'], 1);
 }
 
