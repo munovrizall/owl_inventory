@@ -29,7 +29,6 @@ if (isset($_GET["getDropdownOptions"])) {
     $tanggal = $_POST["tanggal"];
     $nama_client = $_POST["client"];
 
-    // Check if the client needs to be added
     if (isset($_POST["namaPTBaru"]) && !empty($_POST["namaPTBaru"])) {
         $newClientName = $_POST["namaPTBaru"];
 
@@ -275,6 +274,14 @@ if (isset($_GET["getDropdownOptions"])) {
                                 </p>
                             </a>
                         </li>
+                        <li class="nav-item">
+                            <a href="../tambah_perusahaan.php" class="nav-link">
+                                <i class="nav-icon fas fa-industry"></i>
+                                <p>
+                                    Perusahaan
+                                </p>
+                            </a>
+                        </li>
                         <li class="nav-header">PELAPORAN</li>
                         <li class="nav-item">
                             <a href="../laporan_stok.php" class="nav-link">
@@ -355,7 +362,6 @@ if (isset($_GET["getDropdownOptions"])) {
                                             }
                                             ?>
                                         </select>
-                                        <button type="button" class="btn btn-outline-info btn-block" data-toggle="modal" data-target="#modalBuatPT" style="margin-top: 10px; max-width: 180px;"><i class="fas fa-plus" style="margin-right: 8px;" onclick=""></i>Tambah PT</button>
                                     </div>
                                 </div>
                                 <div class="card-body p-0">
@@ -409,26 +415,6 @@ if (isset($_GET["getDropdownOptions"])) {
         </aside>
         <!-- /.control-sidebar -->
 
-        <form id="tambahPTForm">
-            <div class="modal fade" id="modalBuatPT" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
-                <div class="modal-dialog modal-dialog-centered" role="document">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="exampleModalCenterTitle">Buat PT Baru</h5>
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                            </button>
-                        </div>
-                        <div class="modal-body">
-                            <div class="form-group">
-                                <label for="namaPTBaru">Nama PT <span style="color: red;">*</span></label>
-                                <input type="text" class="form-control form-control-border border-width-2" id="namaPTBaru" name="namaPTBaru" placeholder="Masukkan nama PT yang ingin dibuat">
-                            </div>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                            <button type="button" class="btn btn-primary" onclick="if(validateFormPT()) { validateSuccessPT(); resetForm(); }">Submit</button>
-        </form>
     </div>
     <!-- ./wrapper -->
 
@@ -570,44 +556,6 @@ if (isset($_GET["getDropdownOptions"])) {
             });
         }
 
-        function validateFormPT() {
-            var namaKB = document.getElementById("namaPTBaru").value;
-
-            if (namaKB === "") {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Oops...',
-                    text: 'Harap lengkapi semua formulir!',
-                });
-                return false;
-            }
-
-            return true;
-        }
-
-        function validateSuccessPT() {
-            // Get the form data
-            var formDataKB = $("#tambahPTForm").serialize();
-
-            $.ajax({
-                type: "POST",
-                url: "input.php",
-                data: formDataKB,
-                success: function(response) {
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Client berhasil didaftarkan!',
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            location.reload();
-                        }
-                    });
-                },
-                error: function(error) {
-                    alert("Error mendaftarkan Client.");
-                }
-            });
-        }
     </script>
 </body>
 

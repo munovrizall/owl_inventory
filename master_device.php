@@ -77,7 +77,7 @@ if (isset($_GET["getDropdownOptions"])) {
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Master Bahan</title>
+    <title>Master Device</title>
 
     <link rel="icon" href="assets/adminlte/dist/img/OWLlogo.png" type="image/x-icon">
     <!-- Google Font: Source Sans Pro -->
@@ -221,6 +221,14 @@ if (isset($_GET["getDropdownOptions"])) {
                                 </p>
                             </a>
                         </li>
+                        <li class="nav-item">
+                            <a href="tambah_perusahaan.php" class="nav-link">
+                                <i class="nav-icon fas fa-industry"></i>
+                                <p>
+                                    Perusahaan
+                                </p>
+                            </a>
+                        </li>
                         <li class="nav-header">PELAPORAN</li>
                         <li class="nav-item">
                             <a href="laporan_stok.php" class="nav-link">
@@ -280,7 +288,7 @@ if (isset($_GET["getDropdownOptions"])) {
                                 <div class="form-group">
                                     <div class="row">
                                         <div class="col">
-                                            <label for="namaDevice">Masukkan Nama Device <span style="color: red;">*</span></label>
+                                            <label for="namaDevice">Nama Device <span style="color: red;">*</span></label>
                                             <input type="text" class="form-control form-control-border border-width-2" id="namaDevice" name="namaDevice" placeholder="Masukkan nama device baru">
                                         </div>
                                     </div>
@@ -374,7 +382,7 @@ if (isset($_GET["getDropdownOptions"])) {
                         var newRow = $("<tr>");
                         var cols = "";
 
-                        cols += '<td><select class="form-control select2 pilihNamaBahan" name="pilihNamaBahan[]">' + dropdownOptions + '</select></td>';
+                        cols += '<td><select class="form-control select2 pilihNamaBahan" name="pilihNamaBahan[]" style="min-width:140px;">' + dropdownOptions + '</select></td>';
                         cols += '<td><input type="number" class="form-control quantity" name="quantity[]" min="0" value="" placeholder="0"/></td>';
                         cols += '<td><input type="button" class="ibtnDel btn btn-md btn-danger"  value="Delete"></td>';
 
