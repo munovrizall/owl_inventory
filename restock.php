@@ -96,7 +96,6 @@ if (isset($_POST['quantity'])) {
             color: #808080;
             font-style: italic;
         }
-
     </style>
 
 </head>
@@ -204,6 +203,14 @@ if (isset($_POST['quantity'])) {
                                 <i class="nav-icon fas fa-cube"></i>
                                 <p>
                                     Master Device
+                                </p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="tambah_perusahaan.php" class="nav-link">
+                                <i class="nav-icon fas fa-industry"></i>
+                                <p>
+                                    Perusahaan
                                 </p>
                             </a>
                         </li>
