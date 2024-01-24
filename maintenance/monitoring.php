@@ -276,7 +276,7 @@ $result = mysqli_query($conn, $query);
                                                                 <a href='edit/edit.php?id=<?php echo $row["transaksi_id"]; ?>' class="btn btn-info btn-block">Edit</a>
                                                             </div>
                                                             <div class="col">
-                                                                <a href='#' class="btn btn-block btn-outline-danger"><i class="fas fa-file-pdf" style="margin-right: 8px;"></i>PDF</a>
+                                                                <a href='generate_pdf/pdf.php?id=<?php echo $row["transaksi_id"]; ?>' class="btn btn-block btn-outline-danger"><i class="fas fa-file-pdf" style="margin-right: 8px;"></i>PDF</a>
                                                             </div>
                                                         </div>
                                                     </td>
