@@ -123,6 +123,10 @@ ALTER TABLE `client`
   ADD PRIMARY KEY (`client_id`),
   ADD UNIQUE KEY `nama_client` (`nama_client`);
 
+ALTER TABLE `client` ADD `nama_korespondensi` VARCHAR(255) NULL 
+AFTER `nama_client`, ADD `alamat_perusahaan` VARCHAR(500) NULL 
+AFTER `nama_korespondensi`;
+
 --
 -- Indexes for table `detail_maintenance`
 --

@@ -9,8 +9,8 @@ $resultBahan = $conn->query($queryBahan);
 $queryKelompok = "SELECT kelompok_id, nama_kelompok FROM masterkelompok ORDER BY nama_kelompok";
 $resultKelompok = $conn->query($queryKelompok);
 
-$queryTransaksi = 
-"SELECT detail_maintenance.*, transaksi_maintenance.nama_client
+$queryTransaksi =
+    "SELECT detail_maintenance.*, transaksi_maintenance.nama_client
 FROM detail_maintenance
 INNER JOIN transaksi_maintenance ON detail_maintenance.transaksi_id = transaksi_maintenance.transaksi_id
 WHERE cek_barang = 0 OR berita_as = 0 OR administrasi = 0 OR pengiriman = 0";
@@ -221,6 +221,14 @@ if (isset($_POST['quantity'])) {
                                 <i class="nav-icon fas fa-cube"></i>
                                 <p>
                                     Master Device
+                                </p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="../tambah_perusahaan.php" class="nav-link">
+                                <i class="nav-icon fas fa-industry"></i>
+                                <p>
+                                    Perusahaan
                                 </p>
                             </a>
                         </li>
@@ -514,7 +522,7 @@ if (isset($_POST['quantity'])) {
         function resetDropdown() {
             const dropdown = document.getElementById("pilihBahanMaintenance");
             dropdown.selectedIndex = 0;
-             // reset ke pilihan pertama
+            // reset ke pilihan pertama
             const dropdownTransaksi = document.getElementById("pilihTransaksi");
             dropdownTransaksi.selectedIndex = 0; // reset ke pilihan pertama
 

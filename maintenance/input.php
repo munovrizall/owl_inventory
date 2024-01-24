@@ -275,6 +275,14 @@ if (isset($_GET["getDropdownOptions"])) {
                                 </p>
                             </a>
                         </li>
+                        <li class="nav-item">
+                            <a href="../tambah_perusahaan.php" class="nav-link">
+                                <i class="nav-icon fas fa-industry"></i>
+                                <p>
+                                    Perusahaan
+                                </p>
+                            </a>
+                        </li>
                         <li class="nav-header">PELAPORAN</li>
                         <li class="nav-item">
                             <a href="../laporan_stok.php" class="nav-link">
