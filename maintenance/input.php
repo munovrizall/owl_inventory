@@ -89,7 +89,7 @@ if (isset($_GET["getDropdownOptions"])) {
                 $queryDetail = "INSERT INTO detail_maintenance (transaksi_id, produk_mt, no_sn, garansi, 
                 keterangan, kedatangan, cek_barang, berita_as, administrasi, pengiriman, no_resi) VALUES (?, ?, ?, ?, ?, '1', '0','0','0','0', '0')";
                 $stmtDetail = $conn->prepare($queryDetail);
-                $stmtDetail->bind_param("isiis", $transaksi_id, $nama_produk, $no_sn, $garansi, $keterangan);
+                $stmtDetail->bind_param("issis", $transaksi_id, $nama_produk, $no_sn, $garansi, $keterangan);
                 $stmtDetail->execute();
                 $stmtDetail->close();
             }
@@ -469,7 +469,7 @@ if (isset($_GET["getDropdownOptions"])) {
                         var cols = "";
 
                         cols += '<td><select class="form-control select2 pilihNamaProduk" name="pilihNamaProduk[]">' + dropdownOptions + '</select></td>';
-                        cols += '<td><input type="text" class="form-control" name="numberSN[]" value="" placeholder="Nomor SN"/></td>';
+                        cols += '<td><input type="number" class="form-control" name="numberSN[]" value="" placeholder="Nomor SN"/></td>';
                         cols += '<td><select class="form-control select2" id="pilihGaransi ' + counter + '" name="pilihGaransi[]' + counter + '">' + dropdownGaransi + '</select></td>';
                         cols += '<td><input type="text" class="form-control" name="inputKerusakan[]" value="" placeholder="Kerusakan Device"/></td>';
                         cols += '<td><input type="button" class="ibtnDel btn btn-md btn-danger"  value="Delete"></td>';
