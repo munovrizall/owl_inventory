@@ -40,7 +40,7 @@ $result = mysqli_query($conn, $query);
         }
 
         .lebar-kolom3 {
-            width: 50%;
+            width: 38%;
         }
 
         .lebar-kolom4 {
@@ -48,7 +48,7 @@ $result = mysqli_query($conn, $query);
         }
 
         .lebar-kolom5 {
-            width: 10%;
+            width: 22%;
         }
 
         .card-padding {
@@ -227,7 +227,7 @@ $result = mysqli_query($conn, $query);
                                                 <th class="text-center lebar-kolom2">Tanggal</th>
                                                 <th class="text-center lebar-kolom3">Nama PT</th>
                                                 <th class="text-center lebar-kolom4">Status</th>
-                                                <th class="text-center lebar-kolom5 aksi-column">Aksi</th>
+                                                <th class="text-center lebar-kolom5">Aksi</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -270,8 +270,15 @@ $result = mysqli_query($conn, $query);
                                                     <td><?php echo $tanggal ?></td>
                                                     <td><?php echo $row["nama_client"]; ?></td>
                                                     <td class="text-center"><span class="badge <?php echo $statusClass; ?>"><?php echo $statusText; ?></span></td>
-                                                    <td>
-                                                        <a href='edit/edit.php?id=<?php echo $row["transaksi_id"]; ?>' class="btn btn-info btn-block">Edit</a>
+                                                    <td class="text-center">
+                                                        <div class="row">
+                                                            <div class="col">
+                                                                <a href='edit/edit.php?id=<?php echo $row["transaksi_id"]; ?>' class="btn btn-info btn-block">Edit</a>
+                                                            </div>
+                                                            <div class="col">
+                                                                <a href='#' class="btn btn-block btn-outline-danger"><i class="fas fa-file-pdf" style="margin-right: 8px;"></i>PDF</a>
+                                                            </div>
+                                                        </div>
                                                     </td>
                                                 </tr>
                                             <?php
@@ -343,7 +350,7 @@ $result = mysqli_query($conn, $query);
                     ['10 rows', '25 rows', '50 rows', 'Show all']
                 ],
                 buttons: [
-                    'pageLength', 
+                    'pageLength',
                     {
                         extend: 'copy',
                         title: 'Monitoring Transaksi Maintenance',
