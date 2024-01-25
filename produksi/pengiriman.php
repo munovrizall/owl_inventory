@@ -10,16 +10,16 @@ $queryProduk = "SELECT DISTINCT produk FROM produksi ORDER BY produk";
 $resultProduk = $conn->query($queryProduk);
 
 if (isset($_POST['quantity'])) {
-    $selectedItemId = $_POST['selectedItem'];
+    $selectedNamaProduk = $_POST['selectedItem'];
 
     // Fetch the username from the POST data
     $pengguna = isset($_SESSION['username']) ? $_SESSION['username'] : '';
 
 
     // Fetch the stock quantity from the database based on the selected item
-    $query = "SELECT quantity FROM masterbahan WHERE stok_id = ?";
+    $query = "SELECT quantity FROM masterbahan WHERE nama = ?";
     $stmt = $conn->prepare($query);
-    $stmt->bind_param("i", $selectedItemId);
+    $stmt->bind_param("s", $selectedNamaProduk);
     $stmt->execute();
     $stmt->bind_result($stockQuantity);
     $stmt->fetch();
@@ -38,20 +38,28 @@ if (isset($_POST['quantity'])) {
     $newStockQuantity = $stockQuantity - $submittedQuantity;
 
     if ($newStockQuantity < 0) {
-        echo "Stok bahan tidak mencukupi untuk keperluan maintenance.";
+        echo "Stok bahan tidak mencukupi untuk keperluan pengiriman.";
         exit();
     }
 
-    $updateQueryStock = "UPDATE masterbahan SET quantity = ? WHERE stok_id = ?";
+    $updateQueryStock = "UPDATE masterbahan SET quantity = ? WHERE nama = ?";
     $updateStmt = $conn->prepare($updateQueryStock);
-    $updateStmt->bind_param("ii", $newStockQuantity, $selectedItemId);
+    $updateStmt->bind_param("is", $newStockQuantity, $selectedNamaProduk);
     $updateStmt->execute();
     $updateStmt->close();
+
+    $queryStokId = "SELECT stok_id FROM masterbahan WHERE nama = ?";
+    $stmtStokId = $conn->prepare($queryStokId);
+    $stmtStokId->bind_param("s", $selectedNamaProduk);
+    $stmtStokId->execute();
+    $stmtStokId->bind_result($stokId);
+    $stmtStokId->fetch();
+    $stmtStokId->close();
 
     // Insert a new record into the 'historis' table
     $insertQueryHistoris = "INSERT INTO historis (pengguna, stok_id, waktu, quantity, activity, deskripsi) VALUES (?, ?, NOW(), ?, 'Pengiriman', ?)";
     $insertStmt = $conn->prepare($insertQueryHistoris);
-    $insertStmt->bind_param("siis", $pengguna, $selectedItemId, $submittedQuantity, $_POST['deskripsi']);
+    $insertStmt->bind_param("siis", $pengguna, $stokId, $submittedQuantity, $_POST['deskripsi']);
 
     $insertStmt->execute();
     $insertStmt->close();
@@ -283,15 +291,15 @@ if (isset($_POST['quantity'])) {
                         </div>
                         <!-- /.card-header -->
                         <!-- form start -->
-                        <form id="maintenanceForm">
+                        <form id="pengirimanForm">
                             <div class="card-body">
                                 <div class="form-group">
-                                    <label for="pilihBahanMaintenance">Pilih Produk <span style="color: red;">*</span></label>
-                                    <select class="form-control select2" id="pilihBahanMaintenance" name="selectedItem">
+                                    <label for="pilihProdukPengiriman">Pilih Produk <span style="color: red;">*</span></label>
+                                    <select class="form-control select2" id="pilihProdukPengiriman" name="selectedItem">
                                         <option value="">--- Pilih Produk ---</option>
                                         <?php
                                         while ($row = $resultProduk->fetch_assoc()) {
-                                            echo '<option value="' . $row['stok_id'] . '">' . $row['produk'] . '</option>';
+                                            echo '<option value="' . $row['produk'] . '">' . $row['produk'] . '</option>';
                                         }
                                         ?>
                                     </select>
@@ -377,13 +385,13 @@ if (isset($_POST['quantity'])) {
             bsCustomFileInput.init();
 
             // Add an event listener to the select element
-            $("#pilihBahanMaintenance").change(function() {
+            $("#pilihProdukPengiriman").change(function() {
                 validateCurrentStock();
             });
         });
 
         function validateForm() {
-            var selectedItem = document.getElementById("pilihBahanMaintenance").value;
+            var selectedItem = document.getElementById("pilihProdukPengiriman").value;
             var quantity = document.getElementById("quantity").value;
 
             if (selectedItem === "" || quantity === "" || quantity <= 0) {
@@ -415,12 +423,12 @@ if (isset($_POST['quantity'])) {
 
         function validateCurrentStock() {
             // Get the form data
-            var formData = $("#maintenanceForm").serialize();
+            var formData = $("#pengirimanForm").serialize();
 
             // Use AJAX to submit the form data and fetch the updated stock quantity
             $.ajax({
                 type: "POST",
-                url: "update.php",
+                url: "pengiriman.php",
                 data: formData,
                 dataType: "json",
                 success: function(response) {
@@ -437,12 +445,12 @@ if (isset($_POST['quantity'])) {
 
         function validateSuccess() {
             // Get the form data
-            var formData = $("#maintenanceForm").serialize();
+            var formData = $("#pengirimanForm").serialize();
 
             // Use AJAX to submit the form data and fetch the updated stock quantity
             $.ajax({
                 type: "POST",
-                url: "update.php",
+                url: "pengiriman.php",
                 data: formData,
                 dataType: "json",
                 success: function(response) {
@@ -483,13 +491,13 @@ if (isset($_POST['quantity'])) {
         }
 
         function resetForm() {
-            document.getElementById("maintenanceForm").reset();
+            document.getElementById("pengirimanForm").reset();
             resetDropdown();
             disableQuantityInput();
         }
 
         function resetDropdown() {
-            const dropdown = document.getElementById("pilihBahanMaintenance");
+            const dropdown = document.getElementById("pilihProdukPengiriman");
             dropdown.selectedIndex = 0;
             // reset ke pilihan pertama
             const dropdownTransaksi = document.getElementById("pilihTransaksi");
@@ -511,7 +519,7 @@ if (isset($_POST['quantity'])) {
             quantityInput.disabled = true;
         }
 
-        $("#pilihBahanMaintenance").change(function() {
+        $("#pilihProdukPengiriman").change(function() {
             const quantityInput = document.getElementById("quantity");
             quantityInput.placeholder = "Masukkan jumlah stok produk yang ingin dikirim";
             quantityInput.disabled = false;
