@@ -21,12 +21,8 @@ $result = mysqli_query($conn, $query);
     <link rel="stylesheet" href="assets/adminlte/plugins/fontawesome-free/css/all.min.css">
     <!-- Ionicons -->
     <link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
-    <!-- Tempusdominus Bootstrap 4 -->
-    <link rel="stylesheet" href="assets/adminlte/plugins/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css">
     <!-- iCheck -->
     <link rel="stylesheet" href="assets/adminlte/plugins/icheck-bootstrap/icheck-bootstrap.min.css">
-    <!-- JQVMap -->
-    <link rel="stylesheet" href="assets/adminlte/plugins/jqvmap/jqvmap.min.css">
     <!-- Theme style -->
     <link rel="stylesheet" href="assets/adminlte/dist/css/adminlte.min.css">
     <!-- overlayScrollbars -->
@@ -300,11 +296,6 @@ $result = mysqli_query($conn, $query);
     </script>
     <!-- Bootstrap 4 -->
     <script src="assets/adminlte/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
-    <!-- JQVMap -->
-    <script src="assets/adminlte/plugins/jqvmap/jquery.vmap.min.js"></script>
-    <script src="assets/adminlte/plugins/jqvmap/maps/jquery.vmap.usa.js"></script>
-    <!-- Tempusdominus Bootstrap 4 -->
-    <script src="assets/adminlte/plugins/tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js"></script>
     <!-- overlayScrollbars -->
     <script src="assets/adminlte/plugins/overlayScrollbars/js/jquery.overlayScrollbars.min.js"></script>
     <!-- AdminLTE App -->

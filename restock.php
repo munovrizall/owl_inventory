@@ -5,14 +5,6 @@ include "connection.php";
 $queryBahan = "SELECT * FROM masterbahan ORDER BY nama";
 $resultBahan = $conn->query($queryBahan);
 
-// Fetch data from masterkelompok table
-$queryKelompok = "SELECT kelompok_id, nama_kelompok FROM masterkelompok ORDER BY nama_kelompok";
-$resultKelompok = $conn->query($queryKelompok);
-
-if (!$resultKelompok) {
-    die("Error fetching kelompok data: " . $conn->error);
-}
-
 $stockQuantity = ""; // Default value, replace it with the actual stock quantity based on the selected item from the database
 $newStockQuantity = "";
 
@@ -270,20 +262,6 @@ if (isset($_POST['quantity'])) {
                         <!-- form start -->
                         <form id="restockForm">
                             <div class="card-body">
-                                <div class="form-group">
-                                    <div>
-                                        <label for="pilihNamaKelompok">Pilih Kelompok<span class="gray-italic-text">
-                                                (opsional)</span></label>
-                                    </div>
-                                    <select class="form-control select2" id="pilihNamaKelompok" name="kelompok">
-                                        <option value="">--- Pilih Kelompok ---</option>
-                                        <?php
-                                        while ($row = $resultKelompok->fetch_assoc()) {
-                                            echo '<option value="' . $row['nama_kelompok'] . '">' . $row['nama_kelompok'] . '</option>';
-                                        }
-                                        ?>
-                                    </select>
-                                </div>
                                 <div class="form-group">
                                     <label for="pilihBahanRestock">Pilih Bahan <span style="color: red;">*</span></label>
                                     <select class="form-control select2" id="pilihBahanRestock" name="selectedItem">
