@@ -1,82 +1,64 @@
 <?php
 
-include "connection.php";
+include "../connection.php";
 
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // Check which fields are provided
-    $kelompok = isset($_POST["kelompok"]) ? $_POST["kelompok"] : null;
-    $nama = isset($_POST["namaBahan"]) ? $_POST["namaBahan"] : null;
-    $quantity = isset($_POST["quantity"]) ? $_POST["quantity"] : null;
-    $deskripsi = isset($_POST["deskripsi"]) ? $_POST["deskripsi"] : null;
 
-    $namaKelompokBaru = isset($_POST["namaKelompokBaru"]) ? $_POST["namaKelompokBaru"] : null;
+$stockQuantity = ""; // Default value, replace it with the actual stock quantity based on the selected item from the database
+$newStockQuantity = "";
 
-    // Check if the material name already exists
-    if ($nama !== null) {
-        $checkQuery = "SELECT COUNT(*) FROM masterbahan WHERE nama = ?";
-        $checkStmt = $conn->prepare($checkQuery);
-        $checkStmt->bind_param("s", $nama);
-        $checkStmt->execute();
-        $checkStmt->bind_result($count);
-        $checkStmt->fetch();
-        $checkStmt->close();
+$queryProduk = "SELECT DISTINCT produk FROM produksi ORDER BY produk";
+$resultProduk = $conn->query($queryProduk);
 
-        // If the material name already exists, display an error
-        if ($count > 0) {
-            echo "Error: Material name '$nama' already exists in the database.";
-            exit; // Stop further execution
-        }
+if (isset($_POST['quantity'])) {
+    $selectedItemId = $_POST['selectedItem'];
+
+    // Fetch the username from the POST data
+    $pengguna = isset($_SESSION['username']) ? $_SESSION['username'] : '';
+
+
+    // Fetch the stock quantity from the database based on the selected item
+    $query = "SELECT quantity FROM masterbahan WHERE stok_id = ?";
+    $stmt = $conn->prepare($query);
+    $stmt->bind_param("i", $selectedItemId);
+    $stmt->execute();
+    $stmt->bind_result($stockQuantity);
+    $stmt->fetch();
+    $stmt->close();
+
+    $submittedQuantity = $_POST['quantity'];
+    if ($submittedQuantity == "") {
+        echo json_encode(array('currentStock' => $stockQuantity, 'newStock' => $newStockQuantity));
+        exit();
+    } elseif ($submittedQuantity <= 0) {
+        echo "Kuantitas yang dimasukkan harus lebih besar dari 0";
+        exit();
     }
 
-    // Check if the group name already exists
-    if ($namaKelompokBaru !== null) {
-        $checkQueryKB = "SELECT COUNT(*) FROM masterkelompok WHERE nama_kelompok = ?";
-        $checkStmtKB = $conn->prepare($checkQueryKB);
-        $checkStmtKB->bind_param("s", $namaKelompokBaru);
-        $checkStmtKB->execute();
-        $checkStmtKB->bind_result($countKB);
-        $checkStmtKB->fetch();
-        $checkStmtKB->close();
+    // Update the database with the new stock quantity
+    $newStockQuantity = $stockQuantity - $submittedQuantity;
 
-        // If the group name already exists, display an error
-        if ($countKB > 0) {
-            echo "Error: Group name '$namaKelompokBaru' already exists in the database.";
-            exit; // Stop further execution
-        }
-        // Insert the new record for the group
-        $insertQueryKB = "INSERT INTO masterkelompok (nama_kelompok) VALUES (?)";
-        $insertStmtKB = $conn->prepare($insertQueryKB);
-        $insertStmtKB->bind_param("s", $namaKelompokBaru);
-
-        if ($insertStmtKB->execute()) {
-            echo "Data berhasil ditambahkan ke tabel masterkelompok.";
-        } else {
-            echo "Error: " . $insertStmtKB->error;
-        }
-
-        $insertStmtKB->close();
-    } elseif ($kelompok !== null) {
-        // Insert the new record for material
-        $insertQuery = "INSERT INTO masterbahan (kelompok, nama, quantity, deskripsi) VALUES (?, ?, ?, ?)";
-        $insertStmt = $conn->prepare($insertQuery);
-        $insertStmt->bind_param("ssis", $kelompok, $nama, $quantity, $deskripsi);
-
-        if ($insertStmt->execute()) {
-            echo "Data berhasil ditambahkan ke tabel masterbahan.";
-        } else {
-            echo "Error: " . $insertStmt->error;
-        }
-
-        $insertStmt->close();
+    if ($newStockQuantity < 0) {
+        echo "Stok bahan tidak mencukupi untuk keperluan maintenance.";
+        exit();
     }
-}
 
-// Fetch data from masterkelompok table
-$queryKelompok = "SELECT kelompok_id, nama_kelompok FROM masterkelompok ORDER BY nama_kelompok";
-$resultKelompok = $conn->query($queryKelompok);
+    $updateQueryStock = "UPDATE masterbahan SET quantity = ? WHERE stok_id = ?";
+    $updateStmt = $conn->prepare($updateQueryStock);
+    $updateStmt->bind_param("ii", $newStockQuantity, $selectedItemId);
+    $updateStmt->execute();
+    $updateStmt->close();
 
-if (!$resultKelompok) {
-    die("Error fetching kelompok data: " . $conn->error);
+    // Insert a new record into the 'historis' table
+    $insertQueryHistoris = "INSERT INTO historis (pengguna, stok_id, waktu, quantity, activity, deskripsi) VALUES (?, ?, NOW(), ?, 'Pengiriman', ?)";
+    $insertStmt = $conn->prepare($insertQueryHistoris);
+    $insertStmt->bind_param("siis", $pengguna, $selectedItemId, $submittedQuantity, $_POST['deskripsi']);
+
+    $insertStmt->execute();
+    $insertStmt->close();
+
+    // Return the updated stock quantity
+    echo json_encode(array('currentStock' => $stockQuantity, 'newStock' => $newStockQuantity));
+    exit();
 }
 
 ?>
@@ -86,26 +68,27 @@ if (!$resultKelompok) {
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Master Bahan</title>
+    <title>Pengiriman Device</title>
 
-    <link rel="icon" href="assets/adminlte/dist/img/OWLlogo.png" type="image/x-icon">
+    <link rel="icon" href="../assets/adminlte/dist/img/OWLlogo.png" type="image/x-icon">
     <!-- Google Font: Source Sans Pro -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
     <!-- Font Awesome -->
-    <link rel="stylesheet" href="assets/adminlte/plugins/fontawesome-free/css/all.min.css">
+    <link rel="stylesheet" href="../assets/adminlte/plugins/fontawesome-free/css/all.min.css">
     <!-- Theme style -->
-    <link rel="stylesheet" href="assets/adminlte/dist/css/adminlte.min.css">
+    <link rel="stylesheet" href="../assets/adminlte/dist/css/adminlte.min.css">
+    <!-- Sweetalert2 -->
+    <link rel="stylesheet" href="../assets/adminlte/plugins/sweetalert2-theme-bootstrap-4/bootstrap-4.min.css">
     <!-- Ionicons -->
     <link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
-    <!-- Sweetalert2 -->
-    <link rel="stylesheet" href="assets/adminlte/plugins/sweetalert2-theme-bootstrap-4/bootstrap-4.min.css">
     <!-- Select2 -->
-    <link rel="stylesheet" href="assets/adminlte/plugins/select2/css/select2.min.css">
-    <link rel="stylesheet" href="assets/adminlte/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css">
+    <link rel="stylesheet" href="../assets/adminlte/plugins/select2/css/select2.min.css">
+    <link rel="stylesheet" href="../assets/adminlte/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css">
 
     <style>
-        .input-group-append label {
-            margin-right: 24px;
+        #successMessage {
+            display: none;
+            /* Hide the success message initially */
         }
 
         .gray-italic-text {
@@ -113,7 +96,6 @@ if (!$resultKelompok) {
             font-style: italic;
         }
     </style>
-
 
 </head>
 
@@ -133,8 +115,8 @@ if (!$resultKelompok) {
         <!-- Main Sidebar Container -->
         <aside class="main-sidebar sidebar-dark-primary elevation-4 fixed">
             <!-- Brand Logo -->
-            <a href="homepage.php" class="brand-link">
-                <img src="assets/adminlte/dist/img/OWLlogo.png" alt="OWL Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
+            <a href="../homepage.php" class="brand-link">
+                <img src="../assets/adminlte/dist/img/OWLlogo.png" alt="OWL Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
                 <span class="brand-text font-weight-heavy">OWL RnD</span>
             </a>
 
@@ -146,7 +128,7 @@ if (!$resultKelompok) {
                         <!-- Add icons to the links using the .nav-icon class
                with font-awesome or any other icon font library -->
                         <li class="nav-item">
-                            <a href="./homepage.php" class="nav-link">
+                            <a href="../homepage.php" class="nav-link">
                                 <i class="nav-icon fas fa-th"></i>
                                 <p>Home</p>
                             </a>
@@ -154,7 +136,7 @@ if (!$resultKelompok) {
                         </li>
                         <li class="nav-header">TRANSAKSI</li>
                         <li class="nav-item">
-                            <a href="produksi.php" class="nav-link">
+                            <a href="produksi.php" class="nav-link active">
                                 <i class="nav-icon fas fa-toolbox"></i>
                                 <p>
                                     Produksi
@@ -163,13 +145,13 @@ if (!$resultKelompok) {
                             </a>
                             <ul class="nav nav-treeview">
                                 <li class="nav-item">
-                                    <a href="produksi/produksi.php" class="nav-link">
+                                    <a href="produksi.php" class="nav-link">
                                         <i class="far fa-circle nav-icon"></i>
                                         <p>Produksi Device</p>
                                     </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a href="produksi/pengiriman.php" class="nav-link">
+                                    <a href="pengiriman.php" class="nav-link active">
                                         <i class="far fa-circle nav-icon"></i>
                                         <p>Pengiriman Device</p>
                                     </a>
@@ -186,19 +168,19 @@ if (!$resultKelompok) {
                             </a>
                             <ul class="nav nav-treeview">
                                 <li class="nav-item">
-                                    <a href="maintenance/input.php" class="nav-link">
+                                    <a href="../maintenance/input.php" class="nav-link">
                                         <i class="far fa-circle nav-icon"></i>
                                         <p>Input</p>
                                     </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a href="maintenance/monitoring.php" class="nav-link">
+                                    <a href="../maintenance/monitoring.php" class="nav-link">
                                         <i class="far fa-circle nav-icon"></i>
                                         <p>Monitoring</p>
                                     </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a href="maintenance/update.php" class="nav-link">
+                                    <a href="../maintenance/update.php" class="nav-link">
                                         <i class="far fa-circle nav-icon"></i>
                                         <p>Update</p>
                                     </a>
@@ -206,7 +188,7 @@ if (!$resultKelompok) {
                             </ul>
                         </li>
                         <li class="nav-item">
-                            <a href="prototype.php" class="nav-link">
+                            <a href="../prototype.php" class="nav-link">
                                 <i class="nav-icon fas fa-screwdriver"></i>
                                 <p>
                                     Prototype
@@ -214,7 +196,7 @@ if (!$resultKelompok) {
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="restock.php" class="nav-link">
+                            <a href="../restock.php" class="nav-link">
                                 <i class="nav-icon fas fa-shopping-cart"></i>
                                 <p>
                                     Restock
@@ -223,7 +205,7 @@ if (!$resultKelompok) {
                         </li>
                         <li class="nav-header">TAMBAH DATA</li>
                         <li class="nav-item">
-                            <a href="master_bahan.php" class="nav-link active">
+                            <a href="../master_bahan.php" class="nav-link">
                                 <i class="nav-icon fa fa-pen"></i>
                                 <p>
                                     Master Bahan
@@ -231,7 +213,7 @@ if (!$resultKelompok) {
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="master_device.php" class="nav-link">
+                            <a href="../master_device.php" class="nav-link">
                                 <i class="nav-icon fas fa-cube"></i>
                                 <p>
                                     Master Device
@@ -239,7 +221,7 @@ if (!$resultKelompok) {
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="tambah_perusahaan.php" class="nav-link">
+                            <a href="../tambah_perusahaan.php" class="nav-link">
                                 <i class="nav-icon fas fa-industry"></i>
                                 <p>
                                     Perusahaan
@@ -248,7 +230,7 @@ if (!$resultKelompok) {
                         </li>
                         <li class="nav-header">PELAPORAN</li>
                         <li class="nav-item">
-                            <a href="laporan_stok.php" class="nav-link">
+                            <a href="../laporan_stok.php" class="nav-link">
                                 <i class="nav-icon ion ion-pie-graph"></i>
                                 <p>
                                     Laporan Stok
@@ -256,7 +238,7 @@ if (!$resultKelompok) {
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="histori_transaksi.php" class="nav-link">
+                            <a href="../histori_transaksi.php" class="nav-link">
                                 <i class="nav-icon fas fa-history"></i>
                                 <p>
                                     Histori Transaksi
@@ -277,12 +259,13 @@ if (!$resultKelompok) {
                 <div class="container-fluid">
                     <div class="row mb-2">
                         <div class="col-sm-6">
-                            <h1>Master Bahan</h1>
+                            <h1>Pengiriman Device</h1>
                         </div>
                         <div class="col-sm-6">
                             <ol class="breadcrumb float-sm-right">
                                 <li class="breadcrumb-item"><a href="homepage.php">Home</a></li>
-                                <li class="breadcrumb-item active">Master Bahan</li>
+                                <li class="breadcrumb-item active">Produksi</li>
+                                <li class="breadcrumb-item active">Pengiriman Device</li>
                             </ol>
                         </div>
                     </div>
@@ -296,46 +279,42 @@ if (!$resultKelompok) {
                     <!-- general form elements -->
                     <div class="card card-primary">
                         <div class="card-header">
-                            <h3 class="card-title">Menambah Jenis Master Bahan</h3>
+                            <h3 class="card-title">Mengurangi Stok Device Untuk Pengiriman</h3>
                         </div>
                         <!-- /.card-header -->
                         <!-- form start -->
-                        <form id="masterBahanForm">
+                        <form id="maintenanceForm">
                             <div class="card-body">
                                 <div class="form-group">
-                                    <div>
-                                        <label for="pilihNamaKelompok">Pilih Kelompok <span style="color: red;">*</span></label>
-                                    </div>
-                                    <select class="form-control select2" id="pilihNamaKelompok" name="kelompok">
-                                        <option value="">--- Pilih Kelompok ---</option>
+                                    <label for="pilihBahanMaintenance">Pilih Produk <span style="color: red;">*</span></label>
+                                    <select class="form-control select2" id="pilihBahanMaintenance" name="selectedItem">
+                                        <option value="">--- Pilih Produk ---</option>
                                         <?php
-                                        while ($row = $resultKelompok->fetch_assoc()) {
-                                            echo '<option value="' . $row['nama_kelompok'] . '">' . $row['nama_kelompok'] . '</option>';
+                                        while ($row = $resultProduk->fetch_assoc()) {
+                                            echo '<option value="' . $row['stok_id'] . '">' . $row['produk'] . '</option>';
                                         }
                                         ?>
                                     </select>
-                                    <button type="button" class="btn btn-outline-info btn-block" data-toggle="modal" data-target="#modalBuatKelompok" style="margin-top: 10px; max-width: 180px;"><i class="fas fa-plus" style="margin-right: 8px;"></i>Kelompok Baru</button>
-                                </div>
-                                <div class="form-group">
-                                    <label for="namaBahan">Nama Bahan <span style="color: red;">*</span></label>
-                                    <input type="text" class="form-control form-control-border border-width-2" id="namaBahan" name="namaBahan" placeholder="Contoh : R060310k">
                                 </div>
                                 <div class="form-group">
                                     <label for="quantity">Kuantitas <span style="color: red;">*</span></label>
                                     <div class="input-group">
                                         <!-- Input untuk kuantitas -->
-                                        <input type="number" class="form-control" id="quantity" name="quantity" min="0" value="" placeholder="Masukkan jumlah stok bahan">
+                                        <input type="number" class="form-control" id="quantity" name="quantity" min="0" value="">
                                     </div>
                                 </div>
+                                <p id="stockMessage">Stok Bahan Tersisa: <?php echo $stockQuantity; ?></p>
+                                <p id="successMessage">Stok Bahan Terkini: <?php echo $newStockQuantity; ?></p>
                                 <div class="form-group">
-                                    <label for="deskripsi">Deskripsi<span class="gray-italic-text"> (opsional)</span></label>
-                                    <textarea class="form-control" id="deskripsi" name="deskripsi" rows="3" placeholder="Masukkan keterangan bahan ..."></textarea>
+                                    <label for="deksripsi">Deskripsi<span class="gray-italic-text"> (opsional)</span></label>
+                                    <textarea class="form-control" id="deskripsi" name="deskripsi" rows="3" placeholder="Masukkan keterangan pengiriman produk ..."></textarea>
                                 </div>
                             </div>
+
                             <!-- /.card-body -->
                         </form>
                         <div class="card-footer d-flex justify-content-end">
-                            <button type="button" id="submitButton" class="btn btn-primary" onclick="if(validateForm()) { validateSuccess(); resetForm(); }">Submit</button>
+                            <button type="submit" id="submitButton" class="btn btn-primary" onclick="if(validateForm()) { validateSuccess();}">Submit</button>
                         </div>
                     </div>
                     <!-- general form elements -->
@@ -347,49 +326,26 @@ if (!$resultKelompok) {
         </div>
         <!-- /.content-wrapper -->
 
-
         <!-- Control Sidebar -->
         <aside class="control-sidebar control-sidebar-dark">
             <!-- Control sidebar content goes here -->
         </aside>
         <!-- /.control-sidebar -->
-
-        <!-- Modal menambahkan kelompok baru -->
-        <form id="tambahKelompokForm">
-            <div class="modal fade" id="modalBuatKelompok" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
-                <div class="modal-dialog modal-dialog-centered" role="document">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="exampleModalCenterTitle">Buat Kelompok Baru</h5>
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                            </button>
-                        </div>
-                        <div class="modal-body">
-                            <div class="form-group">
-                                <label for="namaKelompokBaru">Nama Kelompok <span style="color: red;">*</span></label>
-                                <input type="text" class="form-control form-control-border border-width-2" id="namaKelompokBaru" name="namaKelompokBaru" placeholder="Masukkan nama kelompok yang ingin dibuat">
-                            </div>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                            <button type="button" class="btn btn-primary" onclick="if(validateFormKB()) { validateSuccessKB(); resetForm(); }">Submit</button>
-        </form>
     </div>
     <!-- ./wrapper -->
 
     <!-- jQuery -->
-    <script src="assets/adminlte/plugins/jquery/jquery.min.js"></script>
+    <script src="../assets/adminlte/plugins/jquery/jquery.min.js"></script>
     <!-- Bootstrap 4 -->
-    <script src="assets/adminlte/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="../assets/adminlte/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
     <!-- bs-custom-file-input -->
-    <script src="assets/adminlte/plugins/bs-custom-file-input/bs-custom-file-input.min.js"></script>
+    <script src="../assets/adminlte/plugins/bs-custom-file-input/bs-custom-file-input.min.js"></script>
     <!-- AdminLTE App -->
-    <script src="assets/adminlte/dist/js/adminlte.min.js"></script>
+    <script src="../assets/adminlte/dist/js/adminlte.min.js"></script>
     <!-- SweetAlert2 Toast -->
-    <script src="assets/adminlte/plugins/sweetalert2/sweetalert2.min.js"></script>
+    <script src="../assets/adminlte/plugins/sweetalert2/sweetalert2.min.js"></script>
     <!-- Select2 -->
-    <script src="assets/adminlte/plugins/select2/js/select2.full.min.js"></script>
+    <script src="../assets/adminlte/plugins/select2/js/select2.full.min.js"></script>
 
     <!-- Page specific script -->
     <script>
@@ -405,14 +361,32 @@ if (!$resultKelompok) {
                 width: '100%',
                 containerCssClass: 'height-40px',
             });
+
+            $("#pilihTransaksi").change(function() {
+                var selectedTransaksi = $("#pilihTransaksi").val();
+                console.log(selectedTransaksi);
+                // Extract the value you want from the selectedTransaksi
+                var extractedValue = ""; // Update this based on your logic
+
+                // Update the deskripsi field
+                $("#deskripsi").val(selectedTransaksi);
+            });
+        });
+
+        $(function() {
+            bsCustomFileInput.init();
+
+            // Add an event listener to the select element
+            $("#pilihBahanMaintenance").change(function() {
+                validateCurrentStock();
+            });
         });
 
         function validateForm() {
-            var selectedItem = document.getElementById("pilihNamaKelompok").value;
-            var nama = document.getElementById("namaBahan").value;
+            var selectedItem = document.getElementById("pilihBahanMaintenance").value;
             var quantity = document.getElementById("quantity").value;
 
-            if (selectedItem === "" || nama === "" || quantity === "" || quantity <= 0) {
+            if (selectedItem === "" || quantity === "" || quantity <= 0) {
                 Swal.fire({
                     icon: 'error',
                     title: 'Oops...',
@@ -431,19 +405,54 @@ if (!$resultKelompok) {
             return true;
         }
 
+        function updateStockMessage() {
+            var stockMessage = document.getElementById("stockMessage");
+            var selectedQuantity = parseInt(document.getElementById("quantity").value, 10);
+
+            // Update stock message dynamically based on the selected item's stock quantity
+            stockMessage.innerText = "Stok Bahan Tersisa: " + (<?php echo $stockQuantity; ?> - selectedQuantity);
+        }
+
+        function validateCurrentStock() {
+            // Get the form data
+            var formData = $("#maintenanceForm").serialize();
+
+            // Use AJAX to submit the form data and fetch the updated stock quantity
+            $.ajax({
+                type: "POST",
+                url: "update.php",
+                data: formData,
+                dataType: "json",
+                success: function(response) {
+                    // Hide the stock message
+                    document.getElementById("successMessage").style.display = "none";
+                    // Update the stock message with the fetched quantity
+                    document.getElementById("stockMessage").innerText = "Stok Bahan Tersisa: " + response.currentStock;
+                },
+                error: function(error) {
+                    alert("Error, refresh the page!");
+                }
+            });
+        }
 
         function validateSuccess() {
             // Get the form data
-            var formData = $("#masterBahanForm").serialize();
+            var formData = $("#maintenanceForm").serialize();
 
+            // Use AJAX to submit the form data and fetch the updated stock quantity
             $.ajax({
                 type: "POST",
-                url: "master_bahan.php",
+                url: "update.php",
                 data: formData,
+                dataType: "json",
                 success: function(response) {
+                    // Hide the stock message
+                    document.getElementById("stockMessage").innerText = "Stok Bahan Tersisa: ";
+
                     Swal.fire({
                         icon: 'success',
-                        title: 'Bahan berhasil didaftarkan!',
+                        title: 'Stok berhasil diambil!',
+                        text: 'Stok terbaru adalah ' + response.newStock + ' bahan',
                         showCancelButton: false,
                         confirmButtonColor: '#3085d6',
                         confirmButtonText: 'OK (enter)'
@@ -453,72 +462,60 @@ if (!$resultKelompok) {
                         }
                     });
 
+                    resetForm();
+
                 },
                 error: function(error) {
-                    alert("Error mendaftarkan barang.");
-                }
-            });
-        }
-
-        function validateFormKB() {
-            var namaKB = document.getElementById("namaKelompokBaru").value;
-
-            if (namaKB === "") {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Oops...',
-                    text: 'Harap lengkapi semua formulir!',
-                });
-                return false;
-            }
-
-            return true;
-        }
-
-        function validateSuccessKB() {
-            // Get the form data
-            var formDataKB = $("#tambahKelompokForm").serialize();
-
-            $.ajax({
-                type: "POST",
-                url: "master_bahan.php",
-                data: formDataKB,
-                success: function(response) {
                     Swal.fire({
-                        icon: 'success',
-                        title: 'Kelompok berhasil didaftarkan!',
+                        icon: 'error',
+                        title: 'Stok Kurang',
+                        text: 'Kurangi kuantitas yang diinput!',
+                        showCancelButton: false,
+                        confirmButtonColor: '#3085d6',
+                        confirmButtonText: 'OK (enter)'
                     }).then((result) => {
                         if (result.isConfirmed) {
-                            location.reload();
+                            resetForm();
                         }
                     });
-
-
-                },
-                error: function(error) {
-                    alert("Error mendaftarkan kelompok.");
                 }
             });
         }
 
         function resetForm() {
-            document.getElementById("masterBahanForm").reset();
-            document.getElementById("tambahKelompokForm").reset();
+            document.getElementById("maintenanceForm").reset();
             resetDropdown();
+            disableQuantityInput();
         }
 
         function resetDropdown() {
-            const dropdown = document.getElementById("pilihNamaKelompok");
-            dropdown.selectedIndex = 0; // reset ke pilihan pertama
-
-            // jika multiple selection
-            dropdown.querySelectorAll("option:checked").forEach(option => {
-                option.selected = false;
-            });
+            const dropdown = document.getElementById("pilihBahanMaintenance");
+            dropdown.selectedIndex = 0;
+            // reset ke pilihan pertama
+            const dropdownTransaksi = document.getElementById("pilihTransaksi");
+            dropdownTransaksi.selectedIndex = 0; // reset ke pilihan pertama
 
             // memicu event change 
             dropdown.dispatchEvent(new Event('change'));
+            dropdownTransaksi.dispatchEvent(new Event('change'));
         }
+
+        // Quantity input disabled to prevent bugs
+        document.addEventListener("DOMContentLoaded", function() {
+            disableQuantityInput();
+        });
+
+        function disableQuantityInput() {
+            const quantityInput = document.getElementById("quantity");
+            quantityInput.placeholder = "Pilih produk terlebih dahulu";
+            quantityInput.disabled = true;
+        }
+
+        $("#pilihBahanMaintenance").change(function() {
+            const quantityInput = document.getElementById("quantity");
+            quantityInput.placeholder = "Masukkan jumlah stok produk yang ingin dikirim";
+            quantityInput.disabled = false;
+        });
 
         // When user press enter on keyboard
         var quantityInput = document.getElementById('quantity');
