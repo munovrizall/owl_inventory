@@ -14,3 +14,8 @@ $conn = new mysqli($serverName, $userNameDb, $password, $dbName);
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
+
+if (empty($_SESSION['username'])) {
+    header("Location: login.php");
+    exit();
+}
