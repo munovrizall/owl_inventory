@@ -129,8 +129,23 @@ if (!$result) {
                 <i class="nav-icon fas fa-toolbox"></i>
                 <p>
                   Produksi
+                  <i class="right fas fa-angle-left"></i>
                 </p>
               </a>
+              <ul class="nav nav-treeview">
+                <li class="nav-item">
+                  <a href="produksi/produksi.php" class="nav-link">
+                    <i class="far fa-circle nav-icon"></i>
+                    <p>Produksi Device</p>
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a href="produksi/pengiriman.php" class="nav-link">
+                    <i class="far fa-circle nav-icon"></i>
+                    <p>Pengiriman Device</p>
+                  </a>
+                </li>
+              </ul>
             </li>
             <li class="nav-item">
               <a href="maintenance.php" class="nav-link">
@@ -338,6 +353,9 @@ if (!$result) {
                           switch ($row["activity"]) {
                             case "Produksi":
                               $badgeClass = "badge bg-info";
+                              if (str_contains($row["quantity"], "-")) {
+                                $badgeClass = "badge bg-danger";
+                              }
                               break;
                             case "Restock":
                               $badgeClass = "badge bg-success";
@@ -350,8 +368,11 @@ if (!$result) {
                               $badgeClass = "badge bg-warning";
                               $row["quantity"] = "-" . $row["quantity"];
                               break;
+                            case "Pengiriman":
+                              $badgeClass = "badge bg-secondary";
+                              $row["quantity"] = "-" . $row["quantity"];
+                              break;
                             default:
-                              // Set kelas default jika nilai activity tidak sesuai dengan kasus di atas
                               $badgeClass = "badge bg-secondary";
                               break;
                           }

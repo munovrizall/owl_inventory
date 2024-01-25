@@ -133,8 +133,23 @@ if (isset($_POST['quantity'])) {
                                 <i class="nav-icon fas fa-toolbox"></i>
                                 <p>
                                     Produksi
+                                    <i class="right fas fa-angle-left"></i>
                                 </p>
                             </a>
+                            <ul class="nav nav-treeview">
+                                <li class="nav-item">
+                                    <a href="produksi/produksi.php" class="nav-link">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>Produksi Device</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="produksi/pengiriman.php" class="nav-link">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>Pengiriman Device</p>
+                                    </a>
+                                </li>
+                            </ul>
                         </li>
                         <li class="nav-item">
                             <a href="../maintenance.php" class="nav-link">
