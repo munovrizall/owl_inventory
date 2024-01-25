@@ -285,6 +285,9 @@ if (!$result) {
                                                     switch ($row["activity"]) {
                                                         case "Produksi":
                                                             $badgeClass = "badge bg-info";
+                                                            if (str_contains($row["quantity"], "-")) {
+                                                                $badgeClass = "badge bg-danger";
+                                                            }
                                                             break;
                                                         case "Restock":
                                                             $badgeClass = "badge bg-success";
@@ -297,9 +300,12 @@ if (!$result) {
                                                             $badgeClass = "badge bg-warning";
                                                             $row["quantity"] = "-" . $row["quantity"];
                                                             break;
+                                                        case "Pengiriman":
+                                                            $badgeClass = "badge bg-secondary";
+                                                            $row["quantity"] = "-" . $row["quantity"];
+                                                            break;
                                                         default:
-                                                            // Set kelas default jika nilai activity tidak sesuai dengan kasus di atas
-                                                            $badgeClass = "badge bg-warning";
+                                                            $badgeClass = "badge bg-secondary";
                                                             break;
                                                     }
                                             ?>

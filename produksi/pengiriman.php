@@ -2,6 +2,12 @@
 
 include "../connection.php";
 
+$queryClient = "SELECT * FROM client ORDER BY nama_client";
+$resultClient = $conn->query($queryClient);
+
+if (!$resultClient) {
+    die("Error fetching kelompok data: " . $conn->error);
+}
 
 $stockQuantity = ""; // Default value, replace it with the actual stock quantity based on the selected item from the database
 $newStockQuantity = "";
@@ -314,6 +320,17 @@ if (isset($_POST['quantity'])) {
                                 <p id="stockMessage">Stok Bahan Tersisa: <?php echo $stockQuantity; ?></p>
                                 <p id="successMessage">Stok Bahan Terkini: <?php echo $newStockQuantity; ?></p>
                                 <div class="form-group">
+                                    <label for="pilihClient">Pilih PT <span class="gray-italic-text"> (opsional)</span></label>
+                                    <select class="form-control select2" id="pilihClient" name="client">
+                                        <option value="">--- Pilih PT ---</option>
+                                        <?php
+                                        while ($row = $resultClient->fetch_assoc()) {
+                                            echo '<option value="' . $row['nama_client'] . '">' . $row['nama_client'] . '</option>';
+                                        }
+                                        ?>
+                                    </select>
+                                </div>
+                                <div class="form-group">
                                     <label for="deksripsi">Deskripsi<span class="gray-italic-text"> (opsional)</span></label>
                                     <textarea class="form-control" id="deskripsi" name="deskripsi" rows="3" placeholder="Masukkan keterangan pengiriman produk ..."></textarea>
                                 </div>
@@ -370,14 +387,14 @@ if (isset($_POST['quantity'])) {
                 containerCssClass: 'height-40px',
             });
 
-            $("#pilihTransaksi").change(function() {
-                var selectedTransaksi = $("#pilihTransaksi").val();
-                console.log(selectedTransaksi);
+            $("#pilihClient").change(function() {
+                var selectedPT = $("#pilihClient").val();
+                console.log(selectedPT);
                 // Extract the value you want from the selectedTransaksi
                 var extractedValue = ""; // Update this based on your logic
 
                 // Update the deskripsi field
-                $("#deskripsi").val(selectedTransaksi);
+                $("#deskripsi").val("Pengiriman untuk " + selectedPT);
             });
         });
 
@@ -500,12 +517,7 @@ if (isset($_POST['quantity'])) {
             const dropdown = document.getElementById("pilihProdukPengiriman");
             dropdown.selectedIndex = 0;
             // reset ke pilihan pertama
-            const dropdownTransaksi = document.getElementById("pilihTransaksi");
-            dropdownTransaksi.selectedIndex = 0; // reset ke pilihan pertama
-
-            // memicu event change 
             dropdown.dispatchEvent(new Event('change'));
-            dropdownTransaksi.dispatchEvent(new Event('change'));
         }
 
         // Quantity input disabled to prevent bugs
