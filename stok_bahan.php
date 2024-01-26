@@ -2,7 +2,8 @@
 
 include "connection.php";
 
-$query = "SELECT * FROM masterbahan ORDER BY stok_id";
+$query = "SELECT * FROM masterbahan
+WHERE kelompok != 'Barang Jadi'";
 $result = mysqli_query($conn, $query);
 
 ?>
@@ -12,7 +13,7 @@ $result = mysqli_query($conn, $query);
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Laporan Stok</title>
+    <title>Stok Bahan</title>
 
     <link rel="icon" href="assets/adminlte/dist/img/OWLlogo.png" type="image/x-icon">
     <!-- Google Font: Source Sans Pro -->
@@ -196,10 +197,18 @@ $result = mysqli_query($conn, $query);
                         </li>
                         <li class="nav-header">PELAPORAN</li>
                         <li class="nav-item">
-                            <a href="laporan_stok.php" class="nav-link active">
+                            <a href="stok_bahan.php" class="nav-link active">
                                 <i class="nav-icon ion ion-pie-graph"></i>
                                 <p>
-                                    Laporan Stok
+                                    Stok Bahan
+                                </p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="stok_produk.php" class="nav-link">
+                                <i class="nav-icon fas fa-microchip"></i>
+                                <p>
+                                    Stok Produk
                                 </p>
                             </a>
                         </li>
@@ -225,12 +234,12 @@ $result = mysqli_query($conn, $query);
                 <div class="container-fluid">
                     <div class="row mb-2">
                         <div class="col-sm-6">
-                            <h1 class="m-0">Laporan Stok</h1>
+                            <h1 class="m-0">Laporan Stok Bahan</h1>
                         </div><!-- /.col -->
                         <div class="col-sm-6">
                             <ol class="breadcrumb float-sm-right">
                                 <li class="breadcrumb-item"><a href="homepage.php">Home</a></li>
-                                <li class="breadcrumb-item active">Laporan Stok</li>
+                                <li class="breadcrumb-item active">Stok Bahan</li>
                             </ol>
                         </div><!-- /.col -->
                     </div><!-- /.row -->
@@ -277,7 +286,6 @@ $result = mysqli_query($conn, $query);
                                             ?>
                                         </tbody>
                                     </table>
-
                                 </div>
                                 <!-- /.card-body -->
                             </div>
@@ -353,7 +361,7 @@ $result = mysqli_query($conn, $query);
                     },
                     'csv', 'excel', 'pdf', 'print'
                 ],
-                order: [],
+                order: [1, 'asc'],
             });
 
             table.buttons().container()
