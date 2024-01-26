@@ -2,7 +2,7 @@
 
 include "connection.php";
 
-$queryBahan = "SELECT * FROM masterbahan ORDER BY nama";
+$queryBahan = "SELECT * FROM masterbahan WHERE kelompok != 'Barang Jadi' ORDER BY nama";
 $resultBahan = $conn->query($queryBahan);
 
 $stockQuantity = ""; // Default value, replace it with the actual stock quantity based on the selected item from the database

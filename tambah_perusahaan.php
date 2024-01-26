@@ -352,7 +352,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
 
         function validateSuccess() {
-            // Get the form data
             var formData = $("#perusahaanForm").serialize();
 
             $.ajax({
@@ -360,6 +359,30 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 url: "tambah_perusahaan.php",
                 data: formData,
                 dataType: "json",
+                success: function(response) {
+                    // Handle success response
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Perusahaan Berhasil Ditambahkan!',
+                        showCancelButton: false,
+                        confirmButtonColor: '#3085d6',
+                        confirmButtonText: 'OK'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            resetForm();
+                        }
+                    });
+                },
+                error: function(xhr, status, error) {
+                    // Handle error response
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Perusahaan telah terdaftar!',
+                        showCancelButton: false,
+                        confirmButtonColor: '#3085d6',
+                        confirmButtonText: 'OK'
+                    });
+                }
             });
         }
 
