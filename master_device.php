@@ -59,8 +59,8 @@ if (isset($_GET["getDropdownOptions"])) {
         }
 
         // Insert the new record into masterbahan table
-        $queryMasterBahan = "INSERT INTO masterbahan (kelompok, nama) VALUES ('Barang Jadi', ?)";
-        $stmtMasterBahan = $conn->prepare($queryMasterBahan);
+        $queryMasterDevice = "INSERT INTO masterbahan (kelompok, nama, quantity) VALUES ('Barang Jadi', ?, 0)";
+        $stmtMasterBahan = $conn->prepare($queryMasterDevice);
         $stmtMasterBahan->bind_param("s", $namaDevice);
         $stmtMasterBahan->execute();
         $stmtMasterBahan->close();
@@ -375,6 +375,10 @@ if (isset($_GET["getDropdownOptions"])) {
     <!-- Page specific script -->
     <script>
         $(document).ready(function() {
+            $(document).on('select2:open', () => {
+                document.querySelector('.select2-search__field').focus();
+            });
+
             var counter = 0;
 
             $("#addrow").on("click", function() {
@@ -404,12 +408,19 @@ if (isset($_GET["getDropdownOptions"])) {
                         newRow.append(cols);
                         $("table.order-list").append(newRow);
                         counter++;
+
+                        $('.select2').select2({
+                            theme: 'bootstrap4',
+                            width: '100%',
+                            containerCssClass: 'height-40px',
+                        });
                     },
                     error: function(error) {
                         console.log("Error fetching dropdown options: " + error);
                     }
                 });
             }
+
         });
 
 
