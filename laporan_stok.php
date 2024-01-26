@@ -2,7 +2,7 @@
 
 include "connection.php";
 
-$query = "SELECT * FROM masterbahan ORDER BY stok_id";
+$query = "SELECT * FROM masterbahan WHERE kelompok != 'Barang Jadi' ORDER BY stok_id";
 $result = mysqli_query($conn, $query);
 
 ?>
