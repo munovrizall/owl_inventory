@@ -492,6 +492,12 @@ if (isset($_GET["getDropdownOptions"])) {
                         newRow.append(cols);
                         $("table.order-list").append(newRow);
                         counter++;
+
+                        $('.select2').select2({
+                            theme: 'bootstrap4',
+                            width: '100%',
+                            containerCssClass: 'height-40px',
+                        });
                     },
                     error: function(xhr, status, error) {
                         console.log("Error fetching dropdown options:");

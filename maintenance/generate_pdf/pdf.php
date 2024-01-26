@@ -114,9 +114,10 @@ $pdf->Cell(0,10,"Selanjutnya disebut PIHAK PERTAMA",0,1);
 $pdf->Cell(0,10,"Nama         : $nama_korespondensi",0,1);
 $pdf->WrapAndPrintAddress($alamat_perusahaan);
 
+$pdf->Cell(0,10,"Selanjutnya disebut PIHAK KEDUA",0,1);
+
 $pdf->Cell(0,10,"",0,1,);
 
-$pdf->Cell(0,10,"Selanjutnya disebut PIHAK KEDUA",0,1);
 $pdf->MultiCell(0,5,"PIHAK PERTAMA menyerahkan barang kepada PIHAK KEDUA, dan PIHAK KEDUA menyatakan telah menerima barang dari PIHAK PERTAMA berupa daftar terlampir:",0,1);
 
 //TABEL PRODUK dan Jarak
