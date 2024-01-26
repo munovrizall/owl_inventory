@@ -94,55 +94,55 @@ if (isset($_POST['selectedDevice'])) {
             $stokIdStmt->fetch();
             $stokIdStmt->close();
 
-            
+
             $bahanIdQuery = "SELECT stok_id FROM masterbahan WHERE nama = ?";
             $bahanIdStmt = $conn->prepare($bahanIdQuery);
-            
+
             // Initialize the array outside the loop
             $resultBahanId = array();
-            
+
             foreach ($resultProduksi as $row) {
                 $namaBahan = $row['namaBahan'];
-                
+
                 $bahanIdStmt->bind_param("s", $namaBahan);
                 $bahanIdStmt->execute();
                 $bahanIdStmt->bind_result($bahanId);
-                
+
                 while ($bahanIdStmt->fetch()) {
                     // Accumulate results in the array
                     $resultBahanId[] = array('bahanId' => $bahanId, 'stokDibutuhkan' => $row['stokDibutuhkan']);
                 }
-                
+
                 // Move this inside the loop to capture the correct value for each iteration
                 $stokDibutuhkan = $row['stokDibutuhkan'];
             }
-            
+
             $bahanIdStmt->close();
-            
+
             $insertQueryHistorisMinus = "INSERT INTO historis (pengguna, stok_id, waktu, quantity, activity, deskripsi) VALUES (?, ?, NOW(), ?, 'Produksi', ?)";
             $insertStmtMinus = $conn->prepare($insertQueryHistorisMinus);
-            
+
             foreach ($resultBahanId as $row) {
                 $bahanId = $row['bahanId'];
                 $stokDibutuhkan = $row['stokDibutuhkan'];
                 $minusBahan = -1 * ($submittedQuantity * $stokDibutuhkan);
-                
+
                 $insertStmtMinus->bind_param("siis", $pengguna, $bahanId, $minusBahan, $_POST['deskripsi']);
                 if (!$insertStmtMinus->execute()) {
                     // Log or display the error
                     echo "Error in insertStmtMinus execution: " . $insertStmtMinus->error;
                 }
             }
-            
+
             $insertStmtMinus->close();
-            
+
             // Insert into historis
             $insertQueryHistoris = "INSERT INTO historis (pengguna, stok_id, waktu, quantity, activity, deskripsi) VALUES (?, ?, NOW(), ?, 'Produksi', ?)";
             $insertStmt = $conn->prepare($insertQueryHistoris);
             $insertStmt->bind_param("siis", $pengguna, $stokId, $submittedQuantity, $_POST['deskripsi']);
             $insertStmt->execute();
             $insertStmt->close();
-            
+
             // Update Produk quantity pada masterbahan
             $updateQueryMasterBahan = "UPDATE masterbahan SET quantity = ? WHERE nama = ?";
 
@@ -339,12 +339,27 @@ if (isset($_POST['selectedDevice'])) {
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="../tambah_perusahaan.php" class="nav-link">
+                            <a href="perusahaan.php" class="nav-link">
                                 <i class="nav-icon fas fa-industry"></i>
                                 <p>
                                     Perusahaan
+                                    <i class="right fas fa-angle-left"></i>
                                 </p>
                             </a>
+                            <ul class="nav nav-treeview">
+                                <li class="nav-item">
+                                    <a href="../perusahaan/tambah_perusahaan.php" class="nav-link">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>Tambah Perusahaan</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="../perusahaan/list_perusahaan.php" class="nav-link">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>List Perusahaan</p>
+                                    </a>
+                                </li>
+                            </ul>
                         </li>
                         <li class="nav-header">PELAPORAN</li>
                         <li class="nav-item">

@@ -105,7 +105,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <!-- Main Sidebar Container -->
         <aside class="main-sidebar sidebar-dark-primary elevation-4 fixed">
             <!-- Brand Logo -->
-            <a href="../homepage.php" class="brand-link">
+            <a href="../../homepage.php" class="brand-link">
                 <img src="../../assets/adminlte/dist/img/OWLlogo.png" alt="OWL Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
                 <span class="brand-text font-weight-heavy">OWL RnD</span>
             </a>
@@ -118,7 +118,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         <!-- Add icons to the links using the .nav-icon class
                with font-awesome or any other icon font library -->
                         <li class="nav-item">
-                            <a href="../homepage.php" class="nav-link">
+                            <a href="../../homepage.php" class="nav-link">
                                 <i class="nav-icon fas fa-th"></i>
                                 <p>Home</p>
                             </a>
@@ -126,7 +126,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         </li>
                         <li class="nav-header">TRANSAKSI</li>
                         <li class="nav-item">
-                            <a href="../produksi.php" class="nav-link">
+                            <a href="../../produksi.php" class="nav-link">
                                 <i class="nav-icon fas fa-toolbox"></i>
                                 <p>
                                     Produksi
@@ -135,13 +135,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                             </a>
                             <ul class="nav nav-treeview">
                                 <li class="nav-item">
-                                    <a href="../produksi/produksi.php" class="nav-link">
+                                    <a href="../../produksi/produksi.php" class="nav-link">
                                         <i class="far fa-circle nav-icon"></i>
                                         <p>Produksi Device</p>
                                     </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a href="../produksi/pengiriman.php" class="nav-link">
+                                    <a href="../../produksi/pengiriman.php" class="nav-link">
                                         <i class="far fa-circle nav-icon"></i>
                                         <p>Pengiriman Device</p>
                                     </a>
@@ -149,7 +149,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                             </ul>
                         </li>
                         <li class="nav-item">
-                            <a href="../maintenance.php" class="nav-link">
+                            <a href="../../maintenance.php" class="nav-link">
                                 <i class="nav-icon fas fa-wrench"></i>
                                 <p>
                                     Maintenance
@@ -158,19 +158,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                             </a>
                             <ul class="nav nav-treeview">
                                 <li class="nav-item">
-                                    <a href="../maintenance/input.php" class="nav-link">
+                                    <a href="../../maintenance/input.php" class="nav-link">
                                         <i class="far fa-circle nav-icon"></i>
                                         <p>Input</p>
                                     </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a href="../maintenance/monitoring.php" class="nav-link">
+                                    <a href="../../maintenance/monitoring.php" class="nav-link">
                                         <i class="far fa-circle nav-icon"></i>
                                         <p>Monitoring</p>
                                     </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a href="../maintenance/update.php" class="nav-link">
+                                    <a href="../../maintenance/update.php" class="nav-link">
                                         <i class="far fa-circle nav-icon"></i>
                                         <p>Update</p>
                                     </a>
@@ -178,7 +178,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                             </ul>
                         </li>
                         <li class="nav-item">
-                            <a href="../prototype.php" class="nav-link">
+                            <a href="../../prototype.php" class="nav-link">
                                 <i class="nav-icon fas fa-screwdriver"></i>
                                 <p>
                                     Prototype
@@ -186,7 +186,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="../restock.php" class="nav-link">
+                            <a href="../../restock.php" class="nav-link">
                                 <i class="nav-icon fas fa-shopping-cart"></i>
                                 <p>
                                     Restock
@@ -195,7 +195,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         </li>
                         <li class="nav-header">TAMBAH DATA</li>
                         <li class="nav-item">
-                            <a href="../master_bahan.php" class="nav-link">
+                            <a href="../../master_bahan.php" class="nav-link">
                                 <i class="nav-icon fa fa-pen"></i>
                                 <p>
                                     Master Bahan
@@ -203,7 +203,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="../master_device.php" class="nav-link">
+                            <a href="../../master_device.php" class="nav-link">
                                 <i class="nav-icon fas fa-cube"></i>
                                 <p>
                                     Master Device
@@ -220,13 +220,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                             </a>
                             <ul class="nav nav-treeview">
                                 <li class="nav-item">
-                                    <a href="tambah_perusahaan.php" class="nav-link">
+                                    <a href="../tambah_perusahaan.php" class="nav-link">
                                         <i class="far fa-circle nav-icon"></i>
                                         <p>Tambah Perusahaan</p>
                                     </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a href="list_perusahaan.php" class="nav-link active">
+                                    <a href="../list_perusahaan.php" class="nav-link active">
                                         <i class="far fa-circle nav-icon"></i>
                                         <p>List Perusahaan</p>
                                     </a>
@@ -235,7 +235,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         </li>
                         <li class="nav-header">PELAPORAN</li>
                         <li class="nav-item">
-                            <a href="../stok_bahan.php" class="nav-link">
+                            <a href="../../stok_bahan.php" class="nav-link">
                                 <i class="nav-icon ion ion-pie-graph"></i>
                                 <p>
                                     Stok Bahan
@@ -243,7 +243,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="../stok_produk.php" class="nav-link">
+                            <a href="../../stok_produk.php" class="nav-link">
                                 <i class="nav-icon fas fa-microchip"></i>
                                 <p>
                                     Stok Produk
@@ -251,7 +251,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="../histori_transaksi.php" class="nav-link">
+                            <a href="../../histori_transaksi.php" class="nav-link">
                                 <i class="nav-icon fas fa-history"></i>
                                 <p>
                                     Histori Transaksi
