@@ -275,7 +275,7 @@ if (!$result) {
                 <div class="icon">
                   <i class="nav-icon fas fa-toolbox"></i>
                 </div>
-                <a href="produksi.php" class="small-box-footer">Go <i class="fas fa-arrow-circle-right"></i></a>
+                <a href="produksi/produksi.php" class="small-box-footer">Go <i class="fas fa-arrow-circle-right"></i></a>
               </div>
             </div>
             <!-- ./col -->

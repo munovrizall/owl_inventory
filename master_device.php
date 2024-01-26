@@ -375,6 +375,10 @@ if (isset($_GET["getDropdownOptions"])) {
     <!-- Page specific script -->
     <script>
         $(document).ready(function() {
+            $(document).on('select2:open', () => {
+                document.querySelector('.select2-search__field').focus();
+            });
+
             var counter = 0;
 
             $("#addrow").on("click", function() {
@@ -404,12 +408,19 @@ if (isset($_GET["getDropdownOptions"])) {
                         newRow.append(cols);
                         $("table.order-list").append(newRow);
                         counter++;
+
+                        $('.select2').select2({
+                            theme: 'bootstrap4',
+                            width: '100%',
+                            containerCssClass: 'height-40px',
+                        });
                     },
                     error: function(error) {
                         console.log("Error fetching dropdown options: " + error);
                     }
                 });
             }
+
         });
 
 
