@@ -59,8 +59,8 @@ if (isset($_GET["getDropdownOptions"])) {
         }
 
         // Insert the new record into masterbahan table
-        $queryMasterBahan = "INSERT INTO masterbahan (kelompok, nama) VALUES ('Barang Jadi', ?)";
-        $stmtMasterBahan = $conn->prepare($queryMasterBahan);
+        $queryMasterDevice = "INSERT INTO masterbahan (kelompok, nama, quantity) VALUES ('Barang Jadi', ?, 0)";
+        $stmtMasterBahan = $conn->prepare($queryMasterDevice);
         $stmtMasterBahan->bind_param("s", $namaDevice);
         $stmtMasterBahan->execute();
         $stmtMasterBahan->close();
