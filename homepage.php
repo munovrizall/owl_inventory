@@ -7,7 +7,7 @@ $query = "SELECT historis.pengguna, historis.waktu, historis.quantity,
           historis.activity, historis.deskripsi, masterbahan.nama 
           FROM historis
           JOIN masterbahan ON historis.stok_id = masterbahan.stok_id
-          ORDER BY historis.waktu DESC
+          ORDER BY historis.id DESC
           LIMIT 20";
 $result = mysqli_query($conn, $query);
 if (!$result) {
