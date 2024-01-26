@@ -223,10 +223,18 @@ if (isset($_POST['quantity'])) {
                         </li>
                         <li class="nav-header">PELAPORAN</li>
                         <li class="nav-item">
-                            <a href="laporan_stok.php" class="nav-link">
+                            <a href="stok_bahan.php" class="nav-link">
                                 <i class="nav-icon ion ion-pie-graph"></i>
                                 <p>
-                                    Laporan Stok
+                                    Stok Bahan
+                                </p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="stok_produk.php" class="nav-link">
+                                <i class="nav-icon fas fa-microchip"></i>
+                                <p>
+                                    Stok Produk
                                 </p>
                             </a>
                         </li>
