@@ -188,12 +188,27 @@ $result = mysqli_query($conn, $query);
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="tambah_perusahaan.php" class="nav-link">
+                            <a href="perusahaan.php" class="nav-link">
                                 <i class="nav-icon fas fa-industry"></i>
                                 <p>
                                     Perusahaan
+                                    <i class="right fas fa-angle-left"></i>
                                 </p>
                             </a>
+                            <ul class="nav nav-treeview">
+                                <li class="nav-item">
+                                    <a href="perusahaan/tambah_perusahaan.php" class="nav-link">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>Tambah Perusahaan</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="perusahaan/list_perusahaan.php" class="nav-link">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>List Perusahaan</p>
+                                    </a>
+                                </li>
+                            </ul>
                         </li>
                         <li class="nav-header">PELAPORAN</li>
                         <li class="nav-item">
