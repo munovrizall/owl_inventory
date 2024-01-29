@@ -28,7 +28,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $updateStmt->bind_param("sssi", $namaClient, $namaKorespondensi, $alamatPerusahaan, $client_id);
     $updateStmt->execute();
     $updateStmt->close();
-    
+
     header("Location: ../list_perusahaan.php");
     exit();
 }
@@ -299,7 +299,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                                 </div>
                                 <div class="form-group">
                                     <label for="alamatPerusahaan">Alamat Perusahaan <span style="color: red;">*</span></label>
-                                    <textarea class="form-control" id="alamatPerusahaan" name="alamatPerusahaan" rows="3" ><?php echo $row['alamat_perusahaan']; ?></textarea>
+                                    <textarea class="form-control" id="alamatPerusahaan" name="alamatPerusahaan" rows="3"><?php echo $row['alamat_perusahaan']; ?></textarea>
                                 </div>
                             </div>
 
@@ -349,7 +349,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                     confirmButtonText: 'OK (enter)'
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        resetForm();
+                        window.location.href = "../list_perusahaan.php";
                     }
                 });
             }
@@ -392,7 +392,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                         confirmButtonText: 'OK'
                     }).then((result) => {
                         if (result.isConfirmed) {
-                            resetForm();
+                            window.location.href = "../list_perusahaan.php";
                         }
                     });
                 },
