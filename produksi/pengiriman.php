@@ -165,6 +165,12 @@ if (isset($_POST['quantity'])) {
                                     </a>
                                 </li>
                                 <li class="nav-item">
+                                    <a href="inventaris_device.php" class="nav-link">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>Inventaris Device</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
                                     <a href="pengiriman.php" class="nav-link active">
                                         <i class="far fa-circle nav-icon"></i>
                                         <p>Pengiriman Device</p>
