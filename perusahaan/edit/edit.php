@@ -2,53 +2,35 @@
 
 include "../../connection.php";
 
-$queryClient = "SELECT * FROM client";
-$resultClient = mysqli_query($conn, $queryClient);
+if (isset($_GET['id'])) {
+    $client_id = $_GET['id'];
 
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // Check which fields are provided
-    $namaPerusahaan = isset($_POST["namaPerusahaan"]) ? $_POST["namaPerusahaan"] : null;
-    $namaKorespondensi = isset($_POST["namaKorespondensi"]) ? $_POST["namaKorespondensi"] : null;
-    $alamatPerusahaan = isset($_POST["alamatPerusahaan"]) ? $_POST["alamatPerusahaan"] : null;
-
-    if ($namaPerusahaan !== null) {
-        $checkQuery = "SELECT COUNT(*) FROM client WHERE nama_client = ?";
-        $checkStmt = $conn->prepare($checkQuery);
-        $checkStmt->bind_param("s", $namaPerusahaan);
-        $checkStmt->execute();
-        $checkStmt->bind_result($count);
-        $checkStmt->fetch();
-        $checkStmt->close();
-
-        // If the material name already exists, display an error
-        if ($count > 0) {
-            echo "Error: Material name '$nama' already exists in the database.";
-            exit; // Stop further execution
-        }
-    } else {
-    }
-    // Insert the new record for material
-    $insertQuery = "INSERT INTO client (nama_client, nama_korespondensi, alamat_perusahaan) VALUES (?, ?, ?)";
-    $insertStmt = $conn->prepare($insertQuery);
-    $insertStmt->bind_param("sss", $namaPerusahaan, $namaKorespondensi, $alamatPerusahaan);
-
-    if ($insertStmt->execute()) {
-        echo "Data berhasil ditambahkan ke tabel masterbahan.";
-    } else {
-        echo "Error: " . $insertStmt->error;
-    }
-
-    $insertStmt->close();
-} else if (isset($_GET['id'])) {
-    $clientId = $_GET['id'];
-
-    // Selecting data from detail_maintenance table based on clientId
+    // Selecting data from client table based on client_id
     $query = "SELECT * FROM client WHERE client_id = ?";
     $stmt = $conn->prepare($query);
-    $stmt->bind_param("i", $clientId);
+    $stmt->bind_param("i", $client_id);
     $stmt->execute();
 
     $result = $stmt->get_result();
+} else {
+    echo "ID not provided.";
+}
+
+
+if ($_SERVER["REQUEST_METHOD"] === "POST") {
+    $client_id = isset($_POST["client_id"]) ? $_POST["client_id"] : null;
+    $namaClient = isset($_POST["namaPerusahaan"]) ? $_POST["namaPerusahaan"] : null;
+    $namaKorespondensi = isset($_POST["namaKorespondensi"]) ? $_POST["namaKorespondensi"] : null;
+    $alamatPerusahaan = isset($_POST["alamatPerusahaan"]) ? $_POST["alamatPerusahaan"] : null;
+
+    $updateQuery = "UPDATE client SET nama_client = ?, nama_korespondensi = ?, alamat_perusahaan = ? WHERE client_id=?";
+    $updateStmt = $conn->prepare($updateQuery);
+    $updateStmt->bind_param("sssi", $namaClient, $namaKorespondensi, $alamatPerusahaan, $client_id);
+    $updateStmt->execute();
+    $updateStmt->close();
+    
+    header("Location: ../list_perusahaan.php");
+    exit();
 }
 
 ?>
@@ -293,14 +275,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     <!-- general form elements -->
                     <div class="card card-primary">
                         <div class="card-header">
-                            <h3 class="card-title">Edit Perusahaan *KAI</h3>
+                            <h3 class="card-title">Edit Perusahaan </h3>
                         </div>
                         <!-- /.card-header -->
                         <?php
                         $row = mysqli_fetch_assoc($result);
                         ?>
                         <!-- form start -->
-                        <form id="perusahaanForm">
+                        <form id="perusahaanForm" method="post"> <!-- Added method="post" -->
+                            <input type="hidden" name="client_id" value="<?php echo $client_id; ?>"> <!-- Hidden input to pass client_id -->
                             <div class="card-body">
                                 <div class="form-group">
                                     <div>
@@ -360,7 +343,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 validateSuccess();
                 Swal.fire({
                     icon: 'success',
-                    title: 'Perusahaan Berhasil Ditambahkan!',
+                    title: 'Keterangan perusahaan berhasil diupdate!',
                     showCancelButton: false,
                     confirmButtonColor: '#3085d6',
                     confirmButtonText: 'OK (enter)'
@@ -397,14 +380,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
             $.ajax({
                 type: "POST",
-                url: "tambah_perusahaan.php",
+                url: "edit.php",
                 data: formData,
-                dataType: "json",
                 success: function(response) {
                     // Handle success response
                     Swal.fire({
                         icon: 'success',
-                        title: 'Perusahaan Berhasil Ditambahkan!',
+                        title: 'Keterangan perusahaan berhasil diupdate!',
                         showCancelButton: false,
                         confirmButtonColor: '#3085d6',
                         confirmButtonText: 'OK'
@@ -415,7 +397,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     });
                 },
                 error: function(xhr, status, error) {
-                    // Handle error response
                     Swal.fire({
                         icon: 'error',
                         title: 'Perusahaan telah terdaftar!',
