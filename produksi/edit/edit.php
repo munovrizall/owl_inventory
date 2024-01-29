@@ -3,34 +3,16 @@
 include "../../connection.php";
 
 if (isset($_GET['id'])) {
-    $client_id = $_GET['id'];
+    $getId = $_GET['id'];
 
-    // Selecting data from client table based on client_id
-    $query = "SELECT * FROM client WHERE client_id = ?";
+    $query = "SELECT * FROM inventaris_produk WHERE id = ?";
     $stmt = $conn->prepare($query);
-    $stmt->bind_param("i", $client_id);
+    $stmt->bind_param("i", $getId);
     $stmt->execute();
 
     $result = $stmt->get_result();
 } else {
     echo "ID not provided.";
-}
-
-
-if ($_SERVER["REQUEST_METHOD"] === "POST") {
-    $client_id = isset($_POST["client_id"]) ? $_POST["client_id"] : null;
-    $namaClient = isset($_POST["namaPerusahaan"]) ? $_POST["namaPerusahaan"] : null;
-    $namaKorespondensi = isset($_POST["namaKorespondensi"]) ? $_POST["namaKorespondensi"] : null;
-    $alamatPerusahaan = isset($_POST["alamatPerusahaan"]) ? $_POST["alamatPerusahaan"] : null;
-
-    $updateQuery = "UPDATE client SET nama_client = ?, nama_korespondensi = ?, alamat_perusahaan = ? WHERE client_id=?";
-    $updateStmt = $conn->prepare($updateQuery);
-    $updateStmt->bind_param("sssi", $namaClient, $namaKorespondensi, $alamatPerusahaan, $client_id);
-    $updateStmt->execute();
-    $updateStmt->close();
-
-    header("Location: ../list_perusahaan.php");
-    exit();
 }
 
 ?>
@@ -40,7 +22,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Edit Perusahaan</title>
+    <title>Detail Produk</title>
 
     <link rel="icon" href="../../assets/adminlte/dist/img/OWLlogo.png" type="image/x-icon">
     <!-- Google Font: Source Sans Pro -->
@@ -108,7 +90,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                         </li>
                         <li class="nav-header">TRANSAKSI</li>
                         <li class="nav-item">
-                            <a href="../../produksi.php" class="nav-link">
+                            <a href="../../produksi.php" class="nav-link active">
                                 <i class="nav-icon fas fa-toolbox"></i>
                                 <p>
                                     Produksi
@@ -120,6 +102,12 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                                     <a href="../../produksi/produksi.php" class="nav-link">
                                         <i class="far fa-circle nav-icon"></i>
                                         <p>Produksi Device</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="../inventaris_device.php" class="nav-link active">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>Inventaris Device</p>
                                     </a>
                                 </li>
                                 <li class="nav-item">
@@ -193,7 +181,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="perusahaan.php" class="nav-link active">
+                            <a href="perusahaan.php" class="nav-link">
                                 <i class="nav-icon fas fa-industry"></i>
                                 <p>
                                     Perusahaan
@@ -208,7 +196,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                                     </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a href="../list_perusahaan.php" class="nav-link active">
+                                    <a href="../list_perusahaan.php" class="nav-link">
                                         <i class="far fa-circle nav-icon"></i>
                                         <p>List Perusahaan</p>
                                     </a>
@@ -254,7 +242,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 <div class="container-fluid">
                     <div class="row mb-2">
                         <div class="col-sm-6">
-                            <h1>Edit Perusahaan</h1>
+                            <h1>Detail Produk</h1>
                         </div>
                         <div class="col-sm-6">
                             <ol class="breadcrumb float-sm-right">
@@ -288,7 +276,18 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                                 <div class="form-group">
                                     <div>
                                         <label for="namaPerusahaan">Nama Perusahaan <span style="color: red;">*</span></label>
-                                        <input type="text" class="form-control form-control-border border-width-2" id="namaPerusahaan" name="namaPerusahaan" placeholder="Masukkan nama perusahaan" value="<?php echo $row['nama_client']; ?>">
+                                        <?php
+                                        if (isset($_GET['id'])) {
+                                            $getId = $_GET['id'];
+                                            // Assuming $result contains data from the query
+                                            $row = mysqli_fetch_assoc($result);
+                                            $chip_id = $row["chip_id"];
+                                            echo "Monitoring Transaksi a{$chip_id}";
+                                        } else {
+                                            echo "<h3 class='card-title'>Monitoring Transaksi PT. Origin Wiracipta Lestari</h3>";
+                                            echo "ID not provided.";
+                                        }
+                                        ?>
                                     </div>
                                 </div>
                                 <div class="form-group">
@@ -305,9 +304,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
                             <!-- /.card-body -->
                         </form>
-                        <div class="card-footer d-flex justify-content-end">
-                            <button type="submit" id="submitButton" class="btn btn-primary" onclick="submitForm()">Submit</button>
-                        </div>
                     </div>
                     <!-- general form elements -->
                     <!-- /.card -->
@@ -337,89 +333,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     <!-- SweetAlert2 Toast -->
     <script src="../../assets/adminlte/plugins/sweetalert2/sweetalert2.min.js"></script>
     <!-- Page specific script -->
-    <script>
-        function submitForm() {
-            if (validateForm()) {
-                validateSuccess();
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Keterangan perusahaan berhasil diupdate!',
-                    showCancelButton: false,
-                    confirmButtonColor: '#3085d6',
-                    confirmButtonText: 'OK (enter)'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        window.location.href = "../list_perusahaan.php";
-                    }
-                });
-            }
-        }
-
-        function validateForm() {
-            var namaPerusahaan = document.getElementById("namaPerusahaan").value;
-            var namaKorespondensi = document.getElementById("namaKorespondensi").value;
-            var alamatPerusahaan = document.getElementById("alamatPerusahaan").value;
-
-            if (namaPerusahaan === "" || namaKorespondensi === "" || alamatPerusahaan === "") {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Oops...',
-                    text: 'Harap lengkapi semua formulir!',
-                    showCancelButton: false,
-                    confirmButtonColor: '#3085d6',
-                    confirmButtonText: 'OK (enter)'
-                })
-                return false;
-            }
-
-            return true;
-        }
-
-        function validateSuccess() {
-            var formData = $("#perusahaanForm").serialize();
-
-            $.ajax({
-                type: "POST",
-                url: "edit.php",
-                data: formData,
-                success: function(response) {
-                    // Handle success response
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Keterangan perusahaan berhasil diupdate!',
-                        showCancelButton: false,
-                        confirmButtonColor: '#3085d6',
-                        confirmButtonText: 'OK'
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            window.location.href = "../list_perusahaan.php";
-                        }
-                    });
-                },
-                error: function(xhr, status, error) {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Perusahaan telah terdaftar!',
-                        showCancelButton: false,
-                        confirmButtonColor: '#3085d6',
-                        confirmButtonText: 'OK'
-                    });
-                }
-            });
-        }
-
-        function resetForm() {
-            document.getElementById("perusahaanForm").reset();
-        }
-
-        var deksripsiInput = document.getElementById('alamatPerusahaan');
-        deksripsiInput.addEventListener('keydown', function(event) {
-            if (event.keyCode === 13) {
-                event.preventDefault();
-                submitForm();
-            }
-        });
-    </script>
 </body>
 
 </html>
