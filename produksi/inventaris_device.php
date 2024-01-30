@@ -32,23 +32,27 @@ $result = mysqli_query($conn, $query);
 
     <style>
         .lebar-kolom1 {
-            width: 15%;
+            width: 5%;
         }
 
         .lebar-kolom2 {
-            width: 15%;
+            width: 35%;
         }
 
         .lebar-kolom3 {
-            width: 38%;
+            width: 20%;
         }
 
         .lebar-kolom4 {
-            width: 10%;
+            width: 20%;
         }
 
         .lebar-kolom5 {
-            width: 22%;
+            width: 10%;
+        }
+
+        .lebar-kolom6 {
+            width: 10%;
         }
 
         .card-padding {
@@ -266,7 +270,7 @@ $result = mysqli_query($conn, $query);
 
                         <div class="card">
                             <div class="card-header">
-                                <h3 class="card-title"><b>List Transaksi</b></h3>
+                                <h3 class="card-title"><b>List Device</b></h3>
                             </div>
                             <!-- /.card-header -->
                             <div class="card-body p-0">
@@ -274,12 +278,12 @@ $result = mysqli_query($conn, $query);
                                     <table id="tableInventaris" class="table table order-list table-striped table-bordered">
                                         <thead>
                                             <tr>
-                                                <th class="text-center lebar-kolom1">ID Inventory</th>
+                                                <th class="text-center lebar-kolom1">ID</th>
                                                 <th class="text-center lebar-kolom2">Produk</th>
                                                 <th class="text-center lebar-kolom3">Nomor SN</th>
                                                 <th class="text-center lebar-kolom4">Perusahaan</th>
-                                                <th class="text-center lebar-kolom5 aksi-column">Garansi</th>
-                                                <th class="text-center lebar-kolom5 aksi-column">Aksi</th>
+                                                <th class="text-center lebar-kolom5">Garansi</th>
+                                                <th class="text-center lebar-kolom6 aksi-column">Aksi</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -312,10 +316,7 @@ $result = mysqli_query($conn, $query);
                                                     <td class="text-center">
                                                         <div class="row">
                                                             <div class="col">
-                                                                <a href='edit/edit.php?id=<?php echo $row["id"]; ?>' class="btn btn-info btn-block">Detail</a>
-                                                            </div>
-                                                            <div class="col">
-                                                                <a href='generate_pdf/pdf.php?id=<?php echo $row["id"]; ?>' class="btn btn-block btn-outline-danger"><i class="fas fa-file-pdf" style="margin-right: 8px;"></i>PDF</a>
+                                                                <a href='detail/detail.php?id=<?php echo $row["id"]; ?>' class="btn btn-info btn-block">Detail</a>
                                                             </div>
                                                         </div>
                                                     </td>
@@ -358,9 +359,6 @@ $result = mysqli_query($conn, $query);
     <script src="../assets/adminlte/plugins/bs-custom-file-input/bs-custom-file-input.min.js"></script>
     <!-- AdminLTE App -->
     <script src="../assets/adminlte/dist/js/adminlte.min.js"></script>
-    <!-- bootstrap searchable dropdown -->
-    <script src="../assets/bootstrap-5/bootstrap.bundle.min.js"></script>
-    <script src="../assets/dselect.js"></script>
     <!-- Datatables -->
     <script src="https://cdn.datatables.net/v/bs4/dt-1.13.8/b-2.4.2/b-colvis-2.4.2/b-print-2.4.2/fh-3.4.0/r-2.5.0/rg-1.4.1/sb-1.6.0/sp-2.2.0/datatables.min.js"></script>
     <script src="https:////code.jquery.com/jquery-3.7.0.js"></script>

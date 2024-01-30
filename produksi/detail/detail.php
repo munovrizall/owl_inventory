@@ -49,6 +49,39 @@ if (isset($_GET['id'])) {
             color: #808080;
             font-style: italic;
         }
+
+        .table-container {
+            display: flex;
+            flex-direction: row;
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        .thead-column {
+            flex: 0 0 20%;
+            font-weight: bold;
+        }
+
+        .tr-column {
+            flex: 1;
+        }
+
+        .table-head {
+            width: 180px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            padding: 8px;
+            text-align: left;
+            border: none;
+            /* menghilangkan garis pada sel tabel */
+        }
     </style>
 
 </head>
@@ -248,8 +281,9 @@ if (isset($_GET['id'])) {
                             <ol class="breadcrumb float-sm-right">
                                 <li class="breadcrumb-item"><a href="../../homepage.php">Home</a></li>
                                 <li class="breadcrumb-item active">Produksi</li>
-                                <li class="breadcrumb-item active"><a href="../inventaris_device.php">Inventaris Device</a></li>
-                                <li class="breadcrumb-item active">Edit</li>
+                                <li class="breadcrumb-item active"><a href="../inventaris_device.php">Inventaris
+                                        Device</a></li>
+                                <li class="breadcrumb-item active">Detail</li>
                             </ol>
                         </div>
                     </div>
@@ -263,90 +297,102 @@ if (isset($_GET['id'])) {
                     <!-- general form elements -->
                     <div class="card card-primary">
                         <div class="card-header">
-                            <h3 class="card-title">Edit Perusahaan </h3>
+                            <?php 
+                            if (isset($_GET['id'])) {
+                                $getId = $_GET['id'];
+                                $row = mysqli_fetch_assoc($result);
+                            } else {
+                                echo ('ID not provided');
+                            }
+                            ?>
+                            <h3 class="card-title">Detail Produk <?php echo " #{$row["id"]}" ?></h3>
                         </div>
                         <!-- /.card-header -->
                         <!-- form start -->
-                        <form id="perusahaanForm" method="post"> <!-- Added method="post" -->
-                            <input type="hidden" name="client_id" value="<?php echo $client_id; ?>"> <!-- Hidden input to pass client_id -->
+                        <form id="produkForm" method="post">
+                            <!-- Added method="post" -->
+                            <input type="hidden" name="client_id" value="<?php echo $client_id; ?>">
+                            <!-- Hidden input to pass client_id -->
                             <div class="card-body">
                                 <div class="form-group">
-                                    <div>
-                                        <label for="namaPerusahaan">Nomor SN <span style="color: red;">*</span></label>
-                                        <div>
-                                            <?php
-                                            if (isset($_GET['id'])) {
-                                                $getId = $_GET['id'];
-                                                $row = mysqli_fetch_assoc($result);
-                                                $no_sn = $row["no_sn"];
-                                                echo "{$no_sn}";
-                                            } else {
-                                                echo "<h3 class='card-title'>Monitoring Transaksi PT. Origin Wiracipta Lestari</h3>";
-                                                echo "ID not provided.";
-                                            }
-                                            ?>
+                                    <div class="table-container">
+                                        <div class="tr-column">
+                                            <table>
+                                                <tbody>
+                                                    <tr>
+                                                        <td class="table-head"><b>Nomor SN :</b></td>
+                                                        <td><?php
+                                                            $no_sn = $row["no_sn"];
+                                                            echo "{$no_sn}";
+
+                                                            ?></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td><b>Nama Produk :</b></td>
+                                                        <td>
+                                                            <?php
+                                                            $produk = $row["produk"];
+                                                            echo "{$produk}";
+                                                            ?>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td><b>Nama Perusahaan :</b></td>
+                                                        <td>
+                                                            <?php
+                                                            $nama_client = $row["nama_client"];
+                                                            echo "{$nama_client}";
+                                                            ?>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td><b>Garansi Awal :</b></td>
+                                                        <td>
+                                                            <?php
+                                                            $garansi_awal = $row["garansi_awal"];
+                                                            $formatted_date = date("d/m/Y", strtotime($garansi_awal));
+                                                            echo $formatted_date;
+                                                            ?>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td><b>Garansi Akhir :</b></td>
+                                                        <td>
+                                                            <?php
+                                                            $garansi_akhir = $row["garansi_akhir"];
+                                                            $formatted_date = date("d/m/Y", strtotime($garansi_akhir));
+                                                            echo $formatted_date;
+                                                            ?>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td><b>Status Garansi :</b></td>
+                                                        <td>
+                                                            <?php
+                                                            $statusClass = 'badge bg-danger'; // Default class
+                                                            $statusText = 'Tidak'; // Default text
+
+                                                            if (strtotime($row["garansi_akhir"]) >= strtotime('today')) {
+                                                                $statusClass = 'badge bg-success';
+                                                                $statusText = 'Ya';
+                                                            }
+                                                            ?>
+
+                                                            <div class="<?php echo $statusClass; ?>"><?php echo $statusText; ?></div>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="form-group">
-                                    <div>
-                                        <label for="namaKorespondensi">Nama Produk <span style="color: red;">*</span></label>
-                                        <div>
-                                            <?php
-                                            $produk = $row["produk"];
-                                            echo "{$produk}";
-                                            ?>
-                                        </div>
-                                    </div>
-                                <div class="form-group">
-                                    <label for="alamatPerusahaan">Nama Client <span style="color: red;">*</span></label>
-                                    <div>
-                                        <?php
-                                        $nama_client = $row["nama_client"];
-                                        echo "{$nama_client}";
-                                        ?>
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <label for="alamatPerusahaan">Garansi Awal <span style="color: red;">*</span></label>
-                                    <div>
-                                        <?php
-                                        $garansi_awal = $row["garansi_awal"];
-                                        echo "{$garansi_awal}";
-                                        ?>
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <label for="alamatPerusahaan">Garansi Akhir <span style="color: red;">*</span></label>
-                                    <div>
-                                        <?php
-                                        $garansi_akhir = $row["garansi_akhir"];
-                                        echo "{$garansi_akhir}";
-                                        ?>
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <label for="alamatPerusahaan">Status Garansi <span style="color: red;">*</span></label>
-                                    <div>
-                                        <?php
-                                        // Assuming $row is fetched before this block of code
-                                        $statusClass = 'bg-danger'; // Default class
-                                        $statusText = 'Tidak'; // Default text
 
-                                        // Check conditions for bg-success
-                                        if (strtotime($row["garansi_akhir"]) >= strtotime('today')) {
-                                            $statusClass = 'bg-success';
-                                            $statusText = 'Ya';
-                                        }
-                                        ?>
 
-                                        <div class="<?php echo $statusClass; ?>"><?php echo $statusText; ?></div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- /.card-body -->
+                                <!-- /.card-body -->
                         </form>
+                    </div>
+                    <div class="card-footer d-flex justify-content-end">
+                        <button id="backButton" class="btn btn-info" onclick="goBack()"><i class="fas fa-arrow-left" style="padding-right: 8px"></i>Kembali</button>
                     </div>
                     <!-- general form elements -->
                     <!-- /.card -->
@@ -376,6 +422,11 @@ if (isset($_GET['id'])) {
     <!-- SweetAlert2 Toast -->
     <script src="../../assets/adminlte/plugins/sweetalert2/sweetalert2.min.js"></script>
     <!-- Page specific script -->
+    <script>
+        function goBack() {
+            window.history.back();
+        }
+    </script>
 </body>
 
 </html>
