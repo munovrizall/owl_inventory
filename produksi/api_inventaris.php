@@ -2,24 +2,51 @@
 
 //header("Content-Type:application/json");
 
-//$method = ;
-
 $resultPrep = array();
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    echo 'masuk post';
     if (isset($_POST['chip_id']) AND isset($_POST['produk'])) {
         
         echo 'Semua parameter ada';
 
-        $chip_id = $_POST['chip_id'];
+        $type_produk = isset($_POST['type_produk']) ? $_POST['type_produk'] : '';
         $produk = $_POST['produk'];
-
-        $resultPrep['status'] = [
-            "code" => 200,
-            "description" => 'Request valid'
-        ];
+        $chip_id = $_POST['chip_id'];
+        $ip_address = isset($_POST['ip_address']) ? $_POST['ip_address'] : '';
+        $mac_wifi = isset($_POST['mac_wifi']) ? $_POST['mac_wifi'] : '';
+        $mac_bluetooth = isset($_POST['mac_bluetooth']) ? $_POST['mac_bluetooth'] : '';
+        $firmware_version = isset($_POST['firmware_version']) ? $_POST['firmware_version'] : '';
+        $hardware_version = isset($_POST['hardware_version']) ? $_POST['hardware_version'] : '';
+        $free_ram = isset($_POST['free_ram']) ? $_POST['free_ram'] : '';
+        $min_ram = isset($_POST['min_ram']) ? $_POST['min_ram'] : '';
+        $batt_low = isset($_POST['batt_low']) ? $_POST['batt_low'] : '';
+        $batt_high = isset($_POST['batt_high']) ? $_POST['batt_high'] : '';
+        $temperature = isset($_POST['temperature']) ? $_POST['temperature'] : '';
+        $status_error = isset($_POST['status_error']) ? $_POST['status_error'] : '';
+        $gps_latitude = isset($_POST['gps_latitude']) ? $_POST['gps_latitude'] : '';
+        $gps_longitude = isset($_POST['gps_longitude']) ? $_POST['gps_longitude'] : '';
+        $status_qc_sensor_1 = isset($_POST['status_qc_sensor_1']) ? $_POST['status_qc_sensor_1'] : '';
+        $status_qc_sensor_2 = isset($_POST['status_qc_sensor_2']) ? $_POST['status_qc_sensor_2'] : '';
+        $status_qc_sensor_3 = isset($_POST['status_qc_sensor_3']) ? $_POST['status_qc_sensor_3'] : '';
+        $status_qc_sensor_4 = isset($_POST['status_qc_sensor_4']) ? $_POST['status_qc_sensor_4'] : '';
+        $status_qc_sensor_5 = isset($_POST['status_qc_sensor_5']) ? $_POST['status_qc_sensor_5'] : '';
+        $status_qc_sensor_6 = isset($_POST['status_qc_sensor_6']) ? $_POST['status_qc_sensor_6'] : '';
         
-        include "../connection.php";
+
+        // Establish database connection
+        $serverName = "localhost";
+        $userNameDb = "root";
+        $password = "";
+        $dbName = "databaseinventory";
+                
+        $conn = new mysqli($serverName, $userNameDb, $password, $dbName);    
+
+        // Check for database connection errors
+        if ($conn->connect_error) {
+            die("Connection failed: " . $conn->connect_error);
+        }
+
         // Prepare SQL statement to check if the combination exists
         $sql = "SELECT no_sn FROM inventaris_produk WHERE chip_id = ? AND produk = ?";
         $stmt = $conn->prepare($sql);
@@ -57,9 +84,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
             
             // Insert new record with the generated no_sn
-            $sql_insert = "INSERT INTO inventaris_produk (chip_id, produk, no_sn) VALUES (?, ?, ?)";
+            $sql_insert = "INSERT INTO inventaris_produk (type_produk, produk, chip_id, no_sn, ip_address, mac_wifi, mac_bluetooth, firmware_version, 
+            hardware_version, free_ram, min_ram, batt_low, batt_high, temperature, status_error, gps_latitude, gps_longitude, 
+            status_qc_sensor_1, status_qc_sensor_2, status_qc_sensor_3, status_qc_sensor_4, status_qc_sensor_5, status_qc_sensor_6)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
             $stmt_insert = $conn->prepare($sql_insert);
-            $stmt_insert->bind_param("isi", $chip_id, $produk, $no_sn);
+            $stmt_insert->bind_param("ssiisssssiiiididdssssss", $type_produk, $produk, $chip_id, $no_sn, $ip_address, $mac_wifi, $mac_bluetooth, 
+                $firmware_version, $hardware_version, $free_ram, $min_ram, $batt_low, $batt_high, 
+                $temperature, $status_error, $gps_latitude, $gps_longitude, $status_qc_sensor_1, 
+                $status_qc_sensor_2, $status_qc_sensor_3, $status_qc_sensor_4, $status_qc_sensor_5, $status_qc_sensor_6);
             
             // Execute the insertion statement
             if ($stmt_insert->execute()) {
@@ -68,14 +101,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 // Handle insertion failure
                 $response = array("error" => "Failed to insert data");
             }
+        
         }
         $resultPrep['results'] = [
             "no_sn" => $no_sn,
             "chip_id" => $chip_id,
             "produk"=> $produk,
         ];
-        
-    } else {
+    } 
+    else {
         $resultPrep['status'] = [
             "code" => 400,
             "description" => 'Parameter invalid'
