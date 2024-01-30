@@ -128,19 +128,25 @@ if (isset($_GET['id'])) {
                             </a>
                             <ul class="nav nav-treeview">
                                 <li class="nav-item">
-                                    <a href="../../produksi/produksi.php" class="nav-link">
+                                    <a href="../produksi.php" class="nav-link">
                                         <i class="far fa-circle nav-icon"></i>
                                         <p>Produksi Device</p>
                                     </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a href="../inventaris_device.php" class="nav-link active">
+                                    <a href="../quality_control.php" class="nav-link active">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>Quality Control</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="../inventaris_device.php" class="nav-link">
                                         <i class="far fa-circle nav-icon"></i>
                                         <p>Inventaris Device</p>
                                     </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a href="../../produksi/pengiriman.php" class="nav-link">
+                                    <a href="../pengiriman.php" class="nav-link">
                                         <i class="far fa-circle nav-icon"></i>
                                         <p>Pengiriman Device</p>
                                     </a>
@@ -277,7 +283,7 @@ if (isset($_GET['id'])) {
                             <ol class="breadcrumb float-sm-right">
                                 <li class="breadcrumb-item"><a href="../../homepage.php">Home</a></li>
                                 <li class="breadcrumb-item active">Produksi</li>
-                                <li class="breadcrumb-item active"><a href="../inventaris_device.php">Inventaris Device</a></li>
+                                <li class="breadcrumb-item active"><a href="../quality_control.php">Quality Control</a></li>
                                 <li class="breadcrumb-item active">Edit</li>
                             </ol>
                         </div>

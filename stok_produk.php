@@ -114,6 +114,12 @@ $result = mysqli_query($conn, $query);
                                     </a>
                                 </li>
                                 <li class="nav-item">
+                                    <a href="produksi/quality_control.php" class="nav-link">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>Quality Control</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
                                     <a href="produksi/inventaris_device.php" class="nav-link">
                                         <i class="far fa-circle nav-icon"></i>
                                         <p>Inventaris Device</p>
