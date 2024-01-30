@@ -67,7 +67,7 @@ if (isset($_GET['id'])) {
         }
 
         .table-head {
-            width: 180px;
+            width: 240px;
         }
 
         table {
@@ -303,7 +303,7 @@ if (isset($_GET['id'])) {
                     <!-- general form elements -->
                     <div class="card card-primary">
                         <div class="card-header">
-                            <?php 
+                            <?php
                             if (isset($_GET['id'])) {
                                 $getId = $_GET['id'];
                                 $row = mysqli_fetch_assoc($result);
@@ -330,8 +330,11 @@ if (isset($_GET['id'])) {
                                                         <td><?php
                                                             $no_sn = $row["no_sn"];
                                                             echo "{$no_sn}";
-
                                                             ?></td>
+                                                        <td class="table-head"><b>Battery Low :</b></td>
+                                                        <td>
+                                                            20
+                                                        </td>
                                                     </tr>
                                                     <tr>
                                                         <td><b>Nama Produk :</b></td>
@@ -341,6 +344,10 @@ if (isset($_GET['id'])) {
                                                             echo "{$produk}";
                                                             ?>
                                                         </td>
+                                                        <td><b>Battery High :</b></td>
+                                                        <td>
+                                                            100
+                                                        </td>
                                                     </tr>
                                                     <tr>
                                                         <td><b>Nama Perusahaan :</b></td>
@@ -349,6 +356,10 @@ if (isset($_GET['id'])) {
                                                             $nama_client = $row["nama_client"];
                                                             echo "{$nama_client}";
                                                             ?>
+                                                        </td>
+                                                        <td><b>Temperature :</b></td>
+                                                        <td>
+                                                            60,5°C
                                                         </td>
                                                     </tr>
                                                     <tr>
@@ -360,6 +371,10 @@ if (isset($_GET['id'])) {
                                                             echo $formatted_date;
                                                             ?>
                                                         </td>
+                                                        <td><b>Status Error :</b></td>
+                                                        <td>
+                                                            1
+                                                        </td>
                                                     </tr>
                                                     <tr>
                                                         <td><b>Garansi Akhir :</b></td>
@@ -369,6 +384,10 @@ if (isset($_GET['id'])) {
                                                             $formatted_date = date("d/m/Y", strtotime($garansi_akhir));
                                                             echo $formatted_date;
                                                             ?>
+                                                        </td>
+                                                        <td><b>GPS Latitude :</b></td>
+                                                        <td>
+                                                            6°16'36.7"S
                                                         </td>
                                                     </tr>
                                                     <tr>
@@ -385,6 +404,76 @@ if (isset($_GET['id'])) {
                                                             ?>
 
                                                             <div class="<?php echo $statusClass; ?>"><?php echo $statusText; ?></div>
+                                                        </td>
+                                                        <td><b>GPS Longitude :</b></td>
+                                                        <td>
+                                                            106°47'49.2"E
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td><b>IP Address :</b></td>
+                                                        <td>
+                                                            192.168.1.8
+                                                        </td>
+                                                        <td><b>Status QC Sensor 1 :</b></td>
+                                                        <td>
+                                                            <span class="badge bg-success">OK</span>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td><b>MAC Address WIFI :</b></td>
+                                                        <td>
+                                                            192.168.1.8
+                                                        </td>
+                                                        <td><b>Status QC Sensor 2 :</b></td>
+                                                        <td>
+                                                            <span class="badge bg-success">OK</span>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td><b>MAC Address Bluetooth:</b></td>
+                                                        <td>
+                                                            192.168.1.8
+                                                        </td>
+                                                        <td><b>Status QC Sensor 3 :</b></td>
+                                                        <td>
+                                                            <span class="badge bg-success">OK</span>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td><b>Versi Firmware :</b></td>
+                                                        <td>
+                                                            1.1.0
+                                                        </td>
+                                                        <td><b>Status QC Sensor 4 :</b></td>
+                                                        <td>
+                                                            <span class="badge bg-danger">FAIL</span>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td><b>Versi Hardware :</b></td>
+                                                        <td>
+                                                            1.0.0
+                                                        </td>
+                                                        <td><b>Status QC Sensor 5 :</b></td>
+                                                        <td>
+                                                            <span class="badge bg-success">OK</span>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td><b>Free RAM :</b></td>
+                                                        <td>
+                                                            200 MB
+                                                        </td>
+                                                        <td><b>Status QC Sensor 6 :</b></td>
+                                                        <td>
+                                                            <span class="badge bg-success">OK</span>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td><b>Min RAM :</b></td>
+                                                        <td>
+                                                            2000 MB
                                                         </td>
                                                     </tr>
                                                 </tbody>

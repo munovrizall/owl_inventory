@@ -2,6 +2,13 @@
 
 include "../../connection.php";
 
+$queryClient = "SELECT * FROM client ORDER BY nama_client";
+$resultClient = $conn->query($queryClient);
+
+if (!$resultClient) {
+    die("Error fetching kelompok data: " . $conn->error);
+}
+
 if (isset($_GET['id'])) {
     $getId = $_GET['id'];
 
@@ -294,106 +301,176 @@ if (isset($_GET['id'])) {
             <!-- Main content -->
             <section class="content">
                 <div class="container-fluid">
-
                     <!-- general form elements -->
                     <div class="card card-primary">
                         <div class="card-header">
-                            <h3 class="card-title">Detail Produk</h3>
+                            <h3 class="card-title">Quality Control #Namaproduk</h3>
                         </div>
-                        <!-- /.card-header -->
                         <!-- form start -->
-                        <form id="produkForm" method="post"> <!-- Added method="post" -->
-                            <input type="hidden" name="client_id" value="<?php echo $client_id; ?>"> <!-- Hidden input to pass client_id -->
+                        <form id="qcForm" method="post"> <!-- Added method="post" -->
+                            <input type="hidden" name="client_id"> <!-- Hidden input to pass client_id -->
                             <div class="card-body">
                                 <div class="form-group">
-                                    <div class="table-container">
-                                        <div class="tr-column">
-                                            <table>
-                                                <tbody>
-                                                    <tr>
-                                                        <td style="width: 120px"><b>Nomor SN</b></td>
-                                                        <td><?php
-                                                            if (isset($_GET['id'])) {
-                                                                $getId = $_GET['id'];
-                                                                $row = mysqli_fetch_assoc($result);
-                                                                $no_sn = $row["no_sn"];
-                                                                echo "{$no_sn}";
-                                                            } else {
-                                                                echo "<h3 class='card-title'>Monitoring Transaksi PT. Origin Wiracipta Lestari</h3>";
-                                                                echo "ID not provided.";
-                                                            }
-                                                            ?></td>
-                                                    </tr>
-                                                    <!-- Add more rows as needed -->
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div>
                                     <div>
-                                        <label for="namaproduk">Nomor SN <span style="color: red;">*</span></label>
-                                        <div>
-                                        </div>
+                                        <label for="tipeProduk">Tipe Produk</label>
+                                        <input type="text" class="form-control form-control-border border-width-2" id="tipeProduk" name="tipeProduk" placeholder="Masukkan tipe device">
                                     </div>
                                 </div>
                                 <div class="form-group">
                                     <div>
-                                        <label for="namaKorespondensi">Nama Produk <span style="color: red;">*</span></label>
-                                        <div>
-                                            <?php
-                                            $produk = $row["produk"];
-                                            echo "{$produk}";
-                                            ?>
-                                        </div>
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="alamatproduk">Nama Client <span style="color: red;">*</span></label>
-                                        <div>
-                                            <?php
-                                            $nama_client = $row["nama_client"];
-                                            echo "{$nama_client}";
-                                            ?>
-                                        </div>
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="alamatproduk">Garansi Awal <span style="color: red;">*</span></label>
-                                        <div>
-                                            <?php
-                                            $garansi_awal = $row["garansi_awal"];
-                                            echo "{$garansi_awal}";
-                                            ?>
-                                        </div>
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="alamatproduk">Garansi Akhir <span style="color: red;">*</span></label>
-                                        <div>
-                                            <?php
-                                            $garansi_akhir = $row["garansi_akhir"];
-                                            echo "{$garansi_akhir}";
-                                            ?>
-                                        </div>
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="alamatproduk">Status Garansi <span style="color: red;">*</span></label>
-                                        <div>
-                                            <?php
-                                            // Assuming $row is fetched before this block of code
-                                            $statusClass = 'bg-danger'; // Default class
-                                            $statusText = 'Tidak'; // Default text
-
-                                            // Check conditions for bg-success
-                                            if (strtotime($row["garansi_akhir"]) >= strtotime('today')) {
-                                                $statusClass = 'bg-success';
-                                                $statusText = 'Ya';
-                                            }
-                                            ?>
-
-                                            <div class="<?php echo $statusClass; ?>"><?php echo $statusText; ?></div>
-                                        </div>
+                                        <label for="chipID">Chip ID</label>
+                                        <input type="number" class="form-control form-control-border border-width-2" id="chipID" name="chipID" placeholder="Masukkan nomor Chip ID">
                                     </div>
                                 </div>
-
-                                <!-- /.card-body -->
+                                <div class="form-group">
+                                    <div>
+                                        <label for="nomorSN">Nomor SN Device</label>
+                                        <input type="number" class="form-control form-control-border border-width-2" id="nomorSN" name="nomorSN" placeholder="Masukkan nomor SN">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="pilihClient">Pilih PT</label>
+                                    <select class="form-control select2" id="pilihClient" name="client">
+                                        <option value="">--- Pilih PT ---</option>
+                                        <?php
+                                        while ($row = $resultClient->fetch_assoc()) {
+                                            echo '<option value="' . $row['nama_client'] . '">' . $row['nama_client'] . '</option>';
+                                        }
+                                        ?>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="garansiAwal">Tanggal Garansi Berawal</label>
+                                    <div class="input-group date" id="datepicker" data-target-input="nearest">
+                                        <input type="date" class="form-control" id="garansiAwal" name="garansiAwal" placeholder="Masukkan tanggal transaksi" />
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="garansiAkhir">Tanggal Garansi Berakhir</label>
+                                    <div class="input-group date" id="datepicker" data-target-input="nearest">
+                                        <input type="date" class="form-control" id="garansiAkhir" name="garansiAkhir" placeholder="Masukkan tanggal transaksi" />
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div>
+                                        <label for="ipAddress">IP Address</label>
+                                        <input type="text" class="form-control form-control-border border-width-2" id="ipAddress" name="ipAddress" placeholder="Masukkan IP Address">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div>
+                                        <label for="macWifi">MAC Address Wifi</label>
+                                        <input type="text" class="form-control form-control-border border-width-2" id="macWifi" name="macWifi" placeholder="Masukkan MAC address wifi device">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div>
+                                        <label for="macBluetooth">MAC Address Bluetooth</label>
+                                        <input type="text" class="form-control form-control-border border-width-2" id="macBluetooth" name="macBluetooth" placeholder="Masukkan MAC address bluetooth device">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div>
+                                        <label for="firmwareVersion">Versi Firmware</label>
+                                        <input type="text" class="form-control form-control-border border-width-2" id="firmwareVersion" name="firmwareVersion" placeholder="Masukkan versi firmware device">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div>
+                                        <label for="hardwareVersion">Versi Hardware</label>
+                                        <input type="text" class="form-control form-control-border border-width-2" id="hardwareVersion" name="hardwareVersion" placeholder="Masukkan versi hardware device">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div>
+                                        <label for="freeRam">Free RAM</label>
+                                        <input type="number" class="form-control form-control-border border-width-2" id="freeRam" name="freeRam" placeholder="Masukkan free RAM device">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div>
+                                        <label for="minRam">Min RAM</label>
+                                        <input type="number" class="form-control form-control-border border-width-2" id="minRam" name="minRam" placeholder="Masukkan min RAM device">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div>
+                                        <label for="battLow">Battery Low</label>
+                                        <input type="number" class="form-control form-control-border border-width-2" id="battLow" name="battLow" placeholder="Masukkan battery low device">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div>
+                                        <label for="battHigh">Battery High</label>
+                                        <input type="number" class="form-control form-control-border border-width-2" id="battHigh" name="battHigh" placeholder="Masukkan battery high device">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div>
+                                        <label for="temp">Temperature Device</label>
+                                        <input type="number" class="form-control form-control-border border-width-2" id="temp" name="temp" placeholder="Masukkan temperature device">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div>
+                                        <label for="statusError">Status Error</label>
+                                        <input type="number" class="form-control form-control-border border-width-2" id="statusError" name="statusError" placeholder="Masukkan status error device">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div>
+                                        <label for="gpsLatitude">GPS Latitude</label>
+                                        <input type="text" class="form-control form-control-border border-width-2" id="gpsLatitude" name="gpsLatitude" placeholder="Masukkan GPS latitude device">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div>
+                                        <label for="gpsLongitude">GPS Longitude</label>
+                                        <input type="text" class="form-control form-control-border border-width-2" id="gpsLongitude" name="gpsLongitude" placeholder="Masukkan GPS longitude device">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div>
+                                        <label for="statusSensor1">Status QC Sensor 1</label>
+                                        <input type="text" class="form-control form-control-border border-width-2" id="statusSensor1" name="statusSensor1" placeholder="Masukkan status sensor 1 device">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div>
+                                        <label for="statusSensor2">Status QC Sensor 2</label>
+                                        <input type="text" class="form-control form-control-border border-width-2" id="statusSensor2" name="statusSensor2" placeholder="Masukkan status sensor 2 device">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div>
+                                        <label for="statusSensor3">Status QC Sensor 3</label>
+                                        <input type="text" class="form-control form-control-border border-width-3" id="statusSensor3" name="statusSensor3" placeholder="Masukkan status sensor 3 device">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div>
+                                        <label for="statusSensor4">Status QC Sensor 4</label>
+                                        <input type="text" class="form-control form-control-border border-width-4" id="statusSensor4" name="statusSensor4" placeholder="Masukkan status sensor 4 device">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div>
+                                        <label for="statusSensor5">Status QC Sensor 5</label>
+                                        <input type="text" class="form-control form-control-border border-width-5" id="statusSensor5" name="statusSensor5" placeholder="Masukkan status sensor 5 device">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div>
+                                        <label for="statusSensor6">Status QC Sensor 6</label>
+                                        <input type="text" class="form-control form-control-border border-width-6" id="statusSensor6" name="statusSensor6" placeholder="Masukkan status sensor 6 device">
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- /.card-body -->
                         </form>
+                        <div class="card-footer d-flex justify-content-end">
+                            <button type="submit" id="submitButton" class="btn btn-primary" onclick="submitForm()">Submit</button>
+                        </div>
                     </div>
                     <!-- general form elements -->
                     <!-- /.card -->
@@ -422,7 +499,23 @@ if (isset($_GET['id'])) {
     <script src="../../assets/adminlte/dist/js/adminlte.min.js"></script>
     <!-- SweetAlert2 Toast -->
     <script src="../../assets/adminlte/plugins/sweetalert2/sweetalert2.min.js"></script>
+    <!-- Select2 -->
+    <script src="../../assets/adminlte/plugins/select2/js/select2.full.min.js"></script>
     <!-- Page specific script -->
+    <script>
+        // Select2 Dropdown
+        $(document).on('select2:open', () => {
+            document.querySelector('.select2-search__field').focus();
+        });
+
+        $(document).ready(function() {
+            $('.select2').select2({
+                theme: 'bootstrap4',
+                width: '100%',
+                containerCssClass: 'height-40px',
+            });
+        });
+    </script>
 </body>
 
 </html>
