@@ -296,7 +296,29 @@ $result = mysqli_query($conn, $query);
                                                 // Check conditions for bg-success
                                                 $allConditionsMet = true;
                                                 if (
-                                                    strtotime($row["garansi_akhir"]) < strtotime('today') // Check if warranty expiry date is before today
+                                                    // Check if any of the columns except 'nama_client', 'garansi_awal', and 'garansi_akhir' are null
+                                                    is_null($row["type_produk"]) ||
+                                                    is_null($row["chip_id"]) ||
+                                                    is_null($row["no_sn"]) ||
+                                                    is_null($row["ip_address"]) ||
+                                                    is_null($row["mac_wifi"]) ||
+                                                    is_null($row["mac_bluetooth"]) ||
+                                                    is_null($row["firmware_version"]) ||
+                                                    is_null($row["hardware_version"]) ||
+                                                    is_null($row["free_ram"]) ||
+                                                    is_null($row["min_ram"]) ||
+                                                    is_null($row["batt_low"]) ||
+                                                    is_null($row["batt_high"]) ||
+                                                    is_null($row["temperature"]) ||
+                                                    is_null($row["status_error"]) ||
+                                                    is_null($row["gps_latitude"]) ||
+                                                    is_null($row["gps_longitude"]) ||
+                                                    is_null($row["status_qc_sensor_1"]) ||
+                                                    is_null($row["status_qc_sensor_2"]) ||
+                                                    is_null($row["status_qc_sensor_3"]) ||
+                                                    is_null($row["status_qc_sensor_4"]) ||
+                                                    is_null($row["status_qc_sensor_5"]) ||
+                                                    is_null($row["status_qc_sensor_6"])
                                                 ) {
                                                     $allConditionsMet = false;
                                                 }
@@ -305,8 +327,6 @@ $result = mysqli_query($conn, $query);
                                                     $statusClass = 'badge bg-success';
                                                     $statusText = 'QC Passed';
                                                 }
-
-                                                // Output table row with appropriate status class and text
                                             ?>
                                                 <tr>
                                                     <td><?php echo $row["id"]; ?></td>

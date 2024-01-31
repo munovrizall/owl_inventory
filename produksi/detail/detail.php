@@ -327,13 +327,18 @@ if (isset($_GET['id'])) {
                                                 <tbody>
                                                     <tr>
                                                         <td class="table-head"><b>Nomor SN :</b></td>
-                                                        <td><?php
+                                                        <td>
+                                                            <?php
                                                             $no_sn = $row["no_sn"];
                                                             echo "{$no_sn}";
-                                                            ?></td>
+                                                            ?>
+                                                        </td>
                                                         <td class="table-head"><b>Battery Low :</b></td>
                                                         <td>
-                                                            20
+                                                            <?php
+                                                            $batt_low = $row["batt_low"];
+                                                            echo "{$batt_low}";
+                                                            ?>
                                                         </td>
                                                     </tr>
                                                     <tr>
@@ -346,7 +351,10 @@ if (isset($_GET['id'])) {
                                                         </td>
                                                         <td><b>Battery High :</b></td>
                                                         <td>
-                                                            100
+                                                            <?php
+                                                            $batt_high = $row["batt_high"];
+                                                            echo "{$batt_high}";
+                                                            ?>
                                                         </td>
                                                     </tr>
                                                     <tr>
@@ -354,12 +362,15 @@ if (isset($_GET['id'])) {
                                                         <td>
                                                             <?php
                                                             $nama_client = $row["nama_client"];
-                                                            echo "{$nama_client}";
+                                                            echo $nama_client !== null ? $nama_client : '-';
                                                             ?>
                                                         </td>
                                                         <td><b>Temperature :</b></td>
                                                         <td>
-                                                            60,5°C
+                                                            <?php
+                                                            $temperature = $row["temperature"];
+                                                            echo "{$temperature}";
+                                                            ?>
                                                         </td>
                                                     </tr>
                                                     <tr>
@@ -367,13 +378,16 @@ if (isset($_GET['id'])) {
                                                         <td>
                                                             <?php
                                                             $garansi_awal = $row["garansi_awal"];
-                                                            $formatted_date = date("d/m/Y", strtotime($garansi_awal));
+                                                            $formatted_date = $garansi_awal !== null ? date("d/m/Y", strtotime($garansi_awal)) : '-';
                                                             echo $formatted_date;
                                                             ?>
                                                         </td>
                                                         <td><b>Status Error :</b></td>
                                                         <td>
-                                                            1
+                                                            <?php
+                                                            $status_error = $row["status_error"];
+                                                            echo "{$status_error}";
+                                                            ?>
                                                         </td>
                                                     </tr>
                                                     <tr>
@@ -381,13 +395,16 @@ if (isset($_GET['id'])) {
                                                         <td>
                                                             <?php
                                                             $garansi_akhir = $row["garansi_akhir"];
-                                                            $formatted_date = date("d/m/Y", strtotime($garansi_akhir));
+                                                            $formatted_date = $garansi_awal !== null ? date("d/m/Y", strtotime($garansi_akhir)) : '-';
                                                             echo $formatted_date;
                                                             ?>
                                                         </td>
                                                         <td><b>GPS Latitude :</b></td>
                                                         <td>
-                                                            6°16'36.7"S
+                                                            <?php
+                                                            $gps_latitude = $row["gps_latitude"];
+                                                            echo "{$gps_latitude}";
+                                                            ?>
                                                         </td>
                                                     </tr>
                                                     <tr>
@@ -407,13 +424,19 @@ if (isset($_GET['id'])) {
                                                         </td>
                                                         <td><b>GPS Longitude :</b></td>
                                                         <td>
-                                                            106°47'49.2"E
+                                                            <?php
+                                                            $gps_longitude = $row["gps_longitude"];
+                                                            echo "{$gps_longitude}";
+                                                            ?>
                                                         </td>
                                                     </tr>
                                                     <tr>
                                                         <td><b>IP Address :</b></td>
                                                         <td>
-                                                            192.168.1.8
+                                                            <?php
+                                                            $ip_address = $row["ip_address"];
+                                                            echo "{$ip_address}";
+                                                            ?>
                                                         </td>
                                                         <td><b>Status QC Sensor 1 :</b></td>
                                                         <td>
@@ -423,7 +446,10 @@ if (isset($_GET['id'])) {
                                                     <tr>
                                                         <td><b>MAC Address WIFI :</b></td>
                                                         <td>
-                                                            192.168.1.8
+                                                            <?php
+                                                            $mac_wifi = $row["mac_wifi"];
+                                                            echo "{$mac_wifi}";
+                                                            ?>
                                                         </td>
                                                         <td><b>Status QC Sensor 2 :</b></td>
                                                         <td>
@@ -433,7 +459,10 @@ if (isset($_GET['id'])) {
                                                     <tr>
                                                         <td><b>MAC Address Bluetooth:</b></td>
                                                         <td>
-                                                            192.168.1.8
+                                                            <?php
+                                                            $mac_bluetooth = $row["mac_bluetooth"];
+                                                            echo "{$mac_bluetooth}";
+                                                            ?>
                                                         </td>
                                                         <td><b>Status QC Sensor 3 :</b></td>
                                                         <td>
@@ -443,7 +472,10 @@ if (isset($_GET['id'])) {
                                                     <tr>
                                                         <td><b>Versi Firmware :</b></td>
                                                         <td>
-                                                            1.1.0
+                                                            <?php
+                                                            $firmware_version = $row["firmware_version"];
+                                                            echo "{$firmware_version}";
+                                                            ?>
                                                         </td>
                                                         <td><b>Status QC Sensor 4 :</b></td>
                                                         <td>
@@ -453,7 +485,10 @@ if (isset($_GET['id'])) {
                                                     <tr>
                                                         <td><b>Versi Hardware :</b></td>
                                                         <td>
-                                                            1.0.0
+                                                            <?php
+                                                            $hardware_version = $row["hardware_version"];
+                                                            echo "{$hardware_version}";
+                                                            ?>
                                                         </td>
                                                         <td><b>Status QC Sensor 5 :</b></td>
                                                         <td>
@@ -463,7 +498,10 @@ if (isset($_GET['id'])) {
                                                     <tr>
                                                         <td><b>Free RAM :</b></td>
                                                         <td>
-                                                            200 MB
+                                                            <?php
+                                                            $free_ram = $row["free_ram"];
+                                                            echo "{$free_ram}";
+                                                            ?>
                                                         </td>
                                                         <td><b>Status QC Sensor 6 :</b></td>
                                                         <td>
@@ -473,7 +511,10 @@ if (isset($_GET['id'])) {
                                                     <tr>
                                                         <td><b>Min RAM :</b></td>
                                                         <td>
-                                                            2000 MB
+                                                            <?php
+                                                            $min_ram = $row["min_ram"];
+                                                            echo "{$min_ram}";
+                                                            ?>
                                                         </td>
                                                     </tr>
                                                 </tbody>
