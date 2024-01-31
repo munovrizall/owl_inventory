@@ -41,14 +41,21 @@ if (isset($_POST['quantity'])) {
     $updateStmt->execute();
     $updateStmt->close();
 
-    // Insert a new record into the 'historis' table
-    $insertQueryHistoris = "INSERT INTO historis (pengguna, stok_id, waktu, quantity, activity, deskripsi) VALUES (?, ?, NOW(), ?, 'Restock', ?)";
-    $insertStmt = $conn->prepare($insertQueryHistoris);
-    $insertStmt->bind_param("siis", $pengguna, $selectedItemId, $submittedQuantity, $_POST['deskripsi']);
+    $queryNamaBahan = "SELECT nama FROM masterbahan WHERE stok_id = ?";
+    $stmtNamaBahan = $conn->prepare($queryNamaBahan);
+    $stmtNamaBahan->bind_param("i", $selectedItemId);
+    $stmtNamaBahan->execute();
+    $stmtNamaBahan->bind_result($namaBahan);
+    $stmtNamaBahan->fetch();
+    $stmtNamaBahan->close();
 
+    // Insert a new record into the 'historis' table
+    $insertQueryHistoris = "INSERT INTO historis (pengguna, nama_barang, waktu, quantity, activity, deskripsi) VALUES (?, ?, NOW(), ?, 'Restock', ?)";
+    $insertStmt = $conn->prepare($insertQueryHistoris);
+    $insertStmt->bind_param("ssis", $pengguna, $namaBahan, $submittedQuantity, $_POST['deskripsi']);
     $insertStmt->execute();
     $insertStmt->close();
-
+    
     // Return the updated stock quantity
     echo json_encode(array('currentStock' => $stockQuantity, 'newStock' => $newStockQuantity));
     exit();
