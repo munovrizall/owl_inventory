@@ -12,7 +12,7 @@ if (!$resultClient) {
 $stockQuantity = ""; // Default value, replace it with the actual stock quantity based on the selected item from the database
 $newStockQuantity = "";
 
-$queryProduk = "SELECT DISTINCT produk FROM produksi ORDER BY produk";
+$queryProduk = "SELECT nama_produk FROM produk ORDER BY nama_produk";
 $resultProduk = $conn->query($queryProduk);
 
 if (isset($_POST['quantity'])) {
@@ -23,7 +23,7 @@ if (isset($_POST['quantity'])) {
 
 
     // Fetch the stock quantity from the database based on the selected item
-    $query = "SELECT quantity FROM masterbahan WHERE nama = ?";
+    $query = "SELECT quantity FROM produk WHERE nama_produk = ?";
     $stmt = $conn->prepare($query);
     $stmt->bind_param("s", $selectedNamaProduk);
     $stmt->execute();
@@ -48,24 +48,24 @@ if (isset($_POST['quantity'])) {
         exit();
     }
 
-    $updateQueryStock = "UPDATE masterbahan SET quantity = ? WHERE nama = ?";
+    $updateQueryStock = "UPDATE produk SET quantity = ? WHERE nama_produk = ?";
     $updateStmt = $conn->prepare($updateQueryStock);
     $updateStmt->bind_param("is", $newStockQuantity, $selectedNamaProduk);
     $updateStmt->execute();
     $updateStmt->close();
 
-    $queryStokId = "SELECT stok_id FROM masterbahan WHERE nama = ?";
-    $stmtStokId = $conn->prepare($queryStokId);
-    $stmtStokId->bind_param("s", $selectedNamaProduk);
-    $stmtStokId->execute();
-    $stmtStokId->bind_result($stokId);
-    $stmtStokId->fetch();
-    $stmtStokId->close();
+    $queryProdukId = "SELECT nama_produk FROM produk WHERE nama_produk = ?";
+    $stmtProdukId = $conn->prepare($queryProdukId);
+    $stmtProdukId->bind_param("s", $selectedNamaProduk);
+    $stmtProdukId->execute();
+    $stmtProdukId->bind_result($nama_produk);
+    $stmtProdukId->fetch();
+    $stmtProdukId->close();
 
     // Insert a new record into the 'historis' table
-    $insertQueryHistoris = "INSERT INTO historis (pengguna, stok_id, waktu, quantity, activity, deskripsi) VALUES (?, ?, NOW(), ?, 'Pengiriman', ?)";
+    $insertQueryHistoris = "INSERT INTO historis (pengguna, nama_barang, waktu, quantity, activity, deskripsi) VALUES (?, ?, NOW(), ?, 'Pengiriman', ?)";
     $insertStmt = $conn->prepare($insertQueryHistoris);
-    $insertStmt->bind_param("siis", $pengguna, $stokId, $submittedQuantity, $_POST['deskripsi']);
+    $insertStmt->bind_param("ssis", $pengguna, $nama_produk, $submittedQuantity, $_POST['deskripsi']);
 
     $insertStmt->execute();
     $insertStmt->close();
@@ -162,6 +162,12 @@ if (isset($_POST['quantity'])) {
                                     <a href="produksi.php" class="nav-link">
                                         <i class="far fa-circle nav-icon"></i>
                                         <p>Produksi Device</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="quality_control.php" class="nav-link">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>Quality Control</p>
                                     </a>
                                 </li>
                                 <li class="nav-item">
@@ -334,7 +340,7 @@ if (isset($_POST['quantity'])) {
                                         <option value="">--- Pilih Produk ---</option>
                                         <?php
                                         while ($row = $resultProduk->fetch_assoc()) {
-                                            echo '<option value="' . $row['produk'] . '">' . $row['produk'] . '</option>';
+                                            echo '<option value="' . $row['nama_produk'] . '">' . $row['nama_produk'] . '</option>';
                                         }
                                         ?>
                                     </select>

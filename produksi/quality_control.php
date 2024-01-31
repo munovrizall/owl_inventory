@@ -2,7 +2,7 @@
 
 include "../connection.php";
 
-$query = "SELECT * FROM client";
+$query = "SELECT * FROM inventaris_produk ORDER BY id";
 $result = mysqli_query($conn, $query);
 
 ?>
@@ -13,7 +13,7 @@ $result = mysqli_query($conn, $query);
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>List Perusahaan</title>
+    <title>Quality Control</title>
 
     <link rel="icon" href="../assets/adminlte/dist/img/OWLlogo.png" type="image/x-icon">
     <!-- Google Font: Source Sans Pro -->
@@ -32,25 +32,22 @@ $result = mysqli_query($conn, $query);
 
     <style>
         .lebar-kolom1 {
-            width: 5%;
+            width: 10%;
         }
 
         .lebar-kolom2 {
-            width: 10%;
+            width: 20%;
         }
 
         .lebar-kolom3 {
-            width: 15%;
-        }
-
-        .lebar-kolom4 {
             width: 50%;
         }
 
-        .lebar-kolom5 {
+        .lebar-kolom4 {
             width: 10%;
         }
-        .lebar-kolom6 {
+
+        .lebar-kolom5 {
             width: 10%;
         }
 
@@ -87,17 +84,16 @@ $result = mysqli_query($conn, $query);
                 <nav class="mt-2">
                     <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
                         <!-- Add icons to the links using the .nav-icon class
-               with font-awesome or any other icon font library -->
+                           with font-awesome or any other icon font library -->
                         <li class="nav-item">
                             <a href="../homepage.php" class="nav-link">
                                 <i class="nav-icon fas fa-th"></i>
                                 <p>Home</p>
                             </a>
                         </li>
-                        </li>
                         <li class="nav-header">TRANSAKSI</li>
                         <li class="nav-item">
-                            <a href="../produksi.php" class="nav-link">
+                            <a href="produksi.php" class="nav-link active">
                                 <i class="nav-icon fas fa-toolbox"></i>
                                 <p>
                                     Produksi
@@ -106,25 +102,25 @@ $result = mysqli_query($conn, $query);
                             </a>
                             <ul class="nav nav-treeview">
                                 <li class="nav-item">
-                                    <a href="../produksi/produksi.php" class="nav-link">
+                                    <a href="produksi.php" class="nav-link">
                                         <i class="far fa-circle nav-icon"></i>
                                         <p>Produksi Device</p>
                                     </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a href="../produksi/quality_control.php" class="nav-link">
+                                    <a href="quality_control.php" class="nav-link active">
                                         <i class="far fa-circle nav-icon"></i>
                                         <p>Quality Control</p>
                                     </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a href="../produksi/inventaris_device.php" class="nav-link">
+                                    <a href="inventaris_device.php" class="nav-link">
                                         <i class="far fa-circle nav-icon"></i>
                                         <p>Inventaris Device</p>
                                     </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a href="../produksi/pengiriman.php" class="nav-link">
+                                    <a href="pengiriman.php" class="nav-link">
                                         <i class="far fa-circle nav-icon"></i>
                                         <p>Pengiriman Device</p>
                                     </a>
@@ -194,7 +190,7 @@ $result = mysqli_query($conn, $query);
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="perusahaan.php" class="nav-link active">
+                            <a href="perusahaan.php" class="nav-link">
                                 <i class="nav-icon fas fa-industry"></i>
                                 <p>
                                     Perusahaan
@@ -203,13 +199,13 @@ $result = mysqli_query($conn, $query);
                             </a>
                             <ul class="nav nav-treeview">
                                 <li class="nav-item">
-                                    <a href="tambah_perusahaan.php" class="nav-link">
+                                    <a href="../perusahaan/tambah_perusahaan.php" class="nav-link">
                                         <i class="far fa-circle nav-icon"></i>
                                         <p>Tambah Perusahaan</p>
                                     </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a href="list_perusahaan.php" class="nav-link active">
+                                    <a href="../perusahaan/list_perusahaan.php" class="nav-link">
                                         <i class="far fa-circle nav-icon"></i>
                                         <p>List Perusahaan</p>
                                     </a>
@@ -255,13 +251,13 @@ $result = mysqli_query($conn, $query);
                 <div class="container-fluid">
                     <div class="row mb-2">
                         <div class="col-sm-6">
-                            <h1>List Perusahaan</h1>
+                            <h1>Quality Control</h1>
                         </div>
                         <div class="col-sm-6">
                             <ol class="breadcrumb float-sm-right">
-                                <li class="breadcrumb-item"><a href="homepage.php">Home</a></li>
-                                <li class="breadcrumb-item active">Perusahaan</li>
-                                <li class="breadcrumb-item active">List Perusahaan</li>
+                                <li class="breadcrumb-item"><a href="../homepage.php">Home</a></li>
+                                <li class="breadcrumb-item active">Produksi</li>
+                                <li class="breadcrumb-item active">Quality Control</li>
                             </ol>
                         </div>
                     </div>
@@ -276,39 +272,72 @@ $result = mysqli_query($conn, $query);
 
                         <div class="card">
                             <div class="card-header">
-                                <h3 class="card-title"><b>List Perusahaan</b></h3>
+                                <h3 class="card-title"><b>List Device</b></h3>
                             </div>
                             <!-- /.card-header -->
                             <div class="card-body p-0">
                                 <div class="table-responsive card-padding">
-                                    <table id="tablePerusahaan" class="table table order-list table-striped table-bordered">
+                                    <table id="tableInventaris" class="table table order-list table-striped table-bordered">
                                         <thead>
                                             <tr>
                                                 <th class="text-center lebar-kolom1">ID</th>
-                                                <th class="text-center lebar-kolom2">Nama Perusahaan</th>
-                                                <th class="text-center lebar-kolom3">Nama Korespondensi</th>
-                                                <th class="text-center lebar-kolom4">Alamat Perusahaan</th>
-                                                <th class="text-center lebar-kolom5">Password Login</th>
-                                                <th class="text-center lebar-kolom6 aksi-column">Aksi</th>
+                                                <th class="text-center lebar-kolom2">Chip ID</th>
+                                                <th class="text-center lebar-kolom3">Nama Produk</th>
+                                                <th class="text-center lebar-kolom4">Status</th>
+                                                <th class="text-center lebar-kolom5 aksi-column">Aksi</th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             <?php
                                             while ($row = mysqli_fetch_assoc($result)) {
-                                                // Fetch detail_maintenance data based on transaksi_id
-                                                $clientId = $row["client_id"];
-                                                $detailQuery = "SELECT * FROM client WHERE client_id = $clientId";
-                                                $detailResult = mysqli_query($conn, $detailQuery);
+                                                $statusClass = 'badge bg-danger'; // Default class
+                                                $statusText = 'QC Pending'; // Default text
+
+                                                // Check conditions for bg-success
+                                                $allConditionsMet = true;
+                                                if (
+                                                    // Check if any of the columns except 'nama_client', 'garansi_awal', and 'garansi_akhir' are null
+                                                    is_null($row["type_produk"]) ||
+                                                    is_null($row["chip_id"]) ||
+                                                    is_null($row["no_sn"]) ||
+                                                    is_null($row["ip_address"]) ||
+                                                    is_null($row["mac_wifi"]) ||
+                                                    is_null($row["mac_bluetooth"]) ||
+                                                    is_null($row["firmware_version"]) ||
+                                                    is_null($row["hardware_version"]) ||
+                                                    is_null($row["free_ram"]) ||
+                                                    is_null($row["min_ram"]) ||
+                                                    is_null($row["batt_low"]) ||
+                                                    is_null($row["batt_high"]) ||
+                                                    is_null($row["temperature"]) ||
+                                                    is_null($row["status_error"]) ||
+                                                    is_null($row["gps_latitude"]) ||
+                                                    is_null($row["gps_longitude"]) ||
+                                                    is_null($row["status_qc_sensor_1"]) ||
+                                                    is_null($row["status_qc_sensor_2"]) ||
+                                                    is_null($row["status_qc_sensor_3"]) ||
+                                                    is_null($row["status_qc_sensor_4"]) ||
+                                                    is_null($row["status_qc_sensor_5"]) ||
+                                                    is_null($row["status_qc_sensor_6"])
+                                                ) {
+                                                    $allConditionsMet = false;
+                                                }
+
+                                                if ($allConditionsMet) {
+                                                    $statusClass = 'badge bg-success';
+                                                    $statusText = 'QC Passed';
+                                                }
                                             ?>
                                                 <tr>
-                                                    <td><?php echo $row["client_id"]; ?></td>
-                                                    <td><?php echo $row["nama_client"]; ?></td>
-                                                    <td><?php echo $row["nama_korespondensi"]; ?></td>
-                                                    <td><?php echo $row["alamat_perusahaan"]; ?></td>
-                                                    <td><?php echo $row["password"]; ?></td>
+                                                    <td><?php echo $row["id"]; ?></td>
+                                                    <td><?php echo $row["chip_id"]; ?></td>
+                                                    <td><?php echo $row["produk"] ?></td>
+                                                    <td class="text-center"><span class="badge <?php echo $statusClass; ?>"><?php echo $statusText; ?></span></td>
                                                     <td class="text-center">
-                                                        <div class="col">
-                                                            <a href='edit/edit.php?id=<?php echo $row["client_id"]; ?>' class="btn btn-info btn-block">Edit</a>
+                                                        <div class="row">
+                                                            <div class="col">
+                                                                <a href='edit/edit.php?id=<?php echo $row["id"]; ?>' class="btn btn-info btn-block text-center">Edit</a>
+                                                            </div>
                                                         </div>
                                                     </td>
                                                 </tr>
@@ -350,9 +379,6 @@ $result = mysqli_query($conn, $query);
     <script src="../assets/adminlte/plugins/bs-custom-file-input/bs-custom-file-input.min.js"></script>
     <!-- AdminLTE App -->
     <script src="../assets/adminlte/dist/js/adminlte.min.js"></script>
-    <!-- bootstrap searchable dropdown -->
-    <script src="../assets/bootstrap-5/bootstrap.bundle.min.js"></script>
-    <script src="../assets/dselect.js"></script>
     <!-- Datatables -->
     <script src="https://cdn.datatables.net/v/bs4/dt-1.13.8/b-2.4.2/b-colvis-2.4.2/b-print-2.4.2/fh-3.4.0/r-2.5.0/rg-1.4.1/sb-1.6.0/sp-2.2.0/datatables.min.js"></script>
     <script src="https:////code.jquery.com/jquery-3.7.0.js"></script>
@@ -368,7 +394,7 @@ $result = mysqli_query($conn, $query);
     <!-- Page specific script -->
     <script>
         $(document).ready(function() {
-            var table = $('#tablePerusahaan').DataTable({
+            var table = $('#tableInventaris').DataTable({
                 responsive: true,
                 language: {
                     lengthMenu: 'Tampilkan _MENU_ data per halaman',
@@ -384,7 +410,7 @@ $result = mysqli_query($conn, $query);
                     'pageLength',
                     {
                         extend: 'copy',
-                        title: 'List Perusahaan',
+                        title: 'Quality Control Produk',
                         exportOptions: {
                             columns: ':visible:not(.aksi-column)'
                         }
@@ -396,28 +422,28 @@ $result = mysqli_query($conn, $query);
                     },
                     {
                         extend: 'csv',
-                        title: 'List Perusahaan',
+                        title: 'Quality Control Produk',
                         exportOptions: {
                             columns: ':visible:not(.aksi-column)'
                         }
                     },
                     {
                         extend: 'excel',
-                        title: 'List Perusahaan',
+                        title: 'Quality Control Produk',
                         exportOptions: {
                             columns: ':visible:not(.aksi-column)'
                         }
                     },
                     {
                         extend: 'pdf',
-                        title: 'List Perusahaan',
+                        title: 'Quality Control Produk',
                         exportOptions: {
                             columns: ':visible:not(.aksi-column)'
                         }
                     },
                     {
                         extend: 'print',
-                        title: 'List Perusahaan',
+                        title: 'Quality Control Produk',
                         exportOptions: {
                             columns: ':visible:not(.aksi-column)'
                         }

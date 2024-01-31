@@ -2,11 +2,7 @@
 
 include "connection.php";
 
-$query = "SELECT historis.ID, historis.pengguna, historis.waktu, historis.quantity, 
-          historis.activity, historis.deskripsi, masterbahan.nama 
-          FROM historis
-          JOIN masterbahan ON historis.stok_id = masterbahan.stok_id
-          ORDER BY historis.waktu DESC";
+$query = "SELECT * FROM historis ORDER BY historis.ID DESC";
 $result = mysqli_query($conn, $query);
 if (!$result) {
     die('Error in query: ' . mysqli_error($conn));
@@ -126,6 +122,12 @@ if (!$result) {
                                     <a href="produksi/produksi.php" class="nav-link">
                                         <i class="far fa-circle nav-icon"></i>
                                         <p>Produksi Device</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="produksi/quality_control.php" class="nav-link">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>Quality Control</p>
                                     </a>
                                 </li>
                                 <li class="nav-item">
@@ -341,7 +343,7 @@ if (!$result) {
                                                     <tr>
                                                         <td><?php echo $row["ID"]; ?></td>
                                                         <td><?php echo $row["pengguna"]; ?></td>
-                                                        <td><?php echo $row["nama"]; ?></td>
+                                                        <td><?php echo $row["nama_barang"]; ?></td>
                                                         <td><?php echo $row["quantity"]; ?></td>
                                                         <td><span class="<?php echo $badgeClass; ?>"><?php echo $row["activity"]; ?></span></td>
                                                         <td><?php echo $row["deskripsi"]; ?></td>
