@@ -36,7 +36,7 @@ $result = mysqli_query($conn, $query);
         }
 
         .lebar-kolom2 {
-            width: 20%;
+            width: 10%;
         }
 
         .lebar-kolom3 {
@@ -48,6 +48,9 @@ $result = mysqli_query($conn, $query);
         }
 
         .lebar-kolom5 {
+            width: 10%;
+        }
+        .lebar-kolom6 {
             width: 10%;
         }
 
@@ -279,7 +282,8 @@ $result = mysqli_query($conn, $query);
                                                 <th class="text-center lebar-kolom2">Nama Perusahaan</th>
                                                 <th class="text-center lebar-kolom3">Nama Korespondensi</th>
                                                 <th class="text-center lebar-kolom4">Alamat Perusahaan</th>
-                                                <th class="text-center lebar-kolom5 aksi-column">Aksi</th>
+                                                <th class="text-center lebar-kolom5">Password Login</th>
+                                                <th class="text-center lebar-kolom6 aksi-column">Aksi</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -295,6 +299,7 @@ $result = mysqli_query($conn, $query);
                                                     <td><?php echo $row["nama_client"]; ?></td>
                                                     <td><?php echo $row["nama_korespondensi"]; ?></td>
                                                     <td><?php echo $row["alamat_perusahaan"]; ?></td>
+                                                    <td><?php echo $row["password"]; ?></td>
                                                     <td class="text-center">
                                                         <div class="col">
                                                             <a href='edit/edit.php?id=<?php echo $row["client_id"]; ?>' class="btn btn-info btn-block">Edit</a>
