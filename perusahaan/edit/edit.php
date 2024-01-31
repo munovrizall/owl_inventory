@@ -22,10 +22,11 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $namaClient = isset($_POST["namaPerusahaan"]) ? $_POST["namaPerusahaan"] : null;
     $namaKorespondensi = isset($_POST["namaKorespondensi"]) ? $_POST["namaKorespondensi"] : null;
     $alamatPerusahaan = isset($_POST["alamatPerusahaan"]) ? $_POST["alamatPerusahaan"] : null;
+    $password = isset($_POST["password"]) ? $_POST["password"] : null;
 
-    $updateQuery = "UPDATE client SET nama_client = ?, nama_korespondensi = ?, alamat_perusahaan = ? WHERE client_id=?";
+    $updateQuery = "UPDATE client SET nama_client = ?, nama_korespondensi = ?, alamat_perusahaan = ?, password = ? WHERE client_id=?";
     $updateStmt = $conn->prepare($updateQuery);
-    $updateStmt->bind_param("sssi", $namaClient, $namaKorespondensi, $alamatPerusahaan, $client_id);
+    $updateStmt->bind_param("ssssi", $namaClient, $namaKorespondensi, $alamatPerusahaan, $password, $client_id);
     $updateStmt->execute();
     $updateStmt->close();
 
@@ -307,6 +308,12 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                                     <label for="alamatPerusahaan">Alamat Perusahaan <span style="color: red;">*</span></label>
                                     <textarea class="form-control" id="alamatPerusahaan" name="alamatPerusahaan" rows="3"><?php echo $row['alamat_perusahaan']; ?></textarea>
                                 </div>
+                                <div class="form-group">
+                                    <div>
+                                        <label for="password">Password Login <span style="color: red;">*</span></label>
+                                        <input type="text" class="form-control form-control-border border-width-2" id="password" name="password" placeholder="Masukkan password untuk perusahaan tersebut" value="<?php echo $row['password']; ?>">
+                                    </div>
+                                </div>
                             </div>
 
                             <!-- /.card-body -->
@@ -365,8 +372,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             var namaPerusahaan = document.getElementById("namaPerusahaan").value;
             var namaKorespondensi = document.getElementById("namaKorespondensi").value;
             var alamatPerusahaan = document.getElementById("alamatPerusahaan").value;
+            var password = document.getElementById("password").value;
 
-            if (namaPerusahaan === "" || namaKorespondensi === "" || alamatPerusahaan === "") {
+            if (namaPerusahaan === "" || namaKorespondensi === "" || alamatPerusahaan === "" || password === "") {
                 Swal.fire({
                     icon: 'error',
                     title: 'Oops...',
@@ -418,8 +426,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             document.getElementById("perusahaanForm").reset();
         }
 
-        var deksripsiInput = document.getElementById('alamatPerusahaan');
-        deksripsiInput.addEventListener('keydown', function(event) {
+        var password = document.getElementById('password');
+        password.addEventListener('keydown', function(event) {
             if (event.keyCode === 13) {
                 event.preventDefault();
                 submitForm();
