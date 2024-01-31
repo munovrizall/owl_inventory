@@ -2,7 +2,7 @@
 
 include "../connection.php";
 
-$queryBahan = "SELECT * FROM masterbahan WHERE kelompok != 'Barang Jadi' ORDER BY nama";
+$queryBahan = "SELECT * FROM masterbahan ORDER BY nama";
 $resultBahan = $conn->query($queryBahan);
 
 $queryTransaksi =
@@ -59,10 +59,19 @@ if (isset($_POST['quantity'])) {
     $updateStmt->execute();
     $updateStmt->close();
 
+    $selectNamaBahan = "SELECT nama FROM masterbahan WHERE stok_id = ?";
+    $selectStmt = $conn->prepare($selectNamaBahan);
+    $selectStmt->bind_param("i", $selectedItemId);
+    $selectStmt->execute();
+    $selectStmt->bind_result($namaBahan);
+    $selectStmt->fetch();
+    $selectStmt->close();
+
+
     // Insert a new record into the 'historis' table
-    $insertQueryHistoris = "INSERT INTO historis (pengguna, stok_id, waktu, quantity, activity, deskripsi) VALUES (?, ?, NOW(), ?, 'Maintenance', ?)";
+    $insertQueryHistoris = "INSERT INTO historis (pengguna, nama_barang, waktu, quantity, activity, deskripsi) VALUES (?, ?, NOW(), ?, 'Maintenance', ?)";
     $insertStmt = $conn->prepare($insertQueryHistoris);
-    $insertStmt->bind_param("siis", $pengguna, $selectedItemId, $submittedQuantity, $_POST['deskripsi']);
+    $insertStmt->bind_param("ssis", $pengguna, $namaBahan, $submittedQuantity, $_POST['deskripsi']);
 
     $insertStmt->execute();
     $insertStmt->close();

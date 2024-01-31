@@ -7,7 +7,7 @@ $stokDibutuhkan = "";
 $currentStock = "";
 
 // Fetch data from produksi table
-$queryProdukPilihan = "SELECT DISTINCT produk FROM produksi ORDER BY produk";
+$queryProdukPilihan = "SELECT nama_produk FROM produk ORDER BY nama_produk";
 $resultProdukPilihan = $conn->query($queryProdukPilihan);
 
 if (isset($_POST['selectedDevice'])) {
@@ -86,48 +86,15 @@ if (isset($_POST['selectedDevice'])) {
                 $updateStmt->execute();
             }
 
-            $stokIdQuery = "SELECT stok_id FROM masterbahan WHERE nama = ?";
-            $stokIdStmt = $conn->prepare($stokIdQuery);
-            $stokIdStmt->bind_param("s", $selectedDeviceName);
-            $stokIdStmt->execute();
-            $stokIdStmt->bind_result($stokId);
-            $stokIdStmt->fetch();
-            $stokIdStmt->close();
-
-
-            $bahanIdQuery = "SELECT stok_id FROM masterbahan WHERE nama = ?";
-            $bahanIdStmt = $conn->prepare($bahanIdQuery);
-
-            // Initialize the array outside the loop
-            $resultBahanId = array();
+            $insertQueryHistorisMinus = "INSERT INTO historis (pengguna, nama_barang, waktu, quantity, activity, deskripsi) VALUES (?, ?, NOW(), ?, 'Produksi', ?)";
+            $insertStmtMinus = $conn->prepare($insertQueryHistorisMinus);
 
             foreach ($resultProduksi as $row) {
                 $namaBahan = $row['namaBahan'];
-
-                $bahanIdStmt->bind_param("s", $namaBahan);
-                $bahanIdStmt->execute();
-                $bahanIdStmt->bind_result($bahanId);
-
-                while ($bahanIdStmt->fetch()) {
-                    // Accumulate results in the array
-                    $resultBahanId[] = array('bahanId' => $bahanId, 'stokDibutuhkan' => $row['stokDibutuhkan']);
-                }
-
-                // Move this inside the loop to capture the correct value for each iteration
-                $stokDibutuhkan = $row['stokDibutuhkan'];
-            }
-
-            $bahanIdStmt->close();
-
-            $insertQueryHistorisMinus = "INSERT INTO historis (pengguna, stok_id, waktu, quantity, activity, deskripsi) VALUES (?, ?, NOW(), ?, 'Produksi', ?)";
-            $insertStmtMinus = $conn->prepare($insertQueryHistorisMinus);
-
-            foreach ($resultBahanId as $row) {
-                $bahanId = $row['bahanId'];
                 $stokDibutuhkan = $row['stokDibutuhkan'];
                 $minusBahan = -1 * ($submittedQuantity * $stokDibutuhkan);
 
-                $insertStmtMinus->bind_param("siis", $pengguna, $bahanId, $minusBahan, $_POST['deskripsi']);
+                $insertStmtMinus->bind_param("ssis", $pengguna, $namaBahan, $minusBahan, $_POST['deskripsi']);
                 if (!$insertStmtMinus->execute()) {
                     // Log or display the error
                     echo "Error in insertStmtMinus execution: " . $insertStmtMinus->error;
@@ -137,18 +104,28 @@ if (isset($_POST['selectedDevice'])) {
             $insertStmtMinus->close();
 
             // Insert into historis
-            $insertQueryHistoris = "INSERT INTO historis (pengguna, stok_id, waktu, quantity, activity, deskripsi) VALUES (?, ?, NOW(), ?, 'Produksi', ?)";
+            $insertQueryHistoris = "INSERT INTO historis (pengguna, nama_barang, waktu, quantity, activity, deskripsi) VALUES (?, ?, NOW(), ?, 'Produksi', ?)";
             $insertStmt = $conn->prepare($insertQueryHistoris);
-            $insertStmt->bind_param("siis", $pengguna, $stokId, $submittedQuantity, $_POST['deskripsi']);
+            $insertStmt->bind_param("ssis", $pengguna, $selectedDeviceName, $submittedQuantity, $_POST['deskripsi']);
             $insertStmt->execute();
             $insertStmt->close();
 
             // Update Produk quantity pada masterbahan
-            $updateQueryMasterBahan = "UPDATE masterbahan SET quantity = ? WHERE nama = ?";
+            $updateQueryMasterBahan = "UPDATE produk SET quantity = ? WHERE nama_produk = ?";
 
             $updateStmtMasterBahan = $conn->prepare($updateQueryMasterBahan);
             $updateStmtMasterBahan->bind_param("is", $newProductStock, $selectedDeviceName);
             $updateStmtMasterBahan->execute();
+
+            $insertStmtQualityControl = "INSERT INTO inventaris_produk (produk) VALUES (?)";
+            $insertStmtQualityControl = $conn->prepare($insertStmtQualityControl);
+        
+            for ($i = 0; $i < $submittedQuantity; $i++) {
+                $insertStmtQualityControl->bind_param("s", $selectedDeviceName);
+                $insertStmtQualityControl->execute();
+            }
+        
+            $insertStmtQualityControl->close();
 
 
             $updateStmtMasterBahan->close();
@@ -444,7 +421,7 @@ if (isset($_POST['selectedDevice'])) {
                                         <option value="">--- Pilih Produk ---</option>
                                         <?php
                                         while ($row = $resultProdukPilihan->fetch_assoc()) {
-                                            echo '<option value="' . $row['produk'] . '">' . $row['produk'] . '</option>';
+                                            echo '<option value="' . $row['nama_produk'] . '">' . $row['nama_produk'] . '</option>';
                                         }
                                         ?>
                                     </select>

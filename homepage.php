@@ -3,12 +3,7 @@ include "connection.php";
 
 $username = $_SESSION['username'];
 
-$query = "SELECT historis.pengguna, historis.waktu, historis.quantity, 
-          historis.activity, historis.deskripsi, masterbahan.nama 
-          FROM historis
-          JOIN masterbahan ON historis.stok_id = masterbahan.stok_id
-          ORDER BY historis.id DESC
-          LIMIT 20";
+$query = "SELECT * FROM historis ORDER BY historis.ID DESC LIMIT 20";
 $result = mysqli_query($conn, $query);
 if (!$result) {
   die('Error in query: ' . mysqli_error($conn));
@@ -414,7 +409,7 @@ if (!$result) {
                       ?>
                           <tr>
                             <td><?php echo $row["pengguna"]; ?></td>
-                            <td><?php echo $row["nama"]; ?></td>
+                            <td><?php echo $row["nama_barang"]; ?></td>
                             <td><?php echo $row["quantity"]; ?></td>
                             <td style="text-align: center;"><span class="<?php echo $badgeClass; ?>"><?php echo $row["activity"]; ?></span></td>
                             <td><?php echo $row["deskripsi"]; ?></td>
