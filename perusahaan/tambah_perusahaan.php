@@ -2,11 +2,14 @@
 
 include "../connection.php";
 
+$response = array();
+
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Check which fields are provided
     $namaPerusahaan = isset($_POST["namaPerusahaan"]) ? $_POST["namaPerusahaan"] : null;
     $namaKorespondensi = isset($_POST["namaKorespondensi"]) ? $_POST["namaKorespondensi"] : null;
     $alamatPerusahaan = isset($_POST["alamatPerusahaan"]) ? $_POST["alamatPerusahaan"] : null;
+    $password = isset($_POST["password"]) ? $_POST["password"] : null;
 
     if ($namaPerusahaan !== null) {
         $checkQuery = "SELECT COUNT(*) FROM client WHERE nama_client = ?";
@@ -19,23 +22,23 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         // If the material name already exists, display an error
         if ($count > 0) {
-            echo "Error: Material name '$nama' already exists in the database.";
-            exit; // Stop further execution
+            $response['status'] = 'error';
+            $response['message'] = "'$namaPerusahaan' sudah ada di database!";
+        } else {
+            $insertQuery = "INSERT INTO client (nama_client, nama_korespondensi, alamat_perusahaan, password) VALUES (?, ?, ?, ?)";
+            $insertStmt = $conn->prepare($insertQuery);
+            $insertStmt->bind_param("ssss", $namaPerusahaan, $namaKorespondensi, $alamatPerusahaan, $password);
+            $insertStmt->execute();
+            $insertStmt->close();
+
+            $response['status'] = 'success';
+            $response['message'] = 'Perusahaan berhasil ditambahkan!';
         }
-    } else {
-    }
-    // Insert the new record for material
-    $insertQuery = "INSERT INTO client (nama_client, nama_korespondensi, alamat_perusahaan) VALUES (?, ?, ?)";
-    $insertStmt = $conn->prepare($insertQuery);
-    $insertStmt->bind_param("sss", $namaPerusahaan, $namaKorespondensi, $alamatPerusahaan);
+    } 
 
-    if ($insertStmt->execute()) {
-        echo "Data berhasil ditambahkan ke tabel masterbahan.";
-    } else {
-        echo "Error: " . $insertStmt->error;
-    }
-
-    $insertStmt->close();
+    header('Content-Type: application/json');
+    echo json_encode($response);
+    exit();
 }
 
 ?>
@@ -125,6 +128,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                     <a href="../produksi/produksi.php" class="nav-link">
                                         <i class="far fa-circle nav-icon"></i>
                                         <p>Produksi Device</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="../produksi/quality_control.php" class="nav-link">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>Quality Control</p>
                                     </a>
                                 </li>
                                 <li class="nav-item">
@@ -307,6 +316,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                     <label for="alamatPerusahaan">Alamat Perusahaan <span style="color: red;">*</span></label>
                                     <textarea class="form-control" id="alamatPerusahaan" name="alamatPerusahaan" rows="3" placeholder="Masukkan alamat perusahaan ..."></textarea>
                                 </div>
+                                <div class="form-group">
+                                    <div>
+                                        <label for="password">Password Login <span style="color: red;">*</span></label>
+                                        <input type="text" class="form-control form-control-border border-width-2" id="password" name="password" placeholder="Masukkan password untuk perusahaan tersebut">
+                                    </div>
+                                </div>
                             </div>
 
                             <!-- /.card-body -->
@@ -365,8 +380,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             var namaPerusahaan = document.getElementById("namaPerusahaan").value;
             var namaKorespondensi = document.getElementById("namaKorespondensi").value;
             var alamatPerusahaan = document.getElementById("alamatPerusahaan").value;
+            var password = document.getElementById("password").value;
 
-            if (namaPerusahaan === "" || namaKorespondensi === "" || alamatPerusahaan === "") {
+            if (namaPerusahaan === "" || namaKorespondensi === "" || alamatPerusahaan === "" || password === "") {
                 Swal.fire({
                     icon: 'error',
                     title: 'Oops...',
@@ -390,29 +406,32 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 data: formData,
                 dataType: "json",
                 success: function(response) {
-                    // Handle success response
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Perusahaan Berhasil Ditambahkan!',
-                        showCancelButton: false,
-                        confirmButtonColor: '#3085d6',
-                        confirmButtonText: 'OK'
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            resetForm();
-                        }
-                    });
+                    if (response.status === 'success') {
+                        // Handle success response
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Success',
+                            text: response.message,
+                            showCancelButton: false,
+                            confirmButtonColor: '#3085d6',
+                            confirmButtonText: 'OK'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                resetForm();
+                            }
+                        });
+                    } else if (response.status === 'error') {
+                        // Handle error response
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: response.message,
+                            showCancelButton: false,
+                            confirmButtonColor: '#3085d6',
+                            confirmButtonText: 'OK'
+                        });
+                    }
                 },
-                error: function(xhr, status, error) {
-                    // Handle error response
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Perusahaan telah terdaftar!',
-                        showCancelButton: false,
-                        confirmButtonColor: '#3085d6',
-                        confirmButtonText: 'OK'
-                    });
-                }
             });
         }
 
@@ -420,8 +439,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             document.getElementById("perusahaanForm").reset();
         }
 
-        var deksripsiInput = document.getElementById('alamatPerusahaan');
-        deksripsiInput.addEventListener('keydown', function(event) {
+        var passwordInput = document.getElementById('password');
+        passwordInput.addEventListener('keydown', function(event) {
             if (event.keyCode === 13) {
                 event.preventDefault();
                 submitForm();

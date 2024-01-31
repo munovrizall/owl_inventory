@@ -2,7 +2,7 @@
 
 include "connection.php";
 
-$queryBahan = "SELECT * FROM masterbahan WHERE kelompok != 'Barang Jadi' ORDER BY nama";
+$queryBahan = "SELECT * FROM masterbahan ORDER BY nama";
 $resultBahan = $conn->query($queryBahan);
 
 $stockQuantity = ""; // Default value, replace it with the actual stock quantity based on the selected item from the database
@@ -47,10 +47,18 @@ if (isset($_POST['quantity'])) {
     $updateStmt->execute();
     $updateStmt->close();
 
+    $queryNamaBahan = "SELECT nama FROM masterbahan WHERE stok_id = ?";
+    $stmtNamaBahan = $conn->prepare($queryNamaBahan);
+    $stmtNamaBahan->bind_param("i", $selectedItemId);
+    $stmtNamaBahan->execute();
+    $stmtNamaBahan->bind_result($namaBahan);
+    $stmtNamaBahan->fetch();
+    $stmtNamaBahan->close();
+
     // Insert a new record into the 'historis' table
-    $insertQueryHistoris = "INSERT INTO historis (pengguna, stok_id, waktu, quantity, activity, deskripsi) VALUES (?, ?, NOW(), ?, 'Prototype', ?)";
+    $insertQueryHistoris = "INSERT INTO historis (pengguna, nama_barang, waktu, quantity, activity, deskripsi) VALUES (?, ?, NOW(), ?, 'Prototype', ?)";
     $insertStmt = $conn->prepare($insertQueryHistoris);
-    $insertStmt->bind_param("siis", $pengguna, $selectedItemId, $submittedQuantity, $_POST['deskripsi']);
+    $insertStmt->bind_param("ssis", $pengguna, $namaBahan, $submittedQuantity, $_POST['deskripsi']);
 
     $insertStmt->execute();
     $insertStmt->close();
@@ -147,6 +155,12 @@ if (isset($_POST['quantity'])) {
                                     <a href="produksi/produksi.php" class="nav-link">
                                         <i class="far fa-circle nav-icon"></i>
                                         <p>Produksi Device</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="produksi/quality_control.php" class="nav-link">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>Quality Control</p>
                                     </a>
                                 </li>
                                 <li class="nav-item">

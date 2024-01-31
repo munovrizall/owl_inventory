@@ -32,15 +32,15 @@ $result = mysqli_query($conn, $query);
 
     <style>
         .lebar-kolom1 {
-            width: 15%;
+            width: 10%;
         }
 
         .lebar-kolom2 {
-            width: 15%;
+            width: 20%;
         }
 
         .lebar-kolom3 {
-            width: 38%;
+            width: 50%;
         }
 
         .lebar-kolom4 {
@@ -48,7 +48,7 @@ $result = mysqli_query($conn, $query);
         }
 
         .lebar-kolom5 {
-            width: 22%;
+            width: 10%;
         }
 
         .card-padding {
@@ -272,7 +272,7 @@ $result = mysqli_query($conn, $query);
 
                         <div class="card">
                             <div class="card-header">
-                                <h3 class="card-title"><b>List Transaksi</b></h3>
+                                <h3 class="card-title"><b>List Device</b></h3>
                             </div>
                             <!-- /.card-header -->
                             <div class="card-body p-0">
@@ -280,33 +280,53 @@ $result = mysqli_query($conn, $query);
                                     <table id="tableInventaris" class="table table order-list table-striped table-bordered">
                                         <thead>
                                             <tr>
-                                                <th class="text-center lebar-kolom1">ID Inventory</th>
-                                                <th class="text-center lebar-kolom3">Chip ID</th>
-                                                <th class="text-center lebar-kolom2">Produk</th>
-                                                <th class="text-center lebar-kolom5 aksi-column">QC</th>
+                                                <th class="text-center lebar-kolom1">ID</th>
+                                                <th class="text-center lebar-kolom2">Chip ID</th>
+                                                <th class="text-center lebar-kolom3">Nama Produk</th>
+                                                <th class="text-center lebar-kolom4">Status</th>
                                                 <th class="text-center lebar-kolom5 aksi-column">Aksi</th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             <?php
                                             while ($row = mysqli_fetch_assoc($result)) {
-                                                $statusClass = 'bg-danger'; // Default class
-                                                $statusText = 'Belum'; // Default text
+                                                $statusClass = 'badge bg-danger'; // Default class
+                                                $statusText = 'QC Pending'; // Default text
 
                                                 // Check conditions for bg-success
                                                 $allConditionsMet = true;
                                                 if (
-                                                    strtotime($row["garansi_akhir"]) < strtotime('today') // Check if warranty expiry date is before today
+                                                    // Check if any of the columns except 'nama_client', 'garansi_awal', and 'garansi_akhir' are null
+                                                    is_null($row["type_produk"]) ||
+                                                    is_null($row["chip_id"]) ||
+                                                    is_null($row["no_sn"]) ||
+                                                    is_null($row["ip_address"]) ||
+                                                    is_null($row["mac_wifi"]) ||
+                                                    is_null($row["mac_bluetooth"]) ||
+                                                    is_null($row["firmware_version"]) ||
+                                                    is_null($row["hardware_version"]) ||
+                                                    is_null($row["free_ram"]) ||
+                                                    is_null($row["min_ram"]) ||
+                                                    is_null($row["batt_low"]) ||
+                                                    is_null($row["batt_high"]) ||
+                                                    is_null($row["temperature"]) ||
+                                                    is_null($row["status_error"]) ||
+                                                    is_null($row["gps_latitude"]) ||
+                                                    is_null($row["gps_longitude"]) ||
+                                                    is_null($row["status_qc_sensor_1"]) ||
+                                                    is_null($row["status_qc_sensor_2"]) ||
+                                                    is_null($row["status_qc_sensor_3"]) ||
+                                                    is_null($row["status_qc_sensor_4"]) ||
+                                                    is_null($row["status_qc_sensor_5"]) ||
+                                                    is_null($row["status_qc_sensor_6"])
                                                 ) {
                                                     $allConditionsMet = false;
                                                 }
 
                                                 if ($allConditionsMet) {
-                                                    $statusClass = 'bg-success';
-                                                    $statusText = 'Selesai';
+                                                    $statusClass = 'badge bg-success';
+                                                    $statusText = 'QC Passed';
                                                 }
-
-                                                // Output table row with appropriate status class and text
                                             ?>
                                                 <tr>
                                                     <td><?php echo $row["id"]; ?></td>
@@ -316,7 +336,7 @@ $result = mysqli_query($conn, $query);
                                                     <td class="text-center">
                                                         <div class="row">
                                                             <div class="col">
-                                                                <a href='edit/edit.php?id=<?php echo $row["id"]; ?>' class="btn btn-info btn-block">Edit</a>
+                                                                <a href='edit/edit.php?id=<?php echo $row["id"]; ?>' class="btn btn-info btn-block text-center">Edit</a>
                                                             </div>
                                                         </div>
                                                     </td>
@@ -359,9 +379,6 @@ $result = mysqli_query($conn, $query);
     <script src="../assets/adminlte/plugins/bs-custom-file-input/bs-custom-file-input.min.js"></script>
     <!-- AdminLTE App -->
     <script src="../assets/adminlte/dist/js/adminlte.min.js"></script>
-    <!-- bootstrap searchable dropdown -->
-    <script src="../assets/bootstrap-5/bootstrap.bundle.min.js"></script>
-    <script src="../assets/dselect.js"></script>
     <!-- Datatables -->
     <script src="https://cdn.datatables.net/v/bs4/dt-1.13.8/b-2.4.2/b-colvis-2.4.2/b-print-2.4.2/fh-3.4.0/r-2.5.0/rg-1.4.1/sb-1.6.0/sp-2.2.0/datatables.min.js"></script>
     <script src="https:////code.jquery.com/jquery-3.7.0.js"></script>
@@ -393,7 +410,7 @@ $result = mysqli_query($conn, $query);
                     'pageLength',
                     {
                         extend: 'copy',
-                        title: 'Monitoring Inventaris Produk',
+                        title: 'Quality Control Produk',
                         exportOptions: {
                             columns: ':visible:not(.aksi-column)'
                         }
@@ -405,28 +422,28 @@ $result = mysqli_query($conn, $query);
                     },
                     {
                         extend: 'csv',
-                        title: 'Monitoring Inventaris Produk',
+                        title: 'Quality Control Produk',
                         exportOptions: {
                             columns: ':visible:not(.aksi-column)'
                         }
                     },
                     {
                         extend: 'excel',
-                        title: 'Monitoring Inventaris Produk',
+                        title: 'Quality Control Produk',
                         exportOptions: {
                             columns: ':visible:not(.aksi-column)'
                         }
                     },
                     {
                         extend: 'pdf',
-                        title: 'Monitoring Inventaris Produk',
+                        title: 'Quality Control Produk',
                         exportOptions: {
                             columns: ':visible:not(.aksi-column)'
                         }
                     },
                     {
                         extend: 'print',
-                        title: 'Monitoring Inventaris Produk',
+                        title: 'Quality Control Produk',
                         exportOptions: {
                             columns: ':visible:not(.aksi-column)'
                         }

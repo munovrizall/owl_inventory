@@ -2,8 +2,7 @@
 
 include "connection.php";
 
-$query = "SELECT * FROM masterbahan
-WHERE kelompok = 'Barang Jadi'";
+$query = "SELECT * FROM produk";
 $result = mysqli_query($conn, $query);
 
 ?>
@@ -111,6 +110,12 @@ $result = mysqli_query($conn, $query);
                                     <a href="produksi/produksi.php" class="nav-link">
                                         <i class="far fa-circle nav-icon"></i>
                                         <p>Produksi Device</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="produksi/quality_control.php" class="nav-link">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>Quality Control</p>
                                     </a>
                                 </li>
                                 <li class="nav-item">
@@ -283,7 +288,7 @@ $result = mysqli_query($conn, $query);
                                                 <th class="text-center lebar-kolom1">Stok ID</th>
                                                 <th class="text-center lebar-kolom2">Nama</th>
                                                 <th class="text-center lebar-kolom3">Stok</th>
-                                                <th class="text-center lebar-kolom4">Deskripsi</th>
+                                                <th class="text-center lebar-kolom4">HPP Produk</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -291,10 +296,10 @@ $result = mysqli_query($conn, $query);
                                             while ($row = mysqli_fetch_assoc($result)) {
                                             ?>
                                                 <tr>
-                                                    <td><?php echo $row["stok_id"]; ?></td>
-                                                    <td><?php echo $row["nama"]; ?></td>
+                                                    <td><?php echo $row["produk_id"]; ?></td>
+                                                    <td><?php echo $row["nama_produk"]; ?></td>
                                                     <td><?php echo $row["quantity"]; ?></td>
-                                                    <td><?php echo $row["deskripsi"]; ?></td>
+                                                    <td><?php echo $row["hpp_produk"]; ?></td>
                                                 </tr>
                                             <?php
                                             }

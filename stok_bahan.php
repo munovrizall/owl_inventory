@@ -2,7 +2,8 @@
 
 include "connection.php";
 
-$query = "SELECT * FROM masterbahan ORDER BY stok_id";
+$query = "SELECT * FROM masterbahan
+WHERE kelompok != 'Barang Jadi'";
 $result = mysqli_query($conn, $query);
 
 ?>
@@ -114,6 +115,12 @@ $result = mysqli_query($conn, $query);
                                     <a href="produksi/produksi.php" class="nav-link">
                                         <i class="far fa-circle nav-icon"></i>
                                         <p>Produksi Device</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="produksi/inventaris_device.php" class="nav-link">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>Inventaris Device</p>
                                     </a>
                                 </li>
                                 <li class="nav-item">
@@ -258,6 +265,7 @@ $result = mysqli_query($conn, $query);
                                                 <th class="text-center lebar-kolom2">Kelompok</th>
                                                 <th class="text-center lebar-kolom3">Nama</th>
                                                 <th class="text-center lebar-kolom4">Stok</th>
+                                                <th class="text-center lebar-kolom5">HPP</th>
                                                 <th class="text-center lebar-kolom5">Deskripsi</th>
                                             </tr>
                                         </thead>
@@ -270,6 +278,7 @@ $result = mysqli_query($conn, $query);
                                                     <td><?php echo $row["kelompok"]; ?></td>
                                                     <td><?php echo $row["nama"]; ?></td>
                                                     <td><?php echo $row["quantity"]; ?></td>
+                                                    <td><?php echo $row["hpp_bahan"]; ?></td>
                                                     <td><?php echo $row["deskripsi"]; ?></td>
                                                 </tr>
                                             <?php

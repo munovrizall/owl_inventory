@@ -2,7 +2,32 @@
 
 include "../connection.php";
 
-$query = "SELECT * FROM inventaris_produk ORDER BY id";
+$query = "SELECT * FROM inventaris_produk WHERE 
+           id IS NOT NULL AND 
+           type_produk IS NOT NULL AND 
+           produk IS NOT NULL AND 
+           chip_id IS NOT NULL AND 
+           no_sn IS NOT NULL AND 
+           ip_address IS NOT NULL AND 
+           mac_wifi IS NOT NULL AND 
+           mac_bluetooth IS NOT NULL AND 
+           firmware_version IS NOT NULL AND 
+           hardware_version IS NOT NULL AND 
+           free_ram IS NOT NULL AND 
+           min_ram IS NOT NULL AND 
+           batt_low IS NOT NULL AND 
+           batt_high IS NOT NULL AND 
+           temperature IS NOT NULL AND 
+           status_error IS NOT NULL AND 
+           gps_latitude IS NOT NULL AND 
+           gps_longitude IS NOT NULL AND 
+           status_qc_sensor_1 IS NOT NULL AND 
+           status_qc_sensor_2 IS NOT NULL AND 
+           status_qc_sensor_3 IS NOT NULL AND 
+           status_qc_sensor_4 IS NOT NULL AND 
+           status_qc_sensor_5 IS NOT NULL AND 
+           status_qc_sensor_6 IS NOT NULL
+           ORDER BY id";
 $result = mysqli_query($conn, $query);
 
 ?>
@@ -109,6 +134,12 @@ $result = mysqli_query($conn, $query);
                                     <a href="produksi.php" class="nav-link">
                                         <i class="far fa-circle nav-icon"></i>
                                         <p>Produksi Device</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="quality_control.php" class="nav-link">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>Quality Control</p>
                                     </a>
                                 </li>
                                 <li class="nav-item">
@@ -291,19 +322,26 @@ $result = mysqli_query($conn, $query);
                                             while ($row = mysqli_fetch_assoc($result)) {
                                                 $statusClass = 'bg-danger'; // Default class
                                                 $statusText = 'Tidak'; // Default text
-
-                                                // Check conditions for bg-success
-                                                $allConditionsMet = true;
+                                                
+                                                // Check if any row is missing and set default values
                                                 if (
-                                                    strtotime($row["garansi_akhir"]) < strtotime('today') // Check if warranty expiry date is before today
+                                                    empty($row["garansi_akhir"]) // Check if warranty expiry date is missing
+                                                    // Add similar checks for other rows as needed
                                                 ) {
-                                                    $allConditionsMet = false;
-                                                }
-
-                                                if ($allConditionsMet) {
-                                                    $statusClass = 'bg-success';
-                                                    $statusText = 'Ya';
-                                                }
+                                                    $statusClass = '-';
+                                                    $statusText = '-';
+                                                } else {
+                                                    // Check conditions for bg-success
+                                                    $allConditionsMet = true;
+                                                    if (strtotime($row["garansi_akhir"]) < strtotime('today')) { // Check if warranty expiry date is before today
+                                                        $allConditionsMet = false;
+                                                    }
+                                                
+                                                    if ($allConditionsMet) {
+                                                        $statusClass = 'bg-success';
+                                                        $statusText = 'Ya';
+                                                    }
+                                                }                                                
 
                                                 // Output table row with appropriate status class and text
                                             ?>
@@ -311,7 +349,7 @@ $result = mysqli_query($conn, $query);
                                                     <td><?php echo $row["id"]; ?></td>
                                                     <td><?php echo $row["produk"] ?></td>
                                                     <td><?php echo $row["no_sn"]; ?></td>
-                                                    <td><?php echo $row["nama_client"]; ?></td>
+                                                    <td><?php echo !empty($row["nama_client"]) ? $row["nama_client"] : '-' ?></td>
                                                     <td class="text-center"><span class="badge <?php echo $statusClass; ?>"><?php echo $statusText; ?></span></td>
                                                     <td class="text-center">
                                                         <div class="row">
