@@ -61,7 +61,7 @@ if (isset($_POST['selectedDevice'])) {
             $updatedStockQuantities[] = array('namaBahan' => $namaBahan, 'stokDibutuhkan' => $stokDibutuhkan, 'currentStock' => $currentStock, 'newStock' => $newStock);
         }
 
-        $queryCurrentProductStock = "SELECT quantity FROM masterbahan WHERE nama = ?";
+        $queryCurrentProductStock = "SELECT quantity FROM produk WHERE nama_produk = ?";
         $stmtCurrentProductStock = $conn->prepare($queryCurrentProductStock);
         $stmtCurrentProductStock->bind_param("s", $selectedDeviceName);
         $stmtCurrentProductStock->execute();
@@ -75,8 +75,6 @@ if (isset($_POST['selectedDevice'])) {
             // Update the masterbahan table
             $updateQueryStock = "UPDATE masterbahan SET quantity = ? WHERE nama = ?";
             $updateStmt = $conn->prepare($updateQueryStock);
-
-
 
             foreach ($updatedStockQuantities as $updatedStock) {
                 $newStock = $updatedStock['newStock'];
@@ -111,11 +109,11 @@ if (isset($_POST['selectedDevice'])) {
             $insertStmt->close();
 
             // Update Produk quantity pada masterbahan
-            $updateQueryMasterBahan = "UPDATE produk SET quantity = ? WHERE nama_produk = ?";
-
-            $updateStmtMasterBahan = $conn->prepare($updateQueryMasterBahan);
-            $updateStmtMasterBahan->bind_param("is", $newProductStock, $selectedDeviceName);
-            $updateStmtMasterBahan->execute();
+            $updateQueryProduk = "UPDATE produk SET quantity = ? WHERE nama_produk = ?";
+            $updateStmtProduk = $conn->prepare($updateQueryProduk);
+            $updateStmtProduk->bind_param("is", $newProductStock, $selectedDeviceName);
+            $updateStmtProduk->execute();
+            $updateStmtProduk->close();
 
             $insertStmtQualityControl = "INSERT INTO inventaris_produk (produk) VALUES (?)";
             $insertStmtQualityControl = $conn->prepare($insertStmtQualityControl);
@@ -128,7 +126,6 @@ if (isset($_POST['selectedDevice'])) {
             $insertStmtQualityControl->close();
 
 
-            $updateStmtMasterBahan->close();
             $updateStmt->close();
         }
         // Return the updated stock quantities
@@ -211,7 +208,7 @@ if (isset($_POST['selectedDevice'])) {
         <!-- Main Sidebar Container -->
         <aside class="main-sidebar sidebar-dark-primary elevation-4 fixed">
             <!-- Brand Logo -->
-            <a href="homepage.php" class="brand-link">
+            <a href="../homepage.php" class="brand-link">
                 <img src="../assets/adminlte/dist/img/OWLlogo.png" alt="OWL Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
                 <span class="brand-text font-weight-heavy">OWL RnD</span>
             </a>
