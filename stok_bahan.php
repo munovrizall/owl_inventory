@@ -193,6 +193,14 @@ $result = mysqli_query($conn, $query);
                             </a>
                         </li>
                         <li class="nav-item">
+                            <a href="harga_bahan.php" class="nav-link">
+                                <i class="nav-icon fas fa-dollar-sign"></i>
+                                <p>
+                                    Harga Bahan
+                                </p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
                             <a href="tambah_perusahaan.php" class="nav-link">
                                 <i class="nav-icon fas fa-industry"></i>
                                 <p>
@@ -202,10 +210,18 @@ $result = mysqli_query($conn, $query);
                         </li>
                         <li class="nav-header">PELAPORAN</li>
                         <li class="nav-item">
-                            <a href="laporan_stok.php" class="nav-link active">
+                            <a href="stok_bahan.php" class="nav-link active">
                                 <i class="nav-icon ion ion-pie-graph"></i>
                                 <p>
-                                    Laporan Stok
+                                    Stok Bahan
+                                </p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="stok_produk.php" class="nav-link">
+                                <i class="nav-icon fas fa-microchip"></i>
+                                <p>
+                                    Stok Produk
                                 </p>
                             </a>
                         </li>
@@ -236,7 +252,7 @@ $result = mysqli_query($conn, $query);
                         <div class="col-sm-6">
                             <ol class="breadcrumb float-sm-right">
                                 <li class="breadcrumb-item"><a href="homepage.php">Home</a></li>
-                                <li class="breadcrumb-item active">Laporan Stok</li>
+                                <li class="breadcrumb-item active">Stok Bahan</li>
                             </ol>
                         </div><!-- /.col -->
                     </div><!-- /.row -->
