@@ -293,7 +293,7 @@ $result = mysqli_query($conn, $query);
                                                 <th class="text-center lebar-kolom2">Kelompok</th>
                                                 <th class="text-center lebar-kolom3">Nama</th>
                                                 <th class="text-center lebar-kolom4">Stok</th>
-                                                <th class="text-center lebar-kolom5">HPP</th>
+                                                <th class="text-center lebar-kolom5">Harga Per Piece</th>
                                                 <th class="text-center lebar-kolom5">Deskripsi</th>
                                             </tr>
                                         </thead>
@@ -306,7 +306,7 @@ $result = mysqli_query($conn, $query);
                                                     <td><?php echo $row["kelompok"]; ?></td>
                                                     <td><?php echo $row["nama"]; ?></td>
                                                     <td><?php echo $row["quantity"]; ?></td>
-                                                    <td><?php echo $row["hpp_bahan"]; ?></td>
+                                                    <td><?php echo $row["harga_bahan"]; ?></td>
                                                     <td><?php echo $row["deskripsi"]; ?></td>
                                                 </tr>
                                             <?php
