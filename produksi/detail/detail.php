@@ -488,12 +488,12 @@ if (isset($_GET['id'])) {
                                                         <td><b>Status Garansi :</b></td>
                                                         <td>
                                                             <?php
-                                                            $statusClass = 'badge bg-danger'; // Default class
-                                                            $statusText = 'Tidak'; // Default text
+                                                            $statusClass = 'badge bg-success'; // Default class
+                                                            $statusText = 'Ya'; // Default text
 
-                                                            if (strtotime($row["garansi_akhir"]) >= strtotime('today')) {
-                                                                $statusClass = 'badge bg-success';
-                                                                $statusText = 'Ya';
+                                                            if (strtotime($row["garansi_akhir"]) < strtotime('today') || $row["garansi_void"] == 1) {
+                                                                $statusClass = 'badge bg-danger';
+                                                                $statusText = 'Tidak';
                                                             }
                                                             ?>
                                                             <div class="<?php echo $statusClass; ?>"><?php echo $statusText; ?></div>

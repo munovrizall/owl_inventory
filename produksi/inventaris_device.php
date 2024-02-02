@@ -346,7 +346,7 @@ $result = mysqli_query($conn, $query);
                                                 } else {
                                                     // Check conditions for bg-success
                                                     $allConditionsMet = true;
-                                                    if (strtotime($row["garansi_akhir"]) < strtotime('today') && $row["garansi_void"] == 0) { // Check if warranty expiry date is before today
+                                                    if (strtotime($row["garansi_akhir"]) < strtotime('today') || $row["garansi_void"] == 1) { // Check if warranty expiry date is before today
                                                         $allConditionsMet = false;
                                                     }
                                                 
