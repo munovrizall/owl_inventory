@@ -8,6 +8,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $nama = isset($_POST["namaBahan"]) ? $_POST["namaBahan"] : null;
     $quantity = isset($_POST["quantity"]) ? $_POST["quantity"] : null;
     $deskripsi = isset($_POST["deskripsi"]) ? $_POST["deskripsi"] : null;
+    $hargaBahan = isset($_POST["price"]) ? $_POST["price"] : null;
 
     $namaKelompokBaru = isset($_POST["namaKelompokBaru"]) ? $_POST["namaKelompokBaru"] : null;
 
@@ -57,9 +58,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $insertStmtKB->close();
     } elseif ($kelompok !== null) {
         // Insert the new record for material
-        $insertQuery = "INSERT INTO masterbahan (kelompok, nama, quantity, deskripsi) VALUES (?, ?, ?, ?)";
+        $insertQuery = "INSERT INTO masterbahan (kelompok, nama, quantity, harga_bahan, deskripsi) VALUES (?, ?, ?, ?, ?)";
         $insertStmt = $conn->prepare($insertQuery);
-        $insertStmt->bind_param("ssis", $kelompok, $nama, $quantity, $deskripsi);
+        $insertStmt->bind_param("ssiis", $kelompok, $nama, $quantity, $hargaBahan, $deskripsi);
 
         if ($insertStmt->execute()) {
             echo "Data berhasil ditambahkan ke tabel masterbahan.";
@@ -251,6 +252,14 @@ if (!$resultKelompok) {
                             </a>
                         </li>
                         <li class="nav-item">
+                            <a href="harga_bahan.php" class="nav-link">
+                                <i class="nav-icon fas fa-dollar-sign"></i>
+                                <p>
+                                    Harga Bahan
+                                </p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
                             <a href="perusahaan.php" class="nav-link">
                                 <i class="nav-icon fas fa-industry"></i>
                                 <p>
@@ -358,8 +367,13 @@ if (!$resultKelompok) {
                                 <div class="form-group">
                                     <label for="quantity">Kuantitas <span style="color: red;">*</span></label>
                                     <div class="input-group">
-                                        <!-- Input untuk kuantitas -->
                                         <input type="number" class="form-control" id="quantity" name="quantity" min="0" value="" placeholder="Masukkan jumlah stok bahan">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="price">Harga Bahan <span style="color: red;">*</span></label>
+                                    <div class="input-group">
+                                        <input type="number" class="form-control" id="price" name="price" min="0" value="">
                                     </div>
                                 </div>
                                 <div class="form-group">
@@ -446,8 +460,9 @@ if (!$resultKelompok) {
             var selectedItem = document.getElementById("pilihNamaKelompok").value;
             var nama = document.getElementById("namaBahan").value;
             var quantity = document.getElementById("quantity").value;
+            var price = document.getElementById("price").value;
 
-            if (selectedItem === "" || nama === "" || quantity === "" || quantity <= 0) {
+            if (selectedItem === "" || nama === "" || quantity === "" || quantity <= 0 || price === "") {
                 Swal.fire({
                     icon: 'error',
                     title: 'Oops...',

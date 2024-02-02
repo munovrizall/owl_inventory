@@ -12,7 +12,7 @@ $result = mysqli_query($conn, $query);
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Stok Bahan</title>
+    <title>Laporan Stok</title>
 
     <link rel="icon" href="assets/adminlte/dist/img/OWLlogo.png" type="image/x-icon">
     <!-- Google Font: Source Sans Pro -->
@@ -117,12 +117,6 @@ $result = mysqli_query($conn, $query);
                                     </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a href="produksi/quality_control.php" class="nav-link">
-                                        <i class="far fa-circle nav-icon"></i>
-                                        <p>Quality Control</p>
-                                    </a>
-                                </li>
-                                <li class="nav-item">
                                     <a href="produksi/inventaris_device.php" class="nav-link">
                                         <i class="far fa-circle nav-icon"></i>
                                         <p>Inventaris Device</p>
@@ -199,27 +193,20 @@ $result = mysqli_query($conn, $query);
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="perusahaan.php" class="nav-link">
+                            <a href="harga_bahan.php" class="nav-link">
+                                <i class="nav-icon fas fa-dollar-sign"></i>
+                                <p>
+                                    Harga Bahan
+                                </p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="tambah_perusahaan.php" class="nav-link">
                                 <i class="nav-icon fas fa-industry"></i>
                                 <p>
                                     Perusahaan
-                                    <i class="right fas fa-angle-left"></i>
                                 </p>
                             </a>
-                            <ul class="nav nav-treeview">
-                                <li class="nav-item">
-                                    <a href="perusahaan/tambah_perusahaan.php" class="nav-link">
-                                        <i class="far fa-circle nav-icon"></i>
-                                        <p>Tambah Perusahaan</p>
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="perusahaan/list_perusahaan.php" class="nav-link">
-                                        <i class="far fa-circle nav-icon"></i>
-                                        <p>List Perusahaan</p>
-                                    </a>
-                                </li>
-                            </ul>
                         </li>
                         <li class="nav-header">PELAPORAN</li>
                         <li class="nav-item">
@@ -260,7 +247,7 @@ $result = mysqli_query($conn, $query);
                 <div class="container-fluid">
                     <div class="row mb-2">
                         <div class="col-sm-6">
-                            <h1 class="m-0">Laporan Stok Bahan</h1>
+                            <h1 class="m-0">Laporan Stok</h1>
                         </div><!-- /.col -->
                         <div class="col-sm-6">
                             <ol class="breadcrumb float-sm-right">
@@ -293,7 +280,7 @@ $result = mysqli_query($conn, $query);
                                                 <th class="text-center lebar-kolom2">Kelompok</th>
                                                 <th class="text-center lebar-kolom3">Nama</th>
                                                 <th class="text-center lebar-kolom4">Stok</th>
-                                                <th class="text-center lebar-kolom5">Harga Per Piece</th>
+                                                <th class="text-center lebar-kolom5">Harga per Piece</th>
                                                 <th class="text-center lebar-kolom5">Deskripsi</th>
                                             </tr>
                                         </thead>
@@ -314,6 +301,7 @@ $result = mysqli_query($conn, $query);
                                             ?>
                                         </tbody>
                                     </table>
+
                                 </div>
                                 <!-- /.card-body -->
                             </div>
@@ -389,7 +377,7 @@ $result = mysqli_query($conn, $query);
                     },
                     'csv', 'excel', 'pdf', 'print'
                 ],
-                order: [1, 'asc'],
+                order: [],
             });
 
             table.buttons().container()
