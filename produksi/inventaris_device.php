@@ -323,8 +323,8 @@ $result = mysqli_query($conn, $query);
                                         <thead>
                                             <tr>
                                                 <th class="text-center lebar-kolom1">ID</th>
-                                                <th class="text-center lebar-kolom2">Produk</th>
                                                 <th class="text-center lebar-kolom3">Nomor SN</th>
+                                                <th class="text-center lebar-kolom2">Produk</th>
                                                 <th class="text-center lebar-kolom4">Perusahaan</th>
                                                 <th class="text-center lebar-kolom5">Garansi</th>
                                                 <th class="text-center lebar-kolom6 aksi-column">Aksi</th>
@@ -360,8 +360,8 @@ $result = mysqli_query($conn, $query);
                                             ?>
                                                 <tr>
                                                     <td><?php echo $row["id"]; ?></td>
-                                                    <td><?php echo $row["produk"] ?></td>
                                                     <td><?php echo $row["no_sn"]; ?></td>
+                                                    <td><?php echo $row["produk"] ?></td>
                                                     <td><?php echo !empty($row["nama_client"]) ? $row["nama_client"] : '-' ?></td>
                                                     <td class="text-center"><span class="badge <?php echo $statusClass; ?>"><?php echo $statusText; ?></span></td>
                                                     <td class="text-center">
