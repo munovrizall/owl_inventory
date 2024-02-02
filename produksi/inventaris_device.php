@@ -346,7 +346,7 @@ $result = mysqli_query($conn, $query);
                                                 } else {
                                                     // Check conditions for bg-success
                                                     $allConditionsMet = true;
-                                                    if (strtotime($row["garansi_akhir"]) < strtotime('today')) { // Check if warranty expiry date is before today
+                                                    if (strtotime($row["garansi_akhir"]) < strtotime('today') && $row["garansi_void"] == 0) { // Check if warranty expiry date is before today
                                                         $allConditionsMet = false;
                                                     }
                                                 
@@ -362,7 +362,7 @@ $result = mysqli_query($conn, $query);
                                                     <td><?php echo $row["id"]; ?></td>
                                                     <td><?php echo $row["produk"] ?></td>
                                                     <td><?php echo $row["no_sn"]; ?></td>
-                                                    <td><?php echo !empty($row["nama_client"]) ? $row["nama_client"] : '-' ?></td>
+                                                    <td><?php echo $row["nama_client"]; ?></td>
                                                     <td class="text-center"><span class="badge <?php echo $statusClass; ?>"><?php echo $statusText; ?></span></td>
                                                     <td class="text-center">
                                                         <div class="row">
