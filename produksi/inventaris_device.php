@@ -8,6 +8,11 @@ $query = "SELECT * FROM inventaris_produk WHERE
            produk IS NOT NULL AND 
            chip_id IS NOT NULL AND 
            no_sn IS NOT NULL AND 
+           nama_client IS NOT NULL AND 
+           garansi_awal IS NOT NULL AND 
+           garansi_akhir IS NOT NULL AND 
+           garansi_void IS NOT NULL AND 
+           keterangan_void IS NOT NULL AND 
            ip_address IS NOT NULL AND 
            mac_wifi IS NOT NULL AND 
            mac_bluetooth IS NOT NULL AND 
