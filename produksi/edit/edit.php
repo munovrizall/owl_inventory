@@ -19,6 +19,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_GET['id'])) {
               nama_client = ?,
               garansi_awal = ?,
               garansi_akhir = ?,
+              garansi_void = ?,
+              keterangan_void = ?,
               ip_address = ?,
               mac_wifi = ?,
               mac_bluetooth = ?,
@@ -46,13 +48,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_GET['id'])) {
     $garansiAkhir = empty($_POST['garansiAkhir']) ? null : $_POST['garansiAkhir'];
 
     $stmt->bind_param(
-        "siissssssssiiiididdssssssi",
+        "siisssissssssiiiididdssssssi",
         $_POST['tipeProduk'],
         $_POST['chipID'],
         $_POST['nomorSN'],
         $_POST['client'],
         $garansiAwal,
         $garansiAkhir,
+        $_POST['garansiVoid'],
+        $_POST['keteranganVoid'],
         $_POST['ipAddress'],
         $_POST['macWifi'],
         $_POST['macBluetooth'],
@@ -402,7 +406,7 @@ if (isset($_GET['id'])) {
                             <div class="card-body">
                                 <div class="form-group">
                                     <div>
-                                        <label for="tipeProduk">Tipe Produk</label>
+                                        <label for="tipeProduk">Tipe Produk </label>
                                         <input type="text" class="form-control form-control-border border-width-2" id="tipeProduk" name="tipeProduk" placeholder="Masukkan tipe device" value="<?php echo is_null($row['type_produk']) ? '' : $row['type_produk']; ?>">
                                     </div>
                                 </div>
@@ -440,6 +444,20 @@ if (isset($_GET['id'])) {
                                     <label for="garansiAkhir">Tanggal Garansi Berakhir</label>
                                     <div class="input-group date" id="datepicker" data-target-input="nearest">
                                         <input type="date" class="form-control" id="garansiAkhir" name="garansiAkhir" placeholder="Masukkan tanggal transaksi" value="<?php echo is_null($row['garansi_akhir']) ? 'NULL' : $row['garansi_akhir']; ?>">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="garansiVoid">Apakah Garansi Void?</label>
+                                    <select class="form-control select2" id="garansiVoid" name="garansiVoid">
+                                        <option value="" <?php echo is_null($row['garansi_void']) ? 'selected' : ''; ?>>--- Pilih Void ---</option>
+                                        <option value="1" <?php echo ($row['garansi_void'] == 1) ? 'selected' : ''; ?>>Void</option>
+                                        <option value="0" <?php echo ($row['garansi_void'] == 0) ? 'selected' : ''; ?>>Tidak Void</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <div>
+                                        <label for="keteranganVoid">Keterangan Void</label>
+                                        <input type="text" class="form-control form-control-border border-width-2" id="keteranganVoid" name="keteranganVoid" placeholder="Masukkan Keterangan Void (tulis - jika garansi tidak void)" value="<?php echo is_null($row['keterangan_void']) ? '' : $row['keterangan_void']; ?>">
                                     </div>
                                 </div>
                                 <div class="form-group">

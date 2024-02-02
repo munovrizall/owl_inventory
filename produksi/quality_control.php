@@ -36,18 +36,22 @@ $result = mysqli_query($conn, $query);
         }
 
         .lebar-kolom2 {
-            width: 20%;
+            width: 15%;
         }
 
         .lebar-kolom3 {
-            width: 50%;
+            width: 15%;
         }
 
         .lebar-kolom4 {
-            width: 10%;
+            width: 40%;
         }
 
         .lebar-kolom5 {
+            width: 10%;
+        }
+
+        .lebar-kolom6 {
             width: 10%;
         }
 
@@ -290,9 +294,10 @@ $result = mysqli_query($conn, $query);
                                             <tr>
                                                 <th class="text-center lebar-kolom1">ID</th>
                                                 <th class="text-center lebar-kolom2">Chip ID</th>
-                                                <th class="text-center lebar-kolom3">Nama Produk</th>
-                                                <th class="text-center lebar-kolom4">Status</th>
-                                                <th class="text-center lebar-kolom5 aksi-column">Aksi</th>
+                                                <th class="text-center lebar-kolom3">No SN</th>
+                                                <th class="text-center lebar-kolom4">Nama Produk</th>
+                                                <th class="text-center lebar-kolom5">Status</th>
+                                                <th class="text-center lebar-kolom6 aksi-column">Aksi</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -339,6 +344,7 @@ $result = mysqli_query($conn, $query);
                                                 <tr>
                                                     <td><?php echo $row["id"]; ?></td>
                                                     <td><?php echo $row["chip_id"]; ?></td>
+                                                    <td><?php echo $row["no_sn"]; ?></td>
                                                     <td><?php echo $row["produk"] ?></td>
                                                     <td class="text-center"><span class="badge <?php echo $statusClass; ?>"><?php echo $statusText; ?></span></td>
                                                     <td class="text-center">
