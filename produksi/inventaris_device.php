@@ -318,7 +318,6 @@ $result = mysqli_query($conn, $query);
                                         <thead>
                                             <tr>
                                                 <th class="text-center lebar-kolom1">ID</th>
-                                                <th class="text-center lebar-kolom2">Tipe Produk</th>
                                                 <th class="text-center lebar-kolom2">Produk</th>
                                                 <th class="text-center lebar-kolom3">Nomor SN</th>
                                                 <th class="text-center lebar-kolom4">Perusahaan</th>
@@ -356,7 +355,6 @@ $result = mysqli_query($conn, $query);
                                             ?>
                                                 <tr>
                                                     <td><?php echo $row["id"]; ?></td>
-                                                    <td><?php echo $row["type_produk"] ?></td>
                                                     <td><?php echo $row["produk"] ?></td>
                                                     <td><?php echo $row["no_sn"]; ?></td>
                                                     <td><?php echo !empty($row["nama_client"]) ? $row["nama_client"] : '-' ?></td>
