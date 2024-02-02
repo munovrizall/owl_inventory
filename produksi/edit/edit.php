@@ -297,6 +297,14 @@ if (isset($_GET['id'])) {
                             </a>
                         </li>
                         <li class="nav-item">
+                            <a href="../../harga_bahan.php" class="nav-link">
+                                <i class="nav-icon fas fa-dollar-sign"></i>
+                                <p>
+                                    Harga Bahan
+                                </p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
                             <a href="perusahaan.php" class="nav-link">
                                 <i class="nav-icon fas fa-industry"></i>
                                 <p>

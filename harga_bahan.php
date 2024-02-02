@@ -5,66 +5,50 @@ include "connection.php";
 $queryBahan = "SELECT * FROM masterbahan ORDER BY nama";
 $resultBahan = $conn->query($queryBahan);
 
-$stockQuantity = ""; // Default value, replace it with the actual stock quantity based on the selected item from the database
-$newStockQuantity = "";
+$currentHargaBahan = "";
+$newHargaBahan = "";
 
-if (isset($_POST['quantity'])) {
-    $selectedItemId = $_POST['selectedItem'];
+if (isset($_POST['selectedItem'])) {
+    $selectedItem = $_POST['selectedItem'];
+    $newHargaBahan = $_POST['price'];
 
     // Fetch the username from the POST data
     $pengguna = isset($_SESSION['username']) ? $_SESSION['username'] : '';
 
 
-    // Fetch the stock quantity from the database based on the selected item
-    $query = "SELECT quantity FROM masterbahan WHERE stok_id = ?";
+    // Fetch the stock harga_bahan from the database based on the selected item
+    $query = "SELECT harga_bahan FROM masterbahan WHERE nama = ?";
     $stmt = $conn->prepare($query);
-    $stmt->bind_param("i", $selectedItemId);
+    $stmt->bind_param("s", $selectedItem);
     $stmt->execute();
-    $stmt->bind_result($stockQuantity);
+    $stmt->bind_result($currentHargaBahan);
     $stmt->fetch();
     $stmt->close();
 
-    $submittedQuantity = $_POST['quantity'];
-    if ($submittedQuantity == "") {
-        echo json_encode(array('currentStock' => $stockQuantity, 'newStock' => $newStockQuantity));
+    if ($newHargaBahan == "") {
+        echo json_encode(array('currentHargaBahan' => $currentHargaBahan, 'newHargaBahan' => $newHargaBahan));
         exit();
-    } elseif ($submittedQuantity <= 0) {
-        echo "Kuantitas yang dimasukkan harus lebih besar dari 0";
-        exit();
-    }
-
-    // Update the database with the new stock quantity
-    $newStockQuantity = $stockQuantity - $submittedQuantity;
-
-    if ($newStockQuantity < 0) {
-        echo "Stok bahan tidak mencukupi untuk keperluan prototype.";
+    } elseif ($newHargaBahan <= 0) {
+        echo "Harga yang dimasukkan harus lebih besar dari 0";
         exit();
     }
 
-    $updateQueryStock = "UPDATE masterbahan SET quantity = ? WHERE stok_id = ?";
-    $updateStmt = $conn->prepare($updateQueryStock);
-    $updateStmt->bind_param("ii", $newStockQuantity, $selectedItemId);
-    $updateStmt->execute();
-    $updateStmt->close();
+    // Update the database with the new stock harga_bahan
 
-    $queryNamaBahan = "SELECT nama FROM masterbahan WHERE stok_id = ?";
-    $stmtNamaBahan = $conn->prepare($queryNamaBahan);
-    $stmtNamaBahan->bind_param("i", $selectedItemId);
-    $stmtNamaBahan->execute();
-    $stmtNamaBahan->bind_result($namaBahan);
-    $stmtNamaBahan->fetch();
-    $stmtNamaBahan->close();
+    $updateQueryHarga = "UPDATE masterbahan SET harga_bahan = ? WHERE nama = ?";
+    $updateStmtHarga = $conn->prepare($updateQueryHarga);
+    $updateStmtHarga->bind_param("is", $newHargaBahan, $selectedItem);
+    $updateStmtHarga->execute();
+    $updateStmtHarga->close();
 
-    // Insert a new record into the 'historis' table
-    $insertQueryHistoris = "INSERT INTO historis (pengguna, nama_barang, waktu, quantity, activity, deskripsi) VALUES (?, ?, NOW(), ?, 'Prototype', ?)";
-    $insertStmt = $conn->prepare($insertQueryHistoris);
-    $insertStmt->bind_param("ssis", $pengguna, $namaBahan, $submittedQuantity, $_POST['deskripsi']);
+    $updateQueryHargaProduksi = "UPDATE produksi SET harga_bahan = ? WHERE nama_bahan = ?";
+    $updateStmtHargaProduksi = $conn->prepare($updateQueryHargaProduksi);
+    $updateStmtHargaProduksi->bind_param("is", $newHargaBahan, $selectedItem);
+    $updateStmtHargaProduksi->execute();
+    $updateStmtHargaProduksi->close();
 
-    $insertStmt->execute();
-    $insertStmt->close();
-
-    // Return the updated stock quantity
-    echo json_encode(array('currentStock' => $stockQuantity, 'newStock' => $newStockQuantity));
+    // Return the updated stock harga_bahan
+    echo json_encode(array('currentHargaBahan' => $currentHargaBahan, 'newHargaBahan' => $newHargaBahan));
     exit();
 }
 
@@ -75,7 +59,7 @@ if (isset($_POST['quantity'])) {
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Prototype</title>
+    <title>Harga Bahan</title>
 
     <link rel="icon" href="assets/adminlte/dist/img/OWLlogo.png" type="image/x-icon">
     <!-- Google Font: Source Sans Pro -->
@@ -207,7 +191,7 @@ if (isset($_POST['quantity'])) {
                             </ul>
                         </li>
                         <li class="nav-item">
-                            <a href="prototype.php" class="nav-link active">
+                            <a href="prototype.php" class="nav-link">
                                 <i class="nav-icon fas fa-screwdriver"></i>
                                 <p>
                                     Prototype
@@ -240,7 +224,7 @@ if (isset($_POST['quantity'])) {
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="harga_bahan.php" class="nav-link">
+                            <a href="harga_bahan.php" class="nav-link active">
                                 <i class="nav-icon fas fa-dollar-sign"></i>
                                 <p>
                                     Harga Bahan
@@ -309,12 +293,12 @@ if (isset($_POST['quantity'])) {
                 <div class="container-fluid">
                     <div class="row mb-2">
                         <div class="col-sm-6">
-                            <h1>Prototype</h1>
+                            <h1>Harga Bahan</h1>
                         </div>
                         <div class="col-sm-6">
                             <ol class="breadcrumb float-sm-right">
                                 <li class="breadcrumb-item"><a href="homepage.php">Home</a></li>
-                                <li class="breadcrumb-item active">Prototype</li>
+                                <li class="breadcrumb-item active">Harga Bahan</li>
                             </ol>
                         </div>
                     </div>
@@ -328,42 +312,36 @@ if (isset($_POST['quantity'])) {
                     <!-- general form elements -->
                     <div class="card card-primary">
                         <div class="card-header">
-                            <h3 class="card-title">Mengurangi Bahan Untuk Keperluan Prototype</h3>
+                            <h3 class="card-title">Mengupdate Harga Bahan</h3>
                         </div>
                         <!-- /.card-header -->
                         <!-- form start -->
-                        <form id="prototypeForm">
+                        <form id="priceForm">
                             <div class="card-body">
                                 <div class="form-group">
-                                    <label for="pilihBahanPrototype">Pilih Bahan <span style="color: red;">*</span></label>
-                                    <select class="form-control select2" id="pilihBahanPrototype" name="selectedItem">
+                                    <label for="pilihBahan">Pilih Bahan <span style="color: red;">*</span></label>
+                                    <select class="form-control select2" id="pilihBahan" name="selectedItem">
                                         <option value="">--- Pilih Bahan ---</option>
                                         <?php
                                         while ($row = $resultBahan->fetch_assoc()) {
-                                            echo '<option value="' . $row['stok_id'] . '">' . $row['nama'] . '</option>';
+                                            echo '<option value="' . $row['nama'] . '">' . $row['nama'] . '</option>';
                                         }
                                         ?>
                                     </select>
                                 </div>
+                                <p id="priceMessage">Harga Bahan Saat ini: <?php echo $currentHargaBahan; ?></p>
+                                <p id="successMessage">Harga Bahan Terbaru: <?php echo $newHargaBahan; ?></p>
                                 <div class="form-group">
-                                    <label for="quantity">Kuantitas <span style="color: red;">*</span></label>
+                                    <label for="price">Harga Bahan Terbaru <span style="color: red;">*</span></label>
                                     <div class="input-group">
-                                        <!-- Input untuk kuantitas -->
-                                        <input type="number" class="form-control" id="quantity" name="quantity" min="0" value="">
+                                        <input type="number" class="form-control" id="price" name="price" min="0" value="" placeholder="Masukkan harga bahan terbaru">
                                     </div>
                                 </div>
-                                <p id="stockMessage">Stok Bahan Tersisa: <?php echo $stockQuantity; ?></p>
-                                <p id="successMessage">Stok Bahan Terkini: <?php echo $newStockQuantity; ?></p>
-                                <div class="form-group">
-                                    <label for="deksripsi">Deskripsi<span class="gray-italic-text"> (opsional)</span></label>
-                                    <textarea class="form-control" id="deskripsi" name="deskripsi" rows="3" placeholder="Masukkan keterangan penggunaan bahan ..."></textarea>
-                                </div>
                             </div>
-
                             <!-- /.card-body -->
                         </form>
                         <div class="card-footer d-flex justify-content-end">
-                            <button type="submit" id="submitButton" class="btn btn-primary" onclick="if(validateForm()) { validateSuccess();}">Submit</button>
+                            <button type="button" id="submitButton" class="btn btn-primary" onclick="if(validateForm()) { validateSuccess(); resetForm(); }">Submit</button>
                         </div>
                     </div>
                     <!-- general form elements -->
@@ -374,6 +352,7 @@ if (isset($_POST['quantity'])) {
             <!-- /.content -->
         </div>
         <!-- /.content-wrapper -->
+
 
         <!-- Control Sidebar -->
         <aside class="control-sidebar control-sidebar-dark">
@@ -395,6 +374,7 @@ if (isset($_POST['quantity'])) {
     <script src="assets/adminlte/plugins/sweetalert2/sweetalert2.min.js"></script>
     <!-- Select2 -->
     <script src="assets/adminlte/plugins/select2/js/select2.full.min.js"></script>
+
     <!-- Page specific script -->
     <script>
         // Select2 Dropdown
@@ -415,16 +395,16 @@ if (isset($_POST['quantity'])) {
             bsCustomFileInput.init();
 
             // Add an event listener to the select element
-            $("#pilihBahanPrototype").change(function() {
-                validateCurrentStock();
+            $("#pilihBahan").change(function() {
+                validatecurrentHargaBahan();
             });
         });
 
         function validateForm() {
-            var selectedItem = document.getElementById("pilihBahanPrototype").value;
-            var quantity = document.getElementById("quantity").value;
+            var selectedItem = document.getElementById("pilihBahan").value;
+            var harga_bahan = document.getElementById("price").value;
 
-            if (selectedItem === "" || quantity === "" || quantity <= 0) {
+            if (selectedItem === "" || harga_bahan === "" || harga_bahan <= 0) {
                 Swal.fire({
                     icon: 'error',
                     title: 'Oops...',
@@ -443,29 +423,30 @@ if (isset($_POST['quantity'])) {
             return true;
         }
 
-        function updateStockMessage() {
-            var stockMessage = document.getElementById("stockMessage");
-            var selectedQuantity = parseInt(document.getElementById("quantity").value, 10);
+        function updatepriceMessage() {
+            var priceMessage = document.getElementById("priceMessage");
+            var selectedharga_bahan = parseInt(document.getElementById("harga_bahan").value, 10);
 
-            // Update stock message dynamically based on the selected item's stock quantity
-            stockMessage.innerText = "Stok Bahan Tersisa: " + (<?php echo $stockQuantity; ?> - selectedQuantity);
+            // Update stock message dynamically based on the selected item's stock harga_bahan
+            priceMessage.innerText = "Stok Bahan Tersisa: " + (<?php echo $currentHargaBahan; ?> + selectedharga_bahan);
         }
 
-        function validateCurrentStock() {
+        function validatecurrentHargaBahan() {
             // Get the form data
-            var formData = $("#prototypeForm").serialize();
+            var formData = $("#priceForm").serialize();
 
-            // Use AJAX to submit the form data and fetch the updated stock quantity
+            // Use AJAX to submit the form data and fetch the updated stock harga_bahan
             $.ajax({
                 type: "POST",
-                url: "prototype.php",
+                url: "harga_bahan.php",
                 data: formData,
                 dataType: "json",
                 success: function(response) {
                     // Hide the stock message
                     document.getElementById("successMessage").style.display = "none";
-                    // Update the stock message with the fetched quantity
-                    document.getElementById("stockMessage").innerText = "Stok Bahan Tersisa: " + response.currentStock;
+                    // Update the stock message with the fetched harga_bahan
+                    document.getElementById("priceMessage").innerText = "Harga Bahan Saat Ini: Rp. " + response
+                        .currentHargaBahan;
                 },
                 error: function(error) {
                     alert("Error, refresh the page!");
@@ -475,22 +456,21 @@ if (isset($_POST['quantity'])) {
 
         function validateSuccess() {
             // Get the form data
-            var formData = $("#prototypeForm").serialize();
+            var formData = $("#priceForm").serialize();
 
-            // Use AJAX to submit the form data and fetch the updated stock quantity
+            // Use AJAX to submit the form data and fetch the updated stock harga_bahan
             $.ajax({
                 type: "POST",
-                url: "prototype.php",
+                url: "harga_bahan.php",
                 data: formData,
                 dataType: "json",
                 success: function(response) {
-                    // Hide the stock message
-                    document.getElementById("stockMessage").innerText = "Stok Bahan Tersisa: ";
+                    document.getElementById("priceMessage").innerText = "Harga Bahan Saat Ini: Rp. ";
 
                     Swal.fire({
                         icon: 'success',
-                        title: 'Stok berhasil diambil!',
-                        text: 'Stok terbaru adalah ' + response.newStock + ' bahan',
+                        title: 'Harga bahan berhasil diperbarui!',
+                        text: 'Harga bahan terbaru adalah Rp.' + response.newHargaBahan + ' per piece',
                         showCancelButton: false,
                         confirmButtonColor: '#3085d6',
                         confirmButtonText: 'OK (enter)'
@@ -499,35 +479,22 @@ if (isset($_POST['quantity'])) {
                             resetForm();
                         }
                     });
-
-                    resetForm();
 
                 },
                 error: function(error) {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Stok Kurang',
-                        text: 'Kurangi kuantitas yang diinput!',
-                        showCancelButton: false,
-                        confirmButtonColor: '#3085d6',
-                        confirmButtonText: 'OK (enter)'
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            resetForm();
-                        }
-                    });
+                    alert("Error fetching new material price.");
                 }
             });
         }
 
         function resetForm() {
-            document.getElementById("prototypeForm").reset();
+            document.getElementById("priceForm").reset();
             resetDropdown();
-            disableQuantityInput();
+            disableharga_bahanInput();
         }
 
         function resetDropdown() {
-            const dropdown = document.getElementById("pilihBahanPrototype");
+            const dropdown = document.getElementById("pilihBahan");
             dropdown.selectedIndex = 0; // reset ke pilihan pertama
 
             // jika multiple selection
@@ -539,26 +506,26 @@ if (isset($_POST['quantity'])) {
             dropdown.dispatchEvent(new Event('change'));
         }
 
-        // Quantity input disabled to prevent bugs
+        // harga_bahan input disabled to prevent bugs
         document.addEventListener("DOMContentLoaded", function() {
-            disableQuantityInput();
+            disableharga_bahanInput();
         });
 
-        function disableQuantityInput() {
-            const quantityInput = document.getElementById("quantity");
-            quantityInput.placeholder = "Pilih bahan terlebih dahulu";
-            quantityInput.disabled = true;
+        function disableharga_bahanInput() {
+            const harga_bahanInput = document.getElementById("price");
+            harga_bahanInput.placeholder = "Pilih bahan terlebih dahulu";
+            harga_bahanInput.disabled = true;
         }
 
-        $("#pilihBahanPrototype").change(function() {
-            const quantityInput = document.getElementById("quantity");
-            quantityInput.placeholder = "Masukkan jumlah stok bahan yang ingin digunakan";
-            quantityInput.disabled = false;
+        $("#pilihBahan").change(function() {
+            const harga_bahanInput = document.getElementById("price");
+            harga_bahanInput.placeholder = "Masukkan jumlah stok bahan yang dibeli";
+            harga_bahanInput.disabled = false;
         });
 
         // When user press enter on keyboard
-        var quantityInput = document.getElementById('quantity');
-        quantityInput.addEventListener('keydown', function(event) {
+        var harga_bahanInput = document.getElementById('price');
+        harga_bahanInput.addEventListener('keydown', function(event) {
             if (event.keyCode === 13) {
                 event.preventDefault();
                 submitForm();
@@ -572,7 +539,6 @@ if (isset($_POST['quantity'])) {
                 submitForm();
             }
         });
-
 
         function submitForm() {
             document.getElementById('submitButton').click();

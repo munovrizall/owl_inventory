@@ -13,13 +13,13 @@ if (!$resultClient) {
 
 if (isset($_GET["getDropdownOptions"])) {
 
-    $queryProduk = "SELECT DISTINCT produk FROM produksi ORDER BY produk";
+    $queryProduk = "SELECT * FROM produk ORDER BY nama_produk";
     $resultProduk = $conn->query($queryProduk);
     $options = '<option value="" selected disabled>Pilih Produk</option>';
 
     if ($resultProduk && $resultProduk->num_rows > 0) {
         while ($row = $resultProduk->fetch_assoc()) {
-            $options .= '<option value="' . $row['produk'] . '">' . $row['produk'] . '</option>';
+            $options .= '<option value="' . $row['nama_produk'] . '">' . $row['nama_produk'] . '</option>';
         }
     }
     echo $options;
@@ -28,39 +28,6 @@ if (isset($_GET["getDropdownOptions"])) {
     // Handle the POST request for submitting form data
     $tanggal = $_POST["tanggal"];
     $nama_client = $_POST["client"];
-
-    if (isset($_POST["namaPTBaru"]) && !empty($_POST["namaPTBaru"])) {
-        $newClientName = $_POST["namaPTBaru"];
-
-        // Check if the client already exists in the database
-        $checkClientQuery = "SELECT nama_client FROM client WHERE nama_client = ?";
-        $stmtCheck = $conn->prepare($checkClientQuery);
-        $stmtCheck->bind_param("s", $newClientName);
-        $stmtCheck->execute();
-        $stmtCheck->store_result();
-
-        // If the client already exists, show an error
-        if ($stmtCheck->num_rows > 0) {
-            echo "Client with the name '$newClientName' already exists in the database.";
-            $stmtCheck->close();
-            exit();
-        }
-
-        $stmtCheck->close();
-
-        // Perform insertion of a new client into the database
-        $insertClientQuery = "INSERT INTO client (nama_client) VALUES (?)";
-        $stmt = $conn->prepare($insertClientQuery);
-        $stmt->bind_param("s", $newClientName);
-
-        if ($stmt->execute()) {
-            // Insert successful, continue with the transaction maintenance
-            $stmt->close();
-        } else {
-            echo "Error adding a new client: " . $stmt->error;
-            exit();
-        }
-    }
 
     // Continue with the transaction maintenance
     $query = "INSERT INTO transaksi_maintenance (tanggal_terima, nama_client) VALUES (?, ?)";
@@ -89,7 +56,7 @@ if (isset($_GET["getDropdownOptions"])) {
                 $queryDetail = "INSERT INTO detail_maintenance (transaksi_id, produk_mt, no_sn, garansi, 
                 keterangan, kedatangan, cek_barang, berita_as, administrasi, pengiriman, no_resi) VALUES (?, ?, ?, ?, ?, '1', '0','0','0','0', '0')";
                 $stmtDetail = $conn->prepare($queryDetail);
-                $stmtDetail->bind_param("issis", $transaksi_id, $nama_produk, $no_sn, $garansi, $keterangan);
+                $stmtDetail->bind_param("isiis", $transaksi_id, $nama_produk, $no_sn, $garansi, $keterangan);
                 $stmtDetail->execute();
                 $stmtDetail->close();
             }
@@ -298,6 +265,14 @@ if (isset($_GET["getDropdownOptions"])) {
                                 <i class="nav-icon fas fa-cube"></i>
                                 <p>
                                     Master Device
+                                </p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="../harga_bahan.php" class="nav-link">
+                                <i class="nav-icon fas fa-dollar-sign"></i>
+                                <p>
+                                    Harga Bahan
                                 </p>
                             </a>
                         </li>
@@ -520,7 +495,10 @@ if (isset($_GET["getDropdownOptions"])) {
 
                         cols += '<td><select class="form-control select2 pilihNamaProduk" name="pilihNamaProduk[]">' + dropdownOptions + '</select></td>';
                         cols += '<td><input type="number" class="form-control" name="numberSN[]" value="" placeholder="Nomor SN"/></td>';
-                        cols += '<td><select class="form-control select2" id="pilihGaransi ' + counter + '" name="pilihGaransi[]' + counter + '">' + dropdownGaransi + '</select></td>';
+                        cols += '<td class="text-center">';
+                        cols += '<span class="badge bg-success" style="margin-right : 10px">' + 'Ya' + '</span>';
+                        cols += '<button type="button" class="btn btn-outline-info info cekGaransi"><i class="fas fa-sync-alt" onclick="cekGaransi(' + counter + ')""></i></button>';
+                        cols += '</td>';
                         cols += '<td><input type="text" class="form-control" name="inputKerusakan[]" value="" placeholder="Kerusakan Device"/></td>';
                         cols += '<td><input type="button" class="ibtnDel btn btn-md btn-danger"  value="Delete"></td>';
 
