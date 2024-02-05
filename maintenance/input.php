@@ -11,20 +11,7 @@ if (!$resultClient) {
     die("Error fetching kelompok data: " . $conn->error);
 }
 
-if (isset($_GET["getDropdownOptions"])) {
-
-    $queryProduk = "SELECT * FROM produk ORDER BY nama_produk";
-    $resultProduk = $conn->query($queryProduk);
-    $options = '<option value="" selected disabled>Pilih Produk</option>';
-
-    if ($resultProduk && $resultProduk->num_rows > 0) {
-        while ($row = $resultProduk->fetch_assoc()) {
-            $options .= '<option value="' . $row['nama_produk'] . '">' . $row['nama_produk'] . '</option>';
-        }
-    }
-    echo $options;
-    exit();
-} elseif ($_SERVER["REQUEST_METHOD"] == "POST") {
+if (isset($_POST['tanggal'])) {
     // Handle the POST request for submitting form data
     $tanggal = $_POST["tanggal"];
     $nama_client = $_POST["client"];
@@ -39,24 +26,19 @@ if (isset($_GET["getDropdownOptions"])) {
         $transaksi_id = $conn->insert_id;
 
         // Insert successful, continue with the detail maintenance
-        if (isset($_POST["pilihNamaProduk"]) && isset($_POST["numberSN"]) && isset($_POST["pilihGaransi"]) && isset($_POST["inputKerusakan"])) {
-            $produkArray = $_POST["pilihNamaProduk"];
+        if (isset($_POST["numberSN"]) && isset($_POST["inputKerusakan"])) {
             $numberSNArray = $_POST["numberSN"];
-            $garansiArray = $_POST["pilihGaransi"];
             $keteranganArray = $_POST["inputKerusakan"];
 
             // Loop through the arrays and insert records
-            foreach ($produkArray as $key => $nama_produk) {
-                $no_sn = $numberSNArray[$key];
-                $garansi = $garansiArray[$key];
+            foreach ($numberSNArray as $key => $no_sn) {
                 $keterangan = $keteranganArray[$key];
 
                 // Insert the new record into detail_maintenance table
-                echo "Produk: $nama_produk, SN: $no_sn, Garansi: $garansi, Keterangan: $keterangan";
-                $queryDetail = "INSERT INTO detail_maintenance (transaksi_id, produk_mt, no_sn, garansi, 
-                keterangan, kedatangan, cek_barang, berita_as, administrasi, pengiriman, no_resi) VALUES (?, ?, ?, ?, ?, '1', '0','0','0','0', '0')";
+                $queryDetail = "INSERT INTO detail_maintenance (transaksi_id, no_sn, 
+                keterangan, kedatangan, cek_barang, berita_as, administrasi, pengiriman, no_resi) VALUES (?, ?, ?, '1', '0','0','0','0', '0')";
                 $stmtDetail = $conn->prepare($queryDetail);
-                $stmtDetail->bind_param("isiis", $transaksi_id, $nama_produk, $no_sn, $garansi, $keterangan);
+                $stmtDetail->bind_param("iis", $transaksi_id, $no_sn, $keterangan);
                 $stmtDetail->execute();
                 $stmtDetail->close();
             }
@@ -394,9 +376,7 @@ if (isset($_GET["getDropdownOptions"])) {
                                         <table id="tableDetail" class=" table order-list table-striped">
                                             <thead>
                                                 <tr>
-                                                    <td class="text-center lebar-kolom1" style="min-width:180px;"><b>Nama Produk <span style="color: red;">*</span></b></td>
                                                     <td class="text-center lebar-kolom2" style="min-width:120px;"><b>Nomor SN <span style="color: red;">*</span></b></td>
-                                                    <td class="text-center lebar-kolom3" style="min-width:130px;"><b>Garansi? <span style="color: red;">*</span></b></td>
                                                     <td class="text-center lebar-kolom4" style="min-width:120px;"><b>Kerusakan <span style="color: red;">*</span></b></td>
                                                     <td class="text-center lebar-kolom5"><b>Aksi</b></td>
                                                 </tr>
@@ -484,18 +464,14 @@ if (isset($_GET["getDropdownOptions"])) {
 
                 // Make an AJAX request to fetch dropdown options
                 $.ajax({
-                    url: 'input.php?getDropdownOptions',
-                    type: 'GET',
-                    success: function(dropdownOptions) {
-                        var dropdownGaransi = '<option value="" selected disabled>Garansi</option>' +
-                            '<option value="1">Ya</option>' +
-                            '<option value="0">Tidak</option>';
+                    type: 'POST',
+                    url: 'input.php',
+                    success: function(response) {
+
                         var newRow = $("<tr>");
                         var cols = "";
 
-                        cols += '<td><select class="form-control select2 pilihNamaProduk" name="pilihNamaProduk[]">' + dropdownOptions + '</select></td>';
                         cols += '<td><input type="number" class="form-control" name="numberSN[]" value="" placeholder="Nomor SN"/></td>';
-                        cols += '<td><select class="form-control select2" id="pilihGaransi ' + counter + '" name="pilihGaransi[]' + counter + '">' + dropdownGaransi + '</select></td>';
                         cols += '<td><input type="text" class="form-control" name="inputKerusakan[]" value="" placeholder="Kerusakan Device"/></td>';
                         cols += '<td><input type="button" class="ibtnDel btn btn-md btn-danger"  value="Delete"></td>';
 
@@ -563,7 +539,6 @@ if (isset($_GET["getDropdownOptions"])) {
 
         function validateSuccess() {
             var formData = new FormData(document.getElementById("inputMaintenanceForm"));
-            formData.append('getDropdownOptions', '1');
 
             $.ajax({
                 type: "POST",
