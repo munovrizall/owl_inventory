@@ -5,6 +5,8 @@ include "../connection.php";
 $resultProduksi = "";
 $stokDibutuhkan = "";
 $currentStock = "";
+$totalNewHargaBahan = 0;
+$totalNewHargaTotal = 0;
 
 // Fetch data from produksi table
 $queryProdukPilihan = "SELECT nama_produk FROM produk ORDER BY nama_produk";
@@ -15,14 +17,14 @@ if (isset($_POST['selectedDevice'])) {
     $pengguna = isset($_SESSION['username']) ? $_SESSION['username'] : '';
 
     // Milih bahan untuk produksi
-    $query = "SELECT nama_bahan, quantity FROM produksi WHERE produk = ?";
+    $query = "SELECT nama_bahan, quantity, harga_bahan FROM produksi WHERE produk = ?";
     $stmt = $conn->prepare($query);
     $stmt->bind_param("s", $selectedDeviceName);
     $stmt->execute();
-    $stmt->bind_result($namaBahan, $stokDibutuhkan);
+    $stmt->bind_result($namaBahan, $stokDibutuhkan, $hargaBahan);
     $resultProduksi = array();
     while ($stmt->fetch()) {
-        $resultProduksi[] = array('namaBahan' => $namaBahan, 'stokDibutuhkan' => $stokDibutuhkan);
+        $resultProduksi[] = array('namaBahan' => $namaBahan, 'stokDibutuhkan' => $stokDibutuhkan, 'hargaBahan' => $hargaBahan);
     }
     $stmt->close();
 
@@ -44,6 +46,7 @@ if (isset($_POST['selectedDevice'])) {
         foreach ($resultProduksi as $row) {
             $namaBahan = $row['namaBahan'];
             $stokDibutuhkan = $row['stokDibutuhkan'];
+            $hargaBahan = $row['hargaBahan'];
 
             // Fetch current stock from masterbahan
             $queryCurrentStock = "SELECT quantity FROM masterbahan WHERE nama = ?";
@@ -56,10 +59,27 @@ if (isset($_POST['selectedDevice'])) {
 
             // Update the database with the new stock quantity
             $newStock = $currentStock - ($submittedQuantity * $stokDibutuhkan);
+            $newHargaBahan = $hargaBahan * $stokDibutuhkan;
+            $newHargaTotal = $hargaBahan * $submittedQuantity * $stokDibutuhkan;
+
+            $totalNewHargaBahan += $newHargaBahan;
+            $totalNewHargaTotal += $newHargaTotal;
 
             // Store the updated stock quantities in the array
-            $updatedStockQuantities[] = array('namaBahan' => $namaBahan, 'stokDibutuhkan' => $stokDibutuhkan, 'currentStock' => $currentStock, 'newStock' => $newStock);
+            $updatedStockQuantities[] = array(
+                'namaBahan' => $namaBahan, 'stokDibutuhkan' => $stokDibutuhkan, 'hargaBahan' => $hargaBahan,
+                'currentStock' => $currentStock, 'newStock' => $newStock, 'newHargaBahan' => $newHargaBahan, 'newHargaTotal' => $newHargaTotal,
+                'totalNewHargaBahan' => $totalNewHargaBahan, 'totalNewHargaTotal' => $totalNewHargaTotal
+            );
         }
+
+        // Update hpp_produk column in produk table
+        $totalNewHargaBahan = end($updatedStockQuantities)['totalNewHargaBahan'];
+        $updateQueryHPP = "UPDATE produk SET hpp_produk = ? WHERE nama_produk = ?";
+        $stmtUpdateHPP = $conn->prepare($updateQueryHPP);
+        $stmtUpdateHPP->bind_param("is", $totalNewHargaBahan, $selectedDeviceName);
+        $stmtUpdateHPP->execute();
+        $stmtUpdateHPP->close();
 
         $queryCurrentProductStock = "SELECT quantity FROM produk WHERE nama_produk = ?";
         $stmtCurrentProductStock = $conn->prepare($queryCurrentProductStock);
@@ -117,19 +137,22 @@ if (isset($_POST['selectedDevice'])) {
 
             $insertStmtQualityControl = "INSERT INTO inventaris_produk (produk) VALUES (?)";
             $insertStmtQualityControl = $conn->prepare($insertStmtQualityControl);
-        
+
             for ($i = 0; $i < $submittedQuantity; $i++) {
                 $insertStmtQualityControl->bind_param("s", $selectedDeviceName);
                 $insertStmtQualityControl->execute();
             }
-        
+
             $insertStmtQualityControl->close();
 
 
             $updateStmt->close();
         }
         // Return the updated stock quantities
-        $responseArray = array('resultProduksi' => $resultProduksi, 'updatedStockQuantities' => $updatedStockQuantities);
+        $responseArray = array(
+            'resultProduksi' => $resultProduksi, 'updatedStockQuantities' => $updatedStockQuantities,
+            'totalNewHargaBahan' => $totalNewHargaBahan, 'totalNewHargaTotal' => $totalNewHargaTotal
+        );
 
         if (!isset($_POST['submitForm'])) {
             echo json_encode($responseArray);
@@ -175,18 +198,26 @@ if (isset($_POST['selectedDevice'])) {
         }
 
         .lebar-kolom2 {
-            width: 40%;
+            width: 30%;
         }
 
         .lebar-kolom3 {
-            width: 20%;
+            width: 15%;
         }
 
         .lebar-kolom4 {
-            width: 20%;
+            width: 15%;
         }
 
         .lebar-kolom5 {
+            width: 10%;
+        }
+
+        .lebar-kolom6 {
+            width: 10%;
+        }
+
+        .lebar-kolom7 {
             width: 15%;
         }
     </style>
@@ -454,6 +485,8 @@ if (isset($_POST['selectedDevice'])) {
                                                         <th class="text-center lebar-kolom3">Stok yang Dibutuhkan</th>
                                                         <th class="text-center lebar-kolom4">Stok Tersisa</th>
                                                         <th class="text-center lebar-kolom5">Cukup?</th>
+                                                        <th class="text-center lebar-kolom6">Harga Bahan</th>
+                                                        <th class="text-center lebar-kolom7">Total Harga Bahan</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody id="produksiTable">
@@ -573,11 +606,13 @@ if (isset($_POST['selectedDevice'])) {
                     // Update table rows dynamically
                     var tableBody = document.getElementById("produksiTable");
                     tableBody.innerHTML = ""; // Clear existing rows
+                    var totalNewHargaBahan = response.totalNewHargaBahan;
+                    var totalNewHargaTotal = response.totalNewHargaTotal;
+
                     // Add new rows based on the response array
                     for (var i = 0; i < response.resultProduksi.length; i++) {
                         var isStockSufficient = response.updatedStockQuantities[i].currentStock >= (quantity * response.resultProduksi[i].stokDibutuhkan);
                         var badgeClass = isStockSufficient ? 'bg-success' : 'bg-danger';
-
 
                         var newRow = "<tr>" +
                             "<td style='text-align: center;'>" + (i + 1) + "</td>" +
@@ -585,9 +620,19 @@ if (isset($_POST['selectedDevice'])) {
                             "<td style='text-align: center;'>" + response.resultProduksi[i].stokDibutuhkan * quantity + "</td>" +
                             "<td style='text-align: center;'>" + response.updatedStockQuantities[i].currentStock + "</td>" +
                             "<td style='text-align: center;'><span class='badge " + badgeClass + "'>" + (isStockSufficient ? "Ya" : "Tidak") + "</span></td>" +
+                            "<td style='text-align: center;'>" + formatCurrency((response.resultProduksi[i].hargaBahan !== null ? response.resultProduksi[i].hargaBahan : 0)) + "</td>" +
+                            "<td style='text-align: center;'>" + formatCurrency(response.resultProduksi[i].hargaBahan * (response.resultProduksi[i].stokDibutuhkan * quantity)) + "</td>" +
                             "</tr>";
                         tableBody.innerHTML += newRow;
                     }
+
+                    // Append total row to the table
+                    var totalRowBahan = "<tr><td colspan='7' style='text-align: left;'>Biaya pembuatan satu produk&nbsp: " + formatCurrency(totalNewHargaBahan) + "</td></tr>";
+                    tableBody.innerHTML += totalRowBahan;
+
+                    // Append total row for totalNewHargaTotal
+                    var totalRowTotal = "<tr><td colspan='7' style='text-align: left;'><b>Total keseluruhan biaya produksi: " + formatCurrency(totalNewHargaTotal) + "</b></td></tr>";
+                    tableBody.innerHTML += totalRowTotal;
 
                     // Show the table
                     tableBody.style.display = "table table-striped";
@@ -694,6 +739,10 @@ if (isset($_POST['selectedDevice'])) {
                 document.querySelector('[name="submitForm"]').click();
             }
         });
+
+        function formatCurrency(angka) {
+            return "Rp " + angka.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+        }
     </script>
 
 </body>

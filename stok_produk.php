@@ -35,22 +35,19 @@ $result = mysqli_query($conn, $query);
 
     <style>
         .lebar-kolom1 {
-            width: 12%;
+            width: 5%;
         }
 
         .lebar-kolom2 {
-            width: 30%;
+            width: 70%;
         }
 
         .lebar-kolom3 {
-            width: 8%;
+            width: 5%;
         }
 
         .lebar-kolom4 {
-            width: 50%;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
+            width: 20%;
         }
 
         .card-padding {
@@ -293,10 +290,10 @@ $result = mysqli_query($conn, $query);
                                     <table id="tableBahan" class="table table-striped table-bordered">
                                         <thead>
                                             <tr>
-                                                <th class="text-center lebar-kolom1">Stok ID</th>
-                                                <th class="text-center lebar-kolom2">Nama</th>
+                                                <th class="text-center lebar-kolom1">ID</th>
+                                                <th class="text-center lebar-kolom2">Nama Produk</th>
                                                 <th class="text-center lebar-kolom3">Stok</th>
-                                                <th class="text-center lebar-kolom4">HPP Produk</th>
+                                                <th class="text-center lebar-kolom4">Biaya Produksi</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -307,7 +304,7 @@ $result = mysqli_query($conn, $query);
                                                     <td><?php echo $row["produk_id"]; ?></td>
                                                     <td><?php echo $row["nama_produk"]; ?></td>
                                                     <td><?php echo $row["quantity"]; ?></td>
-                                                    <td><?php echo $row["hpp_produk"]; ?></td>
+                                                    <td>Rp <?php echo number_format($row["hpp_produk"]); ?></td>
                                                 </tr>
                                             <?php
                                             }

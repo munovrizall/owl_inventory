@@ -11,7 +11,6 @@ $newStockQuantity = "";
 if (isset($_POST['quantity'])) {
     $selectedItemId = $_POST['selectedItem'];
     $submittedQuantity = $_POST['quantity'];
-    $hargaBahan = $_POST['price'];
 
     // Fetch the username from the POST data
     $pengguna = isset($_SESSION['username']) ? $_SESSION['username'] : '';
@@ -41,12 +40,6 @@ if (isset($_POST['quantity'])) {
     $updateStmt->bind_param("ii", $newStockQuantity, $selectedItemId);
     $updateStmt->execute();
     $updateStmt->close();
-
-    $updateQueryHarga = "UPDATE masterbahan SET harga_bahan = ? WHERE stok_id = ?";
-    $updateStmtHarga = $conn->prepare($updateQueryHarga);
-    $updateStmtHarga->bind_param("ii", $hargaBahan, $selectedItemId);
-    $updateStmtHarga->execute();
-    $updateStmtHarga->close();
 
     $queryNamaBahan = "SELECT nama FROM masterbahan WHERE stok_id = ?";
     $stmtNamaBahan = $conn->prepare($queryNamaBahan);
@@ -353,12 +346,6 @@ if (isset($_POST['quantity'])) {
                                 </div>
                                 <p id="stockMessage">Stok Bahan Tersisa: <?php echo $stockQuantity; ?></p>
                                 <p id="successMessage">Stok Bahan Terkini: <?php echo $newStockQuantity; ?></p>
-                                <div class="form-group">
-                                    <label for="price">Harga Bahan <span style="color: red;">*</span></label>
-                                    <div class="input-group">
-                                        <input type="number" class="form-control" id="price" name="price" min="0" value="">
-                                    </div>
-                                </div>
                                 <div class="form-group">
                                     <label for="deskripsi">Deskripsi<span class="gray-italic-text"> (opsional)</span>
                                     </label>
