@@ -50,18 +50,25 @@ if (isset($_GET["getDropdownOptions"])) {
             if ($count > 0) {
                 echo "Error: Device and Bahan combination already exists in the database.";
             } else {
-                // Insert the new record
-                $query = "INSERT INTO produksi (produk, nama_bahan, quantity) VALUES (?, ?, ?)";
+                $queryHarga = "SELECT harga_bahan FROM masterbahan WHERE nama = ?";
+                $stmtHarga = $conn->prepare($queryHarga);
+                $stmtHarga->bind_param("s", $bahan);
+                $stmtHarga->execute();
+                $stmtHarga->bind_result($hargaBahan);
+                $stmtHarga->fetch();
+                $stmtHarga->close();
+
+                $query = "INSERT INTO produksi (produk, nama_bahan, quantity, harga_bahan) VALUES (?, ?, ?, ?)";
                 $stmt = $conn->prepare($query);
-                $stmt->bind_param("ssi", $namaDevice, $bahan, $quantity);
+                $stmt->bind_param("ssii", $namaDevice, $bahan, $quantity, $hargaBahan);
 
                 if ($stmt->execute()) {
                     echo "Data berhasil ditambahkan ke tabel produksi dan tabel masterbahan.";
                 } else {
                     echo "Error: " . $stmt->error;
                 }
-
                 $stmt->close();
+
             }
         }
 
