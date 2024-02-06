@@ -49,12 +49,16 @@ $result = mysqli_query($conn, $query);
         .lebar-kolom4 {
             width: 8%;
         }
-
+        
         .lebar-kolom5 {
-            width: 40%;
+            width: 10%;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
+        }
+        
+        .lebar-kolom6 {
+            width: 30%;
         }
 
         .card-padding {
@@ -280,8 +284,8 @@ $result = mysqli_query($conn, $query);
                                                 <th class="text-center lebar-kolom2">Kelompok</th>
                                                 <th class="text-center lebar-kolom3">Nama</th>
                                                 <th class="text-center lebar-kolom4">Stok</th>
-                                                <th class="text-center lebar-kolom5">Harga per Piece</th>
-                                                <th class="text-center lebar-kolom5">Deskripsi</th>
+                                                <th class="text-center lebar-kolom5">Harga Bahan</th>
+                                                <th class="text-center lebar-kolom6">Deskripsi</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -293,7 +297,7 @@ $result = mysqli_query($conn, $query);
                                                     <td><?php echo $row["kelompok"]; ?></td>
                                                     <td><?php echo $row["nama"]; ?></td>
                                                     <td><?php echo $row["quantity"]; ?></td>
-                                                    <td><?php echo $row["harga_bahan"]; ?></td>
+                                                    <td>Rp <?php echo number_format($row["harga_bahan"]); ?></td>
                                                     <td><?php echo $row["deskripsi"]; ?></td>
                                                 </tr>
                                             <?php
@@ -384,6 +388,10 @@ $result = mysqli_query($conn, $query);
                 .appendTo('wrapper .col-md-6:eq(0)');
 
         });
+
+        function formatCurrency(angka) {
+            return "Rp " + angka.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+        }
     </script>
 
 

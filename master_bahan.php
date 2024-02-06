@@ -371,9 +371,9 @@ if (!$resultKelompok) {
                                     </div>
                                 </div>
                                 <div class="form-group">
-                                    <label for="price">Harga Bahan <span style="color: red;">*</span></label>
+                                    <label for="price">Harga Bahan <span class="gray-italic-text"> (opsional)</span></label>
                                     <div class="input-group">
-                                        <input type="number" class="form-control" id="price" name="price" min="0" value="">
+                                        <input type="number" class="form-control" id="price" name="price" min="0" value="" placeholder="Masukkan harga bahan">
                                     </div>
                                 </div>
                                 <div class="form-group">
@@ -460,9 +460,8 @@ if (!$resultKelompok) {
             var selectedItem = document.getElementById("pilihNamaKelompok").value;
             var nama = document.getElementById("namaBahan").value;
             var quantity = document.getElementById("quantity").value;
-            var price = document.getElementById("price").value;
 
-            if (selectedItem === "" || nama === "" || quantity === "" || quantity <= 0 || price === "") {
+            if (selectedItem === "" || nama === "" || quantity === "" || quantity <= 0) {
                 Swal.fire({
                     icon: 'error',
                     title: 'Oops...',
@@ -470,11 +469,7 @@ if (!$resultKelompok) {
                     showCancelButton: false,
                     confirmButtonColor: '#3085d6',
                     confirmButtonText: 'OK (enter)'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        resetForm();
-                    }
-                });
+                })
                 return false;
             }
 

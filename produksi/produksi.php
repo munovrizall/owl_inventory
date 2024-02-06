@@ -620,18 +620,18 @@ if (isset($_POST['selectedDevice'])) {
                             "<td style='text-align: center;'>" + response.resultProduksi[i].stokDibutuhkan * quantity + "</td>" +
                             "<td style='text-align: center;'>" + response.updatedStockQuantities[i].currentStock + "</td>" +
                             "<td style='text-align: center;'><span class='badge " + badgeClass + "'>" + (isStockSufficient ? "Ya" : "Tidak") + "</span></td>" +
-                            "<td style='text-align: center;'>" + formatUang((response.resultProduksi[i].hargaBahan !== null ? response.resultProduksi[i].hargaBahan : 0)) + "</td>" +
-                            "<td style='text-align: center;'>" + formatUang(response.resultProduksi[i].hargaBahan * (response.resultProduksi[i].stokDibutuhkan * quantity)) + "</td>" +
+                            "<td style='text-align: center;'>" + formatCurrency((response.resultProduksi[i].hargaBahan !== null ? response.resultProduksi[i].hargaBahan : 0)) + "</td>" +
+                            "<td style='text-align: center;'>" + formatCurrency(response.resultProduksi[i].hargaBahan * (response.resultProduksi[i].stokDibutuhkan * quantity)) + "</td>" +
                             "</tr>";
                         tableBody.innerHTML += newRow;
                     }
 
                     // Append total row to the table
-                    var totalRowBahan = "<tr><td colspan='7' style='text-align: left;'>Biaya pembuatan satu produk&nbsp: " + formatUang(totalNewHargaBahan) + "</td></tr>";
+                    var totalRowBahan = "<tr><td colspan='7' style='text-align: left;'>Biaya pembuatan satu produk&nbsp: " + formatCurrency(totalNewHargaBahan) + "</td></tr>";
                     tableBody.innerHTML += totalRowBahan;
 
                     // Append total row for totalNewHargaTotal
-                    var totalRowTotal = "<tr><td colspan='7' style='text-align: left;'><b>Total keseluruhan biaya produksi: " + formatUang(totalNewHargaTotal) + "</b></td></tr>";
+                    var totalRowTotal = "<tr><td colspan='7' style='text-align: left;'><b>Total keseluruhan biaya produksi: " + formatCurrency(totalNewHargaTotal) + "</b></td></tr>";
                     tableBody.innerHTML += totalRowTotal;
 
                     // Show the table
@@ -740,7 +740,7 @@ if (isset($_POST['selectedDevice'])) {
             }
         });
 
-        function formatUang(angka) {
+        function formatCurrency(angka) {
             return "Rp " + angka.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
         }
     </script>

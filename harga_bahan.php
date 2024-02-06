@@ -445,8 +445,8 @@ if (isset($_POST['selectedItem'])) {
                     // Hide the stock message
                     document.getElementById("successMessage").style.display = "none";
                     // Update the stock message with the fetched harga_bahan
-                    document.getElementById("priceMessage").innerText = "Harga Bahan Saat Ini: Rp. " + response
-                        .currentHargaBahan;
+                    document.getElementById("priceMessage").innerText = "Harga Bahan Saat Ini: " + 
+                    formatCurrency(response.currentHargaBahan);
                 },
                 error: function(error) {
                     alert("Error, refresh the page!");
@@ -470,7 +470,7 @@ if (isset($_POST['selectedItem'])) {
                     Swal.fire({
                         icon: 'success',
                         title: 'Harga bahan berhasil diperbarui!',
-                        text: 'Harga bahan terbaru adalah Rp.' + response.newHargaBahan + ' per piece',
+                        text: 'Harga bahan terbaru adalah ' + formatCurrency(response.newHargaBahan) + ' per piece',
                         showCancelButton: false,
                         confirmButtonColor: '#3085d6',
                         confirmButtonText: 'OK (enter)'
@@ -542,6 +542,10 @@ if (isset($_POST['selectedItem'])) {
 
         function submitForm() {
             document.getElementById('submitButton').click();
+        }
+
+        function formatCurrency(angka) {
+            return "Rp " + angka.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
         }
     </script>
 </body>
