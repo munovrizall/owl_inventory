@@ -550,6 +550,7 @@ if (isset($_POST['tanggal'])) {
         }
 
         function validateForm() {
+            var namaClientArray = [];
             var tanggal = document.getElementById("tanggal").value;
 
             // Use classes for dynamic elements
@@ -569,6 +570,35 @@ if (isset($_POST['tanggal'])) {
                     });
                     return false;
                 }
+
+                namaClientArray.push(numberSN);
+                $.ajax({
+                    type: 'POST',
+                    url: 'input.php', // Replace with the actual file to fetch nama_client
+                    data: {
+                        no_sn: numberSN
+                    },
+                    async: false, // Ensure synchronous execution
+                    success: function(response) {
+                        namaClientArray.push(response);
+                    },
+                    error: function(xhr, status, error) {
+                        console.log("Error fetching nama_client:");
+                        console.log("Status: " + status);
+                        console.log("Error: " + error);
+                        console.log("Response Text: " + xhr.responseText);
+                    }
+                });
+            }
+
+            // Check if fetched nama_client values are not the same
+            if (namaClientArray.length > 1 && !namaClientArray.every(val => val === namaClientArray[0])) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: 'Barang berasal dari client yang berbeda!',
+                });
+                return false;
             }
 
             return true;
