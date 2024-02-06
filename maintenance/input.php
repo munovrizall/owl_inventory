@@ -4,22 +4,14 @@ include "../connection.php";
 $queryTransaksiId = "SELECT MAX(transaksi_id) AS last_transaksi_id FROM transaksi_maintenance";
 $resultTransaksiId = $conn->query($queryTransaksiId);
 
-$queryClient = "SELECT * FROM client ORDER BY nama_client";
-$resultClient = $conn->query($queryClient);
-
-if (!$resultClient) {
-    die("Error fetching kelompok data: " . $conn->error);
-}
-
 if (isset($_POST['tanggal'])) {
     // Handle the POST request for submitting form data
     $tanggal = $_POST["tanggal"];
-    $nama_client = $_POST["client"];
 
     // Continue with the transaction maintenance
-    $query = "INSERT INTO transaksi_maintenance (tanggal_terima, nama_client) VALUES (?, ?)";
+    $query = "INSERT INTO transaksi_maintenance (tanggal_terima) VALUES (?)";
     $stmt = $conn->prepare($query);
-    $stmt->bind_param("ss", $tanggal, $nama_client);
+    $stmt->bind_param("s", $tanggal);
 
     if ($stmt->execute()) {
         // Get the auto-generated transaksi_id
@@ -32,29 +24,72 @@ if (isset($_POST['tanggal'])) {
             $voidArray = $_POST["void"];
 
             // Loop through the arrays and insert records
+            $namaClientArray = array(); // Array to store fetched nama_client values
+
             foreach ($numberSNArray as $key => $no_sn) {
                 $keterangan = $keteranganArray[$key];
                 $void = isset($voidArray[$key]) ? $voidArray[$key] : 0;
+
+                // Fetch nama_client based on no_sn from inventaris_produk
+                $queryFetchClient = "SELECT nama_client FROM inventaris_produk WHERE no_sn = ?";
+                $stmtFetchClient = $conn->prepare($queryFetchClient);
+                $stmtFetchClient->bind_param("i", $no_sn);
+                $stmtFetchClient->execute();
+                $stmtFetchClient->bind_result($nama_client_fetched);
+
+                // Fetch the result and ensure all fetched nama_client values are the same
+                $stmtFetchClient->fetch();
+                $stmtFetchClient->close();
+
+                if ($key === 0) {
+                    // Store the first fetched nama_client value
+                    $namaClientArray[] = $nama_client_fetched;
+                } else {
+                    // Check if the current fetched nama_client matches the stored value
+                    if ($nama_client_fetched !== $namaClientArray[0]) {
+                        echo "Error: Fetched nama_client values are not the same.";
+                        exit; // Exit the script if validation fails
+                    }
+                }
 
                 // Insert the new record into detail_maintenance table
                 $queryDetail = "INSERT INTO detail_maintenance (transaksi_id, no_sn, 
                 keterangan, kedatangan, cek_barang, berita_as, administrasi, pengiriman, no_resi) VALUES (?, ?, ?, '1', '0','0','0','0', '0')";
                 $stmtDetail = $conn->prepare($queryDetail);
                 $stmtDetail->bind_param("iis", $transaksi_id, $no_sn, $keterangan);
+                
                 if ($stmtDetail->execute()) {
                     $stmtDetail->close();
-            
+
                     // Update the garansi_void column in inventaris_produk table
                     $queryUpdateInventaris = "UPDATE inventaris_produk SET garansi_void = ? WHERE no_sn = ?";
                     $stmtUpdateInventaris = $conn->prepare($queryUpdateInventaris);
                     $stmtUpdateInventaris->bind_param("ii", $void, $no_sn);
-            
+
                     if ($stmtUpdateInventaris->execute()) {
                         $stmtUpdateInventaris->close();
                     } else {
                         echo "Error updating inventaris_produk: " . $stmtUpdateInventaris->error;
                     }
+                } else {
+                    echo "Error inserting record into detail_maintenance: " . $stmtDetail->error;
                 }
+            }
+            // Validate and update transaksi_maintenance table
+            if (count($namaClientArray) > 0) {
+                $nama_client = $namaClientArray[0];
+
+                $queryUpdateClient = "UPDATE transaksi_maintenance SET nama_client = ? WHERE transaksi_id = ?";
+                $stmtUpdateClient = $conn->prepare($queryUpdateClient);
+                $stmtUpdateClient->bind_param("si", $nama_client, $transaksi_id);
+
+                if (!$stmtUpdateClient->execute()) {
+                    echo "Error updating transaksi_maintenance: " . $stmtUpdateClient->error;
+                }
+
+                $stmtUpdateClient->close();
+            } else {
+                echo "Error: No nama_client values fetched.";
             }
         } else {
             echo "Error: Products and other arrays are not set.";
@@ -370,19 +405,6 @@ if (isset($_POST['tanggal'])) {
                                         <div class="input-group date" id="datepicker" data-target-input="nearest">
                                             <input type="date" class="form-control" id="tanggal" name="tanggal" placeholder="Masukkan tanggal transaksi" />
                                         </div>
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <div class="col">
-                                        <label for="pilihClient">Pilih PT <span style="color: red;">*</span></label>
-                                        <select class="form-control select2" id="pilihClient" name="client">
-                                            <option value="">--- Pilih PT ---</option>
-                                            <?php
-                                            while ($row = $resultClient->fetch_assoc()) {
-                                                echo '<option value="' . $row['nama_client'] . '">' . $row['nama_client'] . '</option>';
-                                            }
-                                            ?>
-                                        </select>
                                     </div>
                                 </div>
                                 <div class="card-body p-0">
