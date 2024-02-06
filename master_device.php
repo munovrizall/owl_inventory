@@ -21,11 +21,18 @@ if (isset($_GET["getDropdownOptions"])) {
 
     // Handle the POST request for submitting form data
     $namaDevice = $_POST["namaDevice"];
+    
+    $queryProduk = "INSERT INTO produk (nama_produk, quantity) VALUES (?, '0')";
+    $stmtProduk = $conn->prepare($queryProduk);
+    $stmtProduk->bind_param("s", $namaDevice);
+    $stmtProduk->execute();
+    $stmtProduk->close();
 
     // Check if 'bahan' and 'quantity' arrays are set in POST
     if (isset($_POST["pilihNamaBahan"]) && isset($_POST["quantity"])) {
         $bahanArray = $_POST["pilihNamaBahan"];
         $quantityArray = $_POST["quantity"];
+
 
         // Loop through the arrays and insert records
         foreach ($bahanArray as $key => $bahan) {
