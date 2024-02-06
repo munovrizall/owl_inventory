@@ -8,6 +8,11 @@ $query = "SELECT * FROM inventaris_produk WHERE
            produk IS NOT NULL AND 
            chip_id IS NOT NULL AND 
            no_sn IS NOT NULL AND 
+           nama_client IS NOT NULL AND 
+           garansi_awal IS NOT NULL AND 
+           garansi_akhir IS NOT NULL AND 
+           garansi_void IS NOT NULL AND 
+           keterangan_void IS NOT NULL AND 
            ip_address IS NOT NULL AND 
            mac_wifi IS NOT NULL AND 
            mac_bluetooth IS NOT NULL AND 
@@ -318,8 +323,8 @@ $result = mysqli_query($conn, $query);
                                         <thead>
                                             <tr>
                                                 <th class="text-center lebar-kolom1">ID</th>
-                                                <th class="text-center lebar-kolom2">Produk</th>
                                                 <th class="text-center lebar-kolom3">Nomor SN</th>
+                                                <th class="text-center lebar-kolom2">Produk</th>
                                                 <th class="text-center lebar-kolom4">Perusahaan</th>
                                                 <th class="text-center lebar-kolom5">Garansi</th>
                                                 <th class="text-center lebar-kolom6 aksi-column">Aksi</th>
@@ -341,7 +346,7 @@ $result = mysqli_query($conn, $query);
                                                 } else {
                                                     // Check conditions for bg-success
                                                     $allConditionsMet = true;
-                                                    if (strtotime($row["garansi_akhir"]) < strtotime('today')) { // Check if warranty expiry date is before today
+                                                    if (strtotime($row["garansi_akhir"]) < strtotime('today') || $row["garansi_void"] == 1) { // Check if warranty expiry date is before today
                                                         $allConditionsMet = false;
                                                     }
                                                 
@@ -355,8 +360,8 @@ $result = mysqli_query($conn, $query);
                                             ?>
                                                 <tr>
                                                     <td><?php echo $row["id"]; ?></td>
-                                                    <td><?php echo $row["produk"] ?></td>
                                                     <td><?php echo $row["no_sn"]; ?></td>
+                                                    <td><?php echo $row["produk"] ?></td>
                                                     <td><?php echo !empty($row["nama_client"]) ? $row["nama_client"] : '-' ?></td>
                                                     <td class="text-center"><span class="badge <?php echo $statusClass; ?>"><?php echo $statusText; ?></span></td>
                                                     <td class="text-center">

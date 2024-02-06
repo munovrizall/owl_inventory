@@ -22,11 +22,12 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $namaClient = isset($_POST["namaPerusahaan"]) ? $_POST["namaPerusahaan"] : null;
     $namaKorespondensi = isset($_POST["namaKorespondensi"]) ? $_POST["namaKorespondensi"] : null;
     $alamatPerusahaan = isset($_POST["alamatPerusahaan"]) ? $_POST["alamatPerusahaan"] : null;
+    $username = isset($_POST["username"]) ? $_POST["username"] : null;
     $password = isset($_POST["password"]) ? $_POST["password"] : null;
 
-    $updateQuery = "UPDATE client SET nama_client = ?, nama_korespondensi = ?, alamat_perusahaan = ?, password = ? WHERE client_id=?";
+    $updateQuery = "UPDATE client SET nama_client = ?, nama_korespondensi = ?, alamat_perusahaan = ?, username = ?, password = ? WHERE client_id=?";
     $updateStmt = $conn->prepare($updateQuery);
-    $updateStmt->bind_param("ssssi", $namaClient, $namaKorespondensi, $alamatPerusahaan, $password, $client_id);
+    $updateStmt->bind_param("sssssi", $namaClient, $namaKorespondensi, $alamatPerusahaan, $username, $password, $client_id);
     $updateStmt->execute();
     $updateStmt->close();
 
@@ -324,7 +325,13 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                                 </div>
                                 <div class="form-group">
                                     <div>
-                                        <label for="password">Password Login <span style="color: red;">*</span></label>
+                                        <label for="username">Username Login</label>
+                                        <input type="text" class="form-control form-control-border border-width-2" id="username" name="username" placeholder="Masukkan username untuk perusahaan tersebut" value="<?php echo $row['username']; ?>">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div>
+                                        <label for="password">Password Login</label>
                                         <input type="text" class="form-control form-control-border border-width-2" id="password" name="password" placeholder="Masukkan password untuk perusahaan tersebut" value="<?php echo $row['password']; ?>">
                                     </div>
                                 </div>
@@ -388,7 +395,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             var alamatPerusahaan = document.getElementById("alamatPerusahaan").value;
             var password = document.getElementById("password").value;
 
-            if (namaPerusahaan === "" || namaKorespondensi === "" || alamatPerusahaan === "" || password === "") {
+            if (namaPerusahaan === "" || namaKorespondensi === "" || alamatPerusahaan === "") {
                 Swal.fire({
                     icon: 'error',
                     title: 'Oops...',
@@ -439,6 +446,14 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         function resetForm() {
             document.getElementById("perusahaanForm").reset();
         }
+
+        var alamatInput = document.getElementById('alamatPerusahaan');
+        alamatInput.addEventListener('keydown', function(event) {
+            if (event.keyCode === 13) {
+                event.preventDefault();
+                submitForm();
+            }
+        });
 
         var password = document.getElementById('password');
         password.addEventListener('keydown', function(event) {

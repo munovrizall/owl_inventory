@@ -334,18 +334,18 @@ if (isset($_GET['id'])) {
                                             <table>
                                                 <tbody>
                                                     <tr>
-                                                        <td class="table-head"><b>Nomor SN :</b></td>
+                                                        <td class="table-head"><b>Nama Perusahaan :</b></td>
                                                         <td>
                                                             <?php
-                                                            $no_sn = $row["no_sn"];
-                                                            echo "{$no_sn}";
+                                                            $nama_client = $row["nama_client"];
+                                                            echo $nama_client !== null ? $nama_client : '-';
                                                             ?>
                                                         </td>
-                                                        <td class="table-head"><b>Battery Low :</b></td>
+                                                        <td><b>Free RAM :</b></td>
                                                         <td>
                                                             <?php
-                                                            $batt_low = $row["batt_low"];
-                                                            echo "{$batt_low}";
+                                                            $free_ram = $row["free_ram"];
+                                                            echo "{$free_ram}";
                                                             ?>
                                                         </td>
                                                     </tr>
@@ -357,6 +357,38 @@ if (isset($_GET['id'])) {
                                                             echo "{$produk}";
                                                             ?>
                                                         </td>
+                                                        <td><b>Min RAM :</b></td>
+                                                        <td>
+                                                            <?php
+                                                            $min_ram = $row["min_ram"];
+                                                            echo "{$min_ram}";
+                                                            ?>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td><b>Tipe Produk :</b></td>
+                                                        <td>
+                                                            <?php
+                                                            $type_produk = $row["type_produk"];
+                                                            echo "{$type_produk}";
+                                                            ?>
+                                                        </td>
+                                                        <td class="table-head"><b>Battery Low :</b></td>
+                                                        <td>
+                                                            <?php
+                                                            $batt_low = $row["batt_low"];
+                                                            echo "{$batt_low}";
+                                                            ?>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="table-head"><b>Nomor SN :</b></td>
+                                                        <td>
+                                                            <?php
+                                                            $no_sn = $row["no_sn"];
+                                                            echo "{$no_sn}";
+                                                            ?>
+                                                        </td>
                                                         <td><b>Battery High :</b></td>
                                                         <td>
                                                             <?php
@@ -366,11 +398,11 @@ if (isset($_GET['id'])) {
                                                         </td>
                                                     </tr>
                                                     <tr>
-                                                        <td><b>Nama Perusahaan :</b></td>
+                                                        <td><b>Chip ID :</b></td>
                                                         <td>
                                                             <?php
-                                                            $nama_client = $row["nama_client"];
-                                                            echo $nama_client !== null ? $nama_client : '-';
+                                                            $chip_id = $row["chip_id"];
+                                                            echo "{$chip_id}";
                                                             ?>
                                                         </td>
                                                         <td><b>Temperature :</b></td>
@@ -416,19 +448,20 @@ if (isset($_GET['id'])) {
                                                         </td>
                                                     </tr>
                                                     <tr>
-                                                        <td><b>Status Garansi :</b></td>
+                                                        <td><b>Garansi Void :</b></td>
                                                         <td>
                                                             <?php
-                                                            $statusClass = 'badge bg-danger'; // Default class
-                                                            $statusText = 'Tidak'; // Default text
-
-                                                            if (strtotime($row["garansi_akhir"]) >= strtotime('today')) {
-                                                                $statusClass = 'badge bg-success';
-                                                                $statusText = 'Ya';
+                                                            $voidClass = 'badge bg-success';
+                                                            $voidText = 'Tidak Void';
+                                                            
+                                                            if ($row["garansi_void"] == 1) {
+                                                                $voidClass = "badge bg-danger";
+                                                                $voidText = "Void";
                                                             }
                                                             ?>
 
-                                                            <div class="<?php echo $statusClass; ?>"><?php echo $statusText; ?></div>
+                                                            <div class="<?php echo $voidClass; ?>"><?php echo $voidText; ?></div>
+                                                            
                                                         </td>
                                                         <td><b>GPS Longitude :</b></td>
                                                         <td>
@@ -439,6 +472,38 @@ if (isset($_GET['id'])) {
                                                         </td>
                                                     </tr>
                                                     <tr>
+                                                        <td><b>Keterangan Void:</b></td>
+                                                        <td>
+                                                            <?php
+                                                            $keterangan_void = $row["keterangan_void"];
+                                                            echo "{$keterangan_void}";
+                                                            ?>
+                                                        </td>
+                                                        <td><b>Status QC Sensor 1 :</b></td>
+                                                        <td>
+                                                            <span class="badge bg-success">OK</span>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td><b>Status Garansi :</b></td>
+                                                        <td>
+                                                            <?php
+                                                            $statusClass = 'badge bg-success'; // Default class
+                                                            $statusText = 'Ya'; // Default text
+
+                                                            if (strtotime($row["garansi_akhir"]) < strtotime('today') || $row["garansi_void"] == 1) {
+                                                                $statusClass = 'badge bg-danger';
+                                                                $statusText = 'Tidak';
+                                                            }
+                                                            ?>
+                                                            <div class="<?php echo $statusClass; ?>"><?php echo $statusText; ?></div>
+                                                        </td>
+                                                        <td><b>Status QC Sensor 2 :</b></td>
+                                                        <td>
+                                                            <span class="badge bg-danger">FAIL</span>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
                                                         <td><b>IP Address :</b></td>
                                                         <td>
                                                             <?php
@@ -446,7 +511,7 @@ if (isset($_GET['id'])) {
                                                             echo "{$ip_address}";
                                                             ?>
                                                         </td>
-                                                        <td><b>Status QC Sensor 1 :</b></td>
+                                                        <td><b>Status QC Sensor 3 :</b></td>
                                                         <td>
                                                             <span class="badge bg-success">OK</span>
                                                         </td>
@@ -459,7 +524,7 @@ if (isset($_GET['id'])) {
                                                             echo "{$mac_wifi}";
                                                             ?>
                                                         </td>
-                                                        <td><b>Status QC Sensor 2 :</b></td>
+                                                        <td><b>Status QC Sensor 4 :</b></td>
                                                         <td>
                                                             <span class="badge bg-success">OK</span>
                                                         </td>
@@ -472,7 +537,7 @@ if (isset($_GET['id'])) {
                                                             echo "{$mac_bluetooth}";
                                                             ?>
                                                         </td>
-                                                        <td><b>Status QC Sensor 3 :</b></td>
+                                                        <td><b>Status QC Sensor 5 :</b></td>
                                                         <td>
                                                             <span class="badge bg-success">OK</span>
                                                         </td>
@@ -485,9 +550,9 @@ if (isset($_GET['id'])) {
                                                             echo "{$firmware_version}";
                                                             ?>
                                                         </td>
-                                                        <td><b>Status QC Sensor 4 :</b></td>
+                                                        <td><b>Status QC Sensor 6 :</b></td>
                                                         <td>
-                                                            <span class="badge bg-danger">FAIL</span>
+                                                            <span class="badge bg-success">OK</span>
                                                         </td>
                                                     </tr>
                                                     <tr>
@@ -498,32 +563,7 @@ if (isset($_GET['id'])) {
                                                             echo "{$hardware_version}";
                                                             ?>
                                                         </td>
-                                                        <td><b>Status QC Sensor 5 :</b></td>
-                                                        <td>
-                                                            <span class="badge bg-success">OK</span>
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td><b>Free RAM :</b></td>
-                                                        <td>
-                                                            <?php
-                                                            $free_ram = $row["free_ram"];
-                                                            echo "{$free_ram}";
-                                                            ?>
-                                                        </td>
-                                                        <td><b>Status QC Sensor 6 :</b></td>
-                                                        <td>
-                                                            <span class="badge bg-success">OK</span>
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td><b>Min RAM :</b></td>
-                                                        <td>
-                                                            <?php
-                                                            $min_ram = $row["min_ram"];
-                                                            echo "{$min_ram}";
-                                                            ?>
-                                                        </td>
+
                                                     </tr>
                                                 </tbody>
                                             </table>

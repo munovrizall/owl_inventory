@@ -44,13 +44,18 @@ $result = mysqli_query($conn, $query);
         }
 
         .lebar-kolom4 {
-            width: 50%;
+            width: 40%;
         }
 
         .lebar-kolom5 {
             width: 10%;
         }
+
         .lebar-kolom6 {
+            width: 10%;
+        }
+
+        .lebar-kolom7 {
             width: 10%;
         }
 
@@ -296,8 +301,9 @@ $result = mysqli_query($conn, $query);
                                                 <th class="text-center lebar-kolom2">Nama Perusahaan</th>
                                                 <th class="text-center lebar-kolom3">Nama Korespondensi</th>
                                                 <th class="text-center lebar-kolom4">Alamat Perusahaan</th>
-                                                <th class="text-center lebar-kolom5">Password Login</th>
-                                                <th class="text-center lebar-kolom6 aksi-column">Aksi</th>
+                                                <th class="text-center lebar-kolom5">Username Login</th>
+                                                <th class="text-center lebar-kolom6">Password Login</th>
+                                                <th class="text-center lebar-kolom7 aksi-column">Aksi</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -313,6 +319,7 @@ $result = mysqli_query($conn, $query);
                                                     <td><?php echo $row["nama_client"]; ?></td>
                                                     <td><?php echo $row["nama_korespondensi"]; ?></td>
                                                     <td><?php echo $row["alamat_perusahaan"]; ?></td>
+                                                    <td><?php echo $row["username"]; ?></td>
                                                     <td><?php echo $row["password"]; ?></td>
                                                     <td class="text-center">
                                                         <div class="col">

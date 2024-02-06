@@ -495,10 +495,7 @@ if (isset($_GET["getDropdownOptions"])) {
 
                         cols += '<td><select class="form-control select2 pilihNamaProduk" name="pilihNamaProduk[]">' + dropdownOptions + '</select></td>';
                         cols += '<td><input type="number" class="form-control" name="numberSN[]" value="" placeholder="Nomor SN"/></td>';
-                        cols += '<td class="text-center">';
-                        cols += '<span class="badge bg-success" style="margin-right : 10px">' + 'Ya' + '</span>';
-                        cols += '<button type="button" class="btn btn-outline-info info cekGaransi"><i class="fas fa-sync-alt" onclick="cekGaransi(' + counter + ')""></i></button>';
-                        cols += '</td>';
+                        cols += '<td><select class="form-control select2" id="pilihGaransi ' + counter + '" name="pilihGaransi[]' + counter + '">' + dropdownGaransi + '</select></td>';
                         cols += '<td><input type="text" class="form-control" name="inputKerusakan[]" value="" placeholder="Kerusakan Device"/></td>';
                         cols += '<td><input type="button" class="ibtnDel btn btn-md btn-danger"  value="Delete"></td>';
 
@@ -591,5 +588,4 @@ if (isset($_GET["getDropdownOptions"])) {
         }
     </script>
 </body>
-
 </html>

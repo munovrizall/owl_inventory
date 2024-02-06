@@ -16,6 +16,6 @@ if ($conn->connect_error) {
 }
 
 if (empty($_SESSION['username'])) {
-    header("Location: login.php");
+    header("Location: /owl_inventory/login.php");
     exit();
 }

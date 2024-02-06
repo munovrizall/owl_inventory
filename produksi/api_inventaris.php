@@ -5,7 +5,7 @@
 $resultPrep = array();
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    echo 'masuk post';
+    // echo 'masuk post';
     if (isset($_POST['chip_id']) AND isset($_POST['produk'])) {
         
         echo 'Semua parameter ada';
@@ -13,6 +13,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $type_produk = isset($_POST['type_produk']) ? $_POST['type_produk'] : '';
         $produk = $_POST['produk'];
         $chip_id = $_POST['chip_id'];
+        $nama_client = isset($_POST['nama_client']) ? $_POST['nama_client'] : '';
+        $garansi_awal = isset($_POST['garansi_awal']) ? $_POST['garansi_awal'] : '';
+        $garansi_akhir = isset($_POST['garansi_akhir']) ? $_POST['garansi_akhir'] : '';
+        $garansi_void = isset($_POST['garansi_void']) ? $_POST['garansi_void'] : '';
+        $keterangan_void = isset($_POST['keterangan_void']) ? $_POST['keterangan_void'] : '';
         $ip_address = isset($_POST['ip_address']) ? $_POST['ip_address'] : '';
         $mac_wifi = isset($_POST['mac_wifi']) ? $_POST['mac_wifi'] : '';
         $mac_bluetooth = isset($_POST['mac_bluetooth']) ? $_POST['mac_bluetooth'] : '';
@@ -89,7 +94,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             status_qc_sensor_1, status_qc_sensor_2, status_qc_sensor_3, status_qc_sensor_4, status_qc_sensor_5, status_qc_sensor_6)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
             $stmt_insert = $conn->prepare($sql_insert);
-            $stmt_insert->bind_param("ssiisssssiiiididdssssss", $type_produk, $produk, $chip_id, $no_sn, $ip_address, $mac_wifi, $mac_bluetooth, 
+            $stmt_insert->bind_param("ssisssisisssssiiiididdssssss", $type_produk, $produk, $chip_id, $nama_client, $garansi_awal, 
+                $garansi_akhir, $garansi_void, $keterangan_void, $no_sn, $ip_address, $mac_wifi, $mac_bluetooth, 
                 $firmware_version, $hardware_version, $free_ram, $min_ram, $batt_low, $batt_high, 
                 $temperature, $status_error, $gps_latitude, $gps_longitude, $status_qc_sensor_1, 
                 $status_qc_sensor_2, $status_qc_sensor_3, $status_qc_sensor_4, $status_qc_sensor_5, $status_qc_sensor_6);
