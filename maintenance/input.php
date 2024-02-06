@@ -8,6 +8,34 @@ if (isset($_POST['tanggal'])) {
     // Handle the POST request for submitting form data
     $tanggal = $_POST["tanggal"];
 
+    // Initialize the array to store fetched nama_client values
+    $namaClientArray = array();
+
+    // Loop through the arrays and insert records
+    foreach ($_POST["numberSN"] as $key => $no_sn) {
+        // Fetch nama_client based on no_sn from inventaris_produk
+        $queryFetchClient = "SELECT nama_client FROM inventaris_produk WHERE no_sn = ?";
+        $stmtFetchClient = $conn->prepare($queryFetchClient);
+        $stmtFetchClient->bind_param("i", $no_sn);
+        $stmtFetchClient->execute();
+        $stmtFetchClient->bind_result($nama_client_fetched);
+
+        // Fetch the result and ensure all fetched nama_client values are the same
+        $stmtFetchClient->fetch();
+        $stmtFetchClient->close();
+
+        if ($key === 0) {
+            // Store the first fetched nama_client value
+            $namaClientArray[] = $nama_client_fetched;
+        } else {
+            // Check if the current fetched nama_client matches the stored value
+            if ($nama_client_fetched !== $namaClientArray[0]) {
+                echo "Error: Fetched nama_client values are not the same.";
+                exit; // Exit the script if validation fails
+            }
+        }
+    }
+
     // Continue with the transaction maintenance
     $query = "INSERT INTO transaksi_maintenance (tanggal_terima) VALUES (?)";
     $stmt = $conn->prepare($query);
@@ -23,34 +51,9 @@ if (isset($_POST['tanggal'])) {
             $keteranganArray = $_POST["inputKerusakan"];
             $voidArray = $_POST["void"];
 
-            // Loop through the arrays and insert records
-            $namaClientArray = array(); // Array to store fetched nama_client values
-
             foreach ($numberSNArray as $key => $no_sn) {
                 $keterangan = $keteranganArray[$key];
                 $void = isset($voidArray[$key]) ? $voidArray[$key] : 0;
-
-                // Fetch nama_client based on no_sn from inventaris_produk
-                $queryFetchClient = "SELECT nama_client FROM inventaris_produk WHERE no_sn = ?";
-                $stmtFetchClient = $conn->prepare($queryFetchClient);
-                $stmtFetchClient->bind_param("i", $no_sn);
-                $stmtFetchClient->execute();
-                $stmtFetchClient->bind_result($nama_client_fetched);
-
-                // Fetch the result and ensure all fetched nama_client values are the same
-                $stmtFetchClient->fetch();
-                $stmtFetchClient->close();
-
-                if ($key === 0) {
-                    // Store the first fetched nama_client value
-                    $namaClientArray[] = $nama_client_fetched;
-                } else {
-                    // Check if the current fetched nama_client matches the stored value
-                    if ($nama_client_fetched !== $namaClientArray[0]) {
-                        echo "Error: Fetched nama_client values are not the same.";
-                        exit; // Exit the script if validation fails
-                    }
-                }
 
                 // Insert the new record into detail_maintenance table
                 $queryDetail = "INSERT INTO detail_maintenance (transaksi_id, no_sn, 
@@ -553,6 +556,15 @@ if (isset($_POST['tanggal'])) {
             var namaClientArray = [];
             var tanggal = document.getElementById("tanggal").value;
 
+            if (tanggal === "") {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: 'Harap isi tanggal!',
+                });
+                return false;
+            }
+
             // Use classes for dynamic elements
             var numberSNElements = document.querySelectorAll("[name^='numberSN']");
             var keteranganElements = document.querySelectorAll("[name^='inputKerusakan']");
@@ -570,37 +582,7 @@ if (isset($_POST['tanggal'])) {
                     });
                     return false;
                 }
-
-                namaClientArray.push(numberSN);
-                $.ajax({
-                    type: 'POST',
-                    url: 'input.php', // Replace with the actual file to fetch nama_client
-                    data: {
-                        no_sn: numberSN
-                    },
-                    async: false, // Ensure synchronous execution
-                    success: function(response) {
-                        namaClientArray.push(response);
-                    },
-                    error: function(xhr, status, error) {
-                        console.log("Error fetching nama_client:");
-                        console.log("Status: " + status);
-                        console.log("Error: " + error);
-                        console.log("Response Text: " + xhr.responseText);
-                    }
-                });
             }
-
-            // Check if fetched nama_client values are not the same
-            if (namaClientArray.length > 1 && !namaClientArray.every(val => val === namaClientArray[0])) {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Oops...',
-                    text: 'Barang berasal dari client yang berbeda!',
-                });
-                return false;
-            }
-
             return true;
         }
 
