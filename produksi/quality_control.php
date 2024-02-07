@@ -309,10 +309,15 @@ $result = mysqli_query($conn, $query);
                                                 // Check conditions for bg-success
                                                 $allConditionsMet = true;
                                                 if (
-                                                    // Check if any of the columns except 'nama_client', 'garansi_awal', and 'garansi_akhir' are null
                                                     is_null($row["type_produk"]) ||
+                                                    is_null($row["produk"]) ||
                                                     is_null($row["chip_id"]) ||
                                                     is_null($row["no_sn"]) ||
+                                                    is_null($row["nama_client"]) ||
+                                                    is_null($row["garansi_awal"]) ||
+                                                    is_null($row["garansi_akhir"]) ||
+                                                    is_null($row["garansi_void"]) ||
+                                                    is_null($row["keterangan_void"]) ||
                                                     is_null($row["ip_address"]) ||
                                                     is_null($row["mac_wifi"]) ||
                                                     is_null($row["mac_bluetooth"]) ||
