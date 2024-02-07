@@ -158,6 +158,11 @@ if (isset($_POST['tanggal'])) {
             width: 20px;
             height: 20px;
         }
+
+        .select2-container--default .select2-results__option[data-selected="1"]:hover {
+            background-color: red;
+            color: white;
+        }
     </style>
 
 
@@ -409,9 +414,9 @@ if (isset($_POST['tanggal'])) {
                                         <table id="tableDetail" class=" table order-list table-striped">
                                             <thead>
                                                 <tr>
-                                                    <td class="text-center lebar-kolom2" style="min-width:120px;"><b>Nomor SN <span style="color: red;">*</span></b></td>
+                                                    <td class="text-center lebar-kolom2" style="min-width:160px;"><b>Nomor SN <span style="color: red;">*</span></b></td>
                                                     <td class="text-center lebar-kolom4" style="min-width:120px;"><b>Kerusakan <span style="color: red;">*</span></b></td>
-                                                    <td class="text-center lebar-kolom5"><b>Garansi Void</b></td>
+                                                    <td class="text-center lebar-kolom5" style="min-width:140px;"><b>Garansi Void <span style="color: red;">*</span></b></td>
                                                     <td class="text-center lebar-kolom5"><b>Aksi</b></td>
                                                 </tr>
                                             </thead>
@@ -501,16 +506,15 @@ if (isset($_POST['tanggal'])) {
                     type: 'POST',
                     url: 'input.php',
                     success: function(response) {
-
+                        var dropdownGaransi = '<option value="" selected disabled>Pilih Void</option>' +
+                            '<option value="1">Void</option>' +
+                            '<option value="0">Tidak Void</option>';
                         var newRow = $("<tr>");
                         var cols = "";
 
                         cols += '<td><input type="number" class="form-control" name="numberSN[]" value="" placeholder="Nomor SN"/></td>';
                         cols += '<td><input type="text" class="form-control" name="inputKerusakan[]" value="" placeholder="Kerusakan Device"/></td>';
-                        cols += '<td class="position-sticky text-center">';
-                        cols += '<input class="form-check-input larger-checkbox" type="checkbox" value="1" name="void[]">';
-                        cols += '<input type="hidden" name="void[]" value="0">'; // Hidden input for unchecked checkbox
-                        cols += '</td>';
+                        cols += '<td><select class="form-control select2" id="pilihGaransi ' + counter + '" name="pilihGaransi[]' + counter + '">' + dropdownGaransi + '</select></td>';
                         cols += '<td class="text-center"><input type="button" class="ibtnDel btn btn-md btn-danger"  value="Delete"></td>';
 
                         newRow.append(cols);
@@ -562,13 +566,16 @@ if (isset($_POST['tanggal'])) {
             // Use classes for dynamic elements
             var numberSNElements = document.querySelectorAll("[name^='numberSN']");
             var keteranganElements = document.querySelectorAll("[name^='inputKerusakan']");
+            var garansiElements = document.querySelectorAll("[name^='pilihGaransi']");
 
             // Check each row
             for (var i = 0; i < numberSNElements.length; i++) {
                 var numberSN = numberSNElements[i].value;
                 var keterangan = keteranganElements[i].value;
+                var garansi = garansiElements[i].value;
+                
 
-                if (numberSN === "" || keterangan === "") {
+                if (numberSN === "" || keterangan === "" || garansi === "") {
                     Swal.fire({
                         icon: 'error',
                         title: 'Oops...',
