@@ -17,7 +17,7 @@ if (isset($_POST['selectedDevice'])) {
     $pengguna = isset($_SESSION['username']) ? $_SESSION['username'] : '';
 
     // Milih bahan untuk produksi
-    $query = "SELECT nama_bahan, quantity, harga_bahan FROM produksi WHERE produk = ?";
+    $query = "SELECT nama_bahan, quantity, harga_bahan FROM bahan_produksi WHERE produk = ?";
     $stmt = $conn->prepare($query);
     $stmt->bind_param("s", $selectedDeviceName);
     $stmt->execute();

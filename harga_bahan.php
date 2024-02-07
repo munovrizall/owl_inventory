@@ -41,7 +41,7 @@ if (isset($_POST['selectedItem'])) {
     $updateStmtHarga->execute();
     $updateStmtHarga->close();
 
-    $updateQueryHargaProduksi = "UPDATE produksi SET harga_bahan = ? WHERE nama_bahan = ?";
+    $updateQueryHargaProduksi = "UPDATE bahan_produksi SET harga_bahan = ? WHERE nama_bahan = ?";
     $updateStmtHargaProduksi = $conn->prepare($updateQueryHargaProduksi);
     $updateStmtHargaProduksi->bind_param("is", $newHargaBahan, $selectedItem);
     $updateStmtHargaProduksi->execute();
