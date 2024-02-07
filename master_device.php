@@ -39,7 +39,7 @@ if (isset($_GET["getDropdownOptions"])) {
             $quantity = $quantityArray[$key];
 
             // Use prepared statements
-            $checkQuery = "SELECT COUNT(*) FROM produksi WHERE produk = ? AND nama_bahan = ?";
+            $checkQuery = "SELECT COUNT(*) FROM bahan_produksi WHERE produk = ? AND nama_bahan = ?";
             $checkStmt = $conn->prepare($checkQuery);
             $checkStmt->bind_param("ss", $namaDevice, $bahan);
             $checkStmt->execute();
@@ -58,12 +58,12 @@ if (isset($_GET["getDropdownOptions"])) {
                 $stmtHarga->fetch();
                 $stmtHarga->close();
 
-                $query = "INSERT INTO produksi (produk, nama_bahan, quantity, harga_bahan) VALUES (?, ?, ?, ?)";
+                $query = "INSERT INTO bahan_produksi (produk, nama_bahan, quantity, harga_bahan) VALUES (?, ?, ?, ?)";
                 $stmt = $conn->prepare($query);
                 $stmt->bind_param("ssii", $namaDevice, $bahan, $quantity, $hargaBahan);
 
                 if ($stmt->execute()) {
-                    echo "Data berhasil ditambahkan ke tabel produksi dan tabel masterbahan.";
+                    echo "Data berhasil ditambahkan ke tabel bahan_produksi dan tabel masterbahan.";
                 } else {
                     echo "Error: " . $stmt->error;
                 }
