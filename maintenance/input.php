@@ -60,7 +60,7 @@ if (isset($_POST['tanggal'])) {
                 keterangan, kedatangan, cek_barang, berita_as, administrasi, pengiriman, no_resi) VALUES (?, ?, ?, '1', '0','0','0','0', '0')";
                 $stmtDetail = $conn->prepare($queryDetail);
                 $stmtDetail->bind_param("iis", $transaksi_id, $no_sn, $keterangan);
-                
+
                 if ($stmtDetail->execute()) {
                     $stmtDetail->close();
 
@@ -154,15 +154,9 @@ if (isset($_POST['tanggal'])) {
             width: 10%;
         }
 
-        @media (max-width: 200px) {
-
-            .lebar-kolom1,
-            .lebar-kolom2,
-            .lebar-kolom3,
-            .lebar-kolom4,
-            .lebar-kolom5 {
-                width: 100% !important;
-            }
+        .larger-checkbox {
+            width: 20px;
+            height: 20px;
         }
     </style>
 
@@ -417,7 +411,7 @@ if (isset($_POST['tanggal'])) {
                                                 <tr>
                                                     <td class="text-center lebar-kolom2" style="min-width:120px;"><b>Nomor SN <span style="color: red;">*</span></b></td>
                                                     <td class="text-center lebar-kolom4" style="min-width:120px;"><b>Kerusakan <span style="color: red;">*</span></b></td>
-                                                    <td class="text-center lebar-kolom5"><b>Void</b></td>
+                                                    <td class="text-center lebar-kolom5"><b>Garansi Void</b></td>
                                                     <td class="text-center lebar-kolom5"><b>Aksi</b></td>
                                                 </tr>
                                             </thead>
@@ -513,11 +507,11 @@ if (isset($_POST['tanggal'])) {
 
                         cols += '<td><input type="number" class="form-control" name="numberSN[]" value="" placeholder="Nomor SN"/></td>';
                         cols += '<td><input type="text" class="form-control" name="inputKerusakan[]" value="" placeholder="Kerusakan Device"/></td>';
-                        cols += '<td>';
+                        cols += '<td class="position-sticky text-center">';
                         cols += '<input class="form-check-input larger-checkbox" type="checkbox" value="1" name="void[]">';
                         cols += '<input type="hidden" name="void[]" value="0">'; // Hidden input for unchecked checkbox
-                        cols += '</td>';                        
-                        cols += '<td><input type="button" class="ibtnDel btn btn-md btn-danger"  value="Delete"></td>';
+                        cols += '</td>';
+                        cols += '<td class="text-center"><input type="button" class="ibtnDel btn btn-md btn-danger"  value="Delete"></td>';
 
                         newRow.append(cols);
                         $("table.order-list").append(newRow);
@@ -612,4 +606,5 @@ if (isset($_POST['tanggal'])) {
         }
     </script>
 </body>
+
 </html>
