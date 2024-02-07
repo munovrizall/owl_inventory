@@ -403,7 +403,7 @@ if (isset($_POST['selectedDevice'])) {
                                 </p>
                             </a>
                         </li>
-                        <li class="nav-item">
+                        <li class="nav-item" style="margin-bottom: 40px;">
                             <a href="../histori_transaksi.php" class="nav-link">
                                 <i class="nav-icon fas fa-history"></i>
                                 <p>
@@ -429,7 +429,7 @@ if (isset($_POST['selectedDevice'])) {
                         </div>
                         <div class="col-sm-6">
                             <ol class="breadcrumb float-sm-right">
-                                <li class="breadcrumb-item"><a href="homepage.php">Home</a></li>
+                                <li class="breadcrumb-item"><a href="../homepage.php">Home</a></li>
                                 <li class="breadcrumb-item active">Produksi</li>
                                 <li class="breadcrumb-item active">Produksi Device</li>
                             </ol>
@@ -486,7 +486,7 @@ if (isset($_POST['selectedDevice'])) {
                                                         <th class="text-center lebar-kolom4">Stok Tersisa</th>
                                                         <th class="text-center lebar-kolom5">Cukup?</th>
                                                         <th class="text-center lebar-kolom6">Harga Bahan</th>
-                                                        <th class="text-center lebar-kolom7">Total Harga Bahan</th>
+                                                        <th class="text-center lebar-kolom7" style="min-width: 120px;">Total Harga Bahan</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody id="produksiTable">

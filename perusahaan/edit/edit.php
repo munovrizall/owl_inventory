@@ -254,7 +254,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                                 </p>
                             </a>
                         </li>
-                        <li class="nav-item">
+                        <li class="nav-item" style="margin-bottom: 40px;">
                             <a href="../../histori_transaksi.php" class="nav-link">
                                 <i class="nav-icon fas fa-history"></i>
                                 <p>
@@ -280,7 +280,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                         </div>
                         <div class="col-sm-6">
                             <ol class="breadcrumb float-sm-right">
-                                <li class="breadcrumb-item"><a href="homepage.php">Home</a></li>
+                                <li class="breadcrumb-item"><a href="../../homepage.php">Home</a></li>
                                 <li class="breadcrumb-item active">Perusahaan</li>
                                 <li class="breadcrumb-item active"><a href="../list_perusahaan.php">List Perusahaan</a></li>
                                 <li class="breadcrumb-item active">Edit</li>

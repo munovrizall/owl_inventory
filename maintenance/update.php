@@ -300,7 +300,7 @@ if (isset($_POST['quantity'])) {
                                 </p>
                             </a>
                         </li>
-                        <li class="nav-item">
+                        <li class="nav-item" style="margin-bottom: 40px;">
                             <a href="../histori_transaksi.php" class="nav-link">
                                 <i class="nav-icon fas fa-history"></i>
                                 <p>
@@ -326,7 +326,7 @@ if (isset($_POST['quantity'])) {
                         </div>
                         <div class="col-sm-6">
                             <ol class="breadcrumb float-sm-right">
-                                <li class="breadcrumb-item"><a href="homepage.php">Home</a></li>
+                                <li class="breadcrumb-item"><a href="../homepage.php">Home</a></li>
                                 <li class="breadcrumb-item active">Maintenance</li>
                                 <li class="breadcrumb-item active">Update</li>
                             </ol>

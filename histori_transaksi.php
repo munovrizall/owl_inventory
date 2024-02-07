@@ -254,7 +254,7 @@ if (!$result) {
                                 </p>
                             </a>
                         </li>
-                        <li class="nav-item">
+                        <li class="nav-item" style="margin-bottom: 40px;">
                             <a href="histori_transaksi.php" class="nav-link active">
                                 <i class="nav-icon fas fa-history"></i>
                                 <p>
@@ -311,7 +311,7 @@ if (!$result) {
                                                 <th class="text-center lebar-kolom4">Kuantitas</th>
                                                 <th class="text-center lebar-kolom5">Aktivitas</th>
                                                 <th class="text-center lebar-kolom6">Deskripsi</th>
-                                                <th class="text-center lebar-kolom7">Waktu</th>
+                                                <th class="text-center lebar-kolom7" style="min-width: 120px">Waktu</th>
                                             </tr>
                                         </thead>
                                         <tbody>

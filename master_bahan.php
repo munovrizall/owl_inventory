@@ -299,7 +299,7 @@ if (!$resultKelompok) {
                                 </p>
                             </a>
                         </li>
-                        <li class="nav-item">
+                        <li class="nav-item" style="margin-bottom: 40px;">
                             <a href="histori_transaksi.php" class="nav-link">
                                 <i class="nav-icon fas fa-history"></i>
                                 <p>
@@ -532,12 +532,15 @@ if (!$resultKelompok) {
                     Swal.fire({
                         icon: 'success',
                         title: 'Kelompok berhasil didaftarkan!',
+                        showCancelButton: false,
+                        confirmButtonColor: '#3085d6',
+                        confirmButtonText: 'OK'
                     }).then((result) => {
                         if (result.isConfirmed) {
                             location.reload();
                         }
                     });
-
+                    
 
                 },
                 error: function(error) {
@@ -579,6 +582,14 @@ if (!$resultKelompok) {
             if (event.keyCode === 13) {
                 event.preventDefault();
                 submitForm();
+            }
+        });
+        
+        var kelompokBaruInput = document.getElementById('namaKelompokBaru');
+        kelompokBaruInput.addEventListener('keydown', function(event) {
+            if (event.keyCode === 13) {
+                event.preventDefault();
+                if(validateFormKB()) { validateSuccessKB(); resetForm(); }
             }
         });
 
