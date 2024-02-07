@@ -4,61 +4,95 @@ include "../connection.php";
 $queryTransaksiId = "SELECT MAX(transaksi_id) AS last_transaksi_id FROM transaksi_maintenance";
 $resultTransaksiId = $conn->query($queryTransaksiId);
 
-$queryClient = "SELECT * FROM client ORDER BY nama_client";
-$resultClient = $conn->query($queryClient);
-
-if (!$resultClient) {
-    die("Error fetching kelompok data: " . $conn->error);
-}
-
-if (isset($_GET["getDropdownOptions"])) {
-
-    $queryProduk = "SELECT * FROM produk ORDER BY nama_produk";
-    $resultProduk = $conn->query($queryProduk);
-    $options = '<option value="" selected disabled>Pilih Produk</option>';
-
-    if ($resultProduk && $resultProduk->num_rows > 0) {
-        while ($row = $resultProduk->fetch_assoc()) {
-            $options .= '<option value="' . $row['nama_produk'] . '">' . $row['nama_produk'] . '</option>';
-        }
-    }
-    echo $options;
-    exit();
-} elseif ($_SERVER["REQUEST_METHOD"] == "POST") {
+if (isset($_POST['tanggal'])) {
     // Handle the POST request for submitting form data
     $tanggal = $_POST["tanggal"];
-    $nama_client = $_POST["client"];
+
+    // Initialize the array to store fetched nama_client values
+    $namaClientArray = array();
+
+    // Loop through the arrays and insert records
+    foreach ($_POST["numberSN"] as $key => $no_sn) {
+        // Fetch nama_client based on no_sn from inventaris_produk
+        $queryFetchClient = "SELECT nama_client FROM inventaris_produk WHERE no_sn = ?";
+        $stmtFetchClient = $conn->prepare($queryFetchClient);
+        $stmtFetchClient->bind_param("i", $no_sn);
+        $stmtFetchClient->execute();
+        $stmtFetchClient->bind_result($nama_client_fetched);
+
+        // Fetch the result and ensure all fetched nama_client values are the same
+        $stmtFetchClient->fetch();
+        $stmtFetchClient->close();
+
+        if ($key === 0) {
+            // Store the first fetched nama_client value
+            $namaClientArray[] = $nama_client_fetched;
+        } else {
+            // Check if the current fetched nama_client matches the stored value
+            if ($nama_client_fetched !== $namaClientArray[0]) {
+                echo "Error: Fetched nama_client values are not the same.";
+                exit; // Exit the script if validation fails
+            }
+        }
+    }
 
     // Continue with the transaction maintenance
-    $query = "INSERT INTO transaksi_maintenance (tanggal_terima, nama_client) VALUES (?, ?)";
+    $query = "INSERT INTO transaksi_maintenance (tanggal_terima) VALUES (?)";
     $stmt = $conn->prepare($query);
-    $stmt->bind_param("ss", $tanggal, $nama_client);
+    $stmt->bind_param("s", $tanggal);
 
     if ($stmt->execute()) {
         // Get the auto-generated transaksi_id
         $transaksi_id = $conn->insert_id;
 
         // Insert successful, continue with the detail maintenance
-        if (isset($_POST["pilihNamaProduk"]) && isset($_POST["numberSN"]) && isset($_POST["pilihGaransi"]) && isset($_POST["inputKerusakan"])) {
-            $produkArray = $_POST["pilihNamaProduk"];
+        if (isset($_POST["numberSN"]) && isset($_POST["inputKerusakan"])) {
             $numberSNArray = $_POST["numberSN"];
-            $garansiArray = $_POST["pilihGaransi"];
             $keteranganArray = $_POST["inputKerusakan"];
+            $pilihGaransiArray = $_POST["pilihGaransi"];
 
-            // Loop through the arrays and insert records
-            foreach ($produkArray as $key => $nama_produk) {
-                $no_sn = $numberSNArray[$key];
-                $garansi = $garansiArray[$key];
+            foreach ($numberSNArray as $key => $no_sn) {
                 $keterangan = $keteranganArray[$key];
+                $pilihGaransi = $pilihGaransiArray[$key];
 
                 // Insert the new record into detail_maintenance table
-                echo "Produk: $nama_produk, SN: $no_sn, Garansi: $garansi, Keterangan: $keterangan";
-                $queryDetail = "INSERT INTO detail_maintenance (transaksi_id, produk_mt, no_sn, garansi, 
-                keterangan, kedatangan, cek_barang, berita_as, administrasi, pengiriman, no_resi) VALUES (?, ?, ?, ?, ?, '1', '0','0','0','0', '0')";
+                $queryDetail = "INSERT INTO detail_maintenance (transaksi_id, no_sn, 
+                keterangan, kedatangan, cek_barang, berita_as, administrasi, pengiriman, no_resi) VALUES (?, ?, ?, '1', '0','0','0','0', '0')";
                 $stmtDetail = $conn->prepare($queryDetail);
-                $stmtDetail->bind_param("isiis", $transaksi_id, $nama_produk, $no_sn, $garansi, $keterangan);
-                $stmtDetail->execute();
-                $stmtDetail->close();
+                $stmtDetail->bind_param("iis", $transaksi_id, $no_sn, $keterangan);
+
+                if ($stmtDetail->execute()) {
+                    $stmtDetail->close();
+
+                    // Update the garansi_void column in inventaris_produk table
+                    $queryUpdateInventaris = "UPDATE inventaris_produk SET garansi_void = ? WHERE no_sn = ?";
+                    $stmtUpdateInventaris = $conn->prepare($queryUpdateInventaris);
+                    $stmtUpdateInventaris->bind_param("ii", $pilihGaransi, $no_sn);
+
+                    if ($stmtUpdateInventaris->execute()) {
+                        $stmtUpdateInventaris->close();
+                    } else {
+                        echo "Error updating inventaris_produk: " . $stmtUpdateInventaris->error;
+                    }
+                } else {
+                    echo "Error inserting record into detail_maintenance: " . $stmtDetail->error;
+                }
+            }
+            // Validate and update transaksi_maintenance table
+            if (count($namaClientArray) > 0) {
+                $nama_client = $namaClientArray[0];
+
+                $queryUpdateClient = "UPDATE transaksi_maintenance SET nama_client = ? WHERE transaksi_id = ?";
+                $stmtUpdateClient = $conn->prepare($queryUpdateClient);
+                $stmtUpdateClient->bind_param("si", $nama_client, $transaksi_id);
+
+                if (!$stmtUpdateClient->execute()) {
+                    echo "Error updating transaksi_maintenance: " . $stmtUpdateClient->error;
+                }
+
+                $stmtUpdateClient->close();
+            } else {
+                echo "Error: No nama_client values fetched.";
             }
         } else {
             echo "Error: Products and other arrays are not set.";
@@ -120,15 +154,14 @@ if (isset($_GET["getDropdownOptions"])) {
             width: 10%;
         }
 
-        @media (max-width: 200px) {
+        .larger-checkbox {
+            width: 20px;
+            height: 20px;
+        }
 
-            .lebar-kolom1,
-            .lebar-kolom2,
-            .lebar-kolom3,
-            .lebar-kolom4,
-            .lebar-kolom5 {
-                width: 100% !important;
-            }
+        .select2-container--default .select2-results__option[data-selected="1"]:hover {
+            background-color: red;
+            color: white;
         }
     </style>
 
@@ -376,28 +409,14 @@ if (isset($_GET["getDropdownOptions"])) {
                                         </div>
                                     </div>
                                 </div>
-                                <div class="form-group">
-                                    <div class="col">
-                                        <label for="pilihClient">Pilih PT <span style="color: red;">*</span></label>
-                                        <select class="form-control select2" id="pilihClient" name="client">
-                                            <option value="">--- Pilih PT ---</option>
-                                            <?php
-                                            while ($row = $resultClient->fetch_assoc()) {
-                                                echo '<option value="' . $row['nama_client'] . '">' . $row['nama_client'] . '</option>';
-                                            }
-                                            ?>
-                                        </select>
-                                    </div>
-                                </div>
                                 <div class="card-body p-0">
                                     <div class="table-responsive">
                                         <table id="tableDetail" class=" table order-list table-striped">
                                             <thead>
                                                 <tr>
-                                                    <td class="text-center lebar-kolom1" style="min-width:180px;"><b>Nama Produk <span style="color: red;">*</span></b></td>
-                                                    <td class="text-center lebar-kolom2" style="min-width:120px;"><b>Nomor SN <span style="color: red;">*</span></b></td>
-                                                    <td class="text-center lebar-kolom3" style="min-width:130px;"><b>Garansi? <span style="color: red;">*</span></b></td>
+                                                    <td class="text-center lebar-kolom2" style="min-width:160px;"><b>Nomor SN <span style="color: red;">*</span></b></td>
                                                     <td class="text-center lebar-kolom4" style="min-width:120px;"><b>Kerusakan <span style="color: red;">*</span></b></td>
+                                                    <td class="text-center lebar-kolom5" style="min-width:140px;"><b>Garansi Void <span style="color: red;">*</span></b></td>
                                                     <td class="text-center lebar-kolom5"><b>Aksi</b></td>
                                                 </tr>
                                             </thead>
@@ -484,20 +503,19 @@ if (isset($_GET["getDropdownOptions"])) {
 
                 // Make an AJAX request to fetch dropdown options
                 $.ajax({
-                    url: 'input.php?getDropdownOptions',
-                    type: 'GET',
-                    success: function(dropdownOptions) {
-                        var dropdownGaransi = '<option value="" selected disabled>Garansi</option>' +
-                            '<option value="1">Ya</option>' +
-                            '<option value="0">Tidak</option>';
+                    type: 'POST',
+                    url: 'input.php',
+                    success: function(response) {
+                        var dropdownGaransi = '<option value="" selected disabled>Pilih Void</option>' +
+                            '<option value="1">Void</option>' +
+                            '<option value="0">Tidak Void</option>';
                         var newRow = $("<tr>");
                         var cols = "";
 
-                        cols += '<td><select class="form-control select2 pilihNamaProduk" name="pilihNamaProduk[]">' + dropdownOptions + '</select></td>';
                         cols += '<td><input type="number" class="form-control" name="numberSN[]" value="" placeholder="Nomor SN"/></td>';
-                        cols += '<td><select class="form-control select2" id="pilihGaransi ' + counter + '" name="pilihGaransi[]' + counter + '">' + dropdownGaransi + '</select></td>';
                         cols += '<td><input type="text" class="form-control" name="inputKerusakan[]" value="" placeholder="Kerusakan Device"/></td>';
-                        cols += '<td><input type="button" class="ibtnDel btn btn-md btn-danger"  value="Delete"></td>';
+                        cols += '<td><select class="form-control select2" id="pilihGaransi ' + counter + '" name="pilihGaransi[]' + counter + '">' + dropdownGaransi + '</select></td>';
+                        cols += '<td class="text-center"><input type="button" class="ibtnDel btn btn-md btn-danger"  value="Delete"></td>';
 
                         newRow.append(cols);
                         $("table.order-list").append(newRow);
@@ -533,22 +551,31 @@ if (isset($_GET["getDropdownOptions"])) {
         }
 
         function validateForm() {
+            var namaClientArray = [];
             var tanggal = document.getElementById("tanggal").value;
 
+            if (tanggal === "") {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: 'Harap isi tanggal!',
+                });
+                return false;
+            }
+
             // Use classes for dynamic elements
-            var namaElements = document.querySelectorAll(".pilihNamaProduk");
             var numberSNElements = document.querySelectorAll("[name^='numberSN']");
-            var garansiElements = document.querySelectorAll("[name^='pilihGaransi']");
             var keteranganElements = document.querySelectorAll("[name^='inputKerusakan']");
+            var garansiElements = document.querySelectorAll("[name^='pilihGaransi']");
 
             // Check each row
-            for (var i = 0; i < namaElements.length; i++) {
-                var nama = namaElements[i].value;
+            for (var i = 0; i < numberSNElements.length; i++) {
                 var numberSN = numberSNElements[i].value;
-                var garansi = garansiElements[i].value;
                 var keterangan = keteranganElements[i].value;
+                var garansi = garansiElements[i].value;
+                
 
-                if (nama === "" || numberSN === "" || garansi === "" || keterangan === "") {
+                if (numberSN === "" || keterangan === "" || garansi === "") {
                     Swal.fire({
                         icon: 'error',
                         title: 'Oops...',
@@ -557,13 +584,11 @@ if (isset($_GET["getDropdownOptions"])) {
                     return false;
                 }
             }
-
             return true;
         }
 
         function validateSuccess() {
             var formData = new FormData(document.getElementById("inputMaintenanceForm"));
-            formData.append('getDropdownOptions', '1');
 
             $.ajax({
                 type: "POST",
@@ -588,4 +613,5 @@ if (isset($_GET["getDropdownOptions"])) {
         }
     </script>
 </body>
+
 </html>

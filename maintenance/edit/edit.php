@@ -14,7 +14,7 @@ if (isset($_GET['id'])) {
     $result = $stmt->get_result();
 
     // You can also fetch data from the transaksi_maintenance table
-    $transaksiQuery = "SELECT nama_client FROM transaksi_maintenance WHERE transaksi_id = ?";
+    $transaksiQuery = "SELECT * FROM transaksi_maintenance WHERE transaksi_id = ?";
     $transaksiStmt = $conn->prepare($transaksiQuery);
     $transaksiStmt->bind_param("i", $transaksi_id);
     $transaksiStmt->execute();
@@ -405,13 +405,52 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                                                 </thead>
                                                 <tbody id="transaksiTable">
                                                     <?php
+                                                    $tanggal_terima = $row['tanggal_terima'];
+                                                    
                                                     while ($row = mysqli_fetch_assoc($result)) {
-                                                    ?>
+                                                        $no_sn = $row['no_sn'];
+                                                        $garansiQuery = "SELECT garansi_void, garansi_akhir, produk FROM inventaris_produk WHERE no_sn = ?";
+                                                        $garansiStmt = $conn->prepare($garansiQuery);
+                                                        $garansiStmt->bind_param("s", $no_sn);
+                                                        $garansiStmt->execute();
+                                                        $garansiResult = $garansiStmt->get_result();
+                                                        
+                                                        $produk = $garansi_void = $garansi_akhir = null; // Initialize variables
+                                                        list($garansi_void, $garansi_akhir, $produk) = $garansiResult->fetch_row();
+                                                        ?>
                                                         <tr>
                                                             <td><?php echo $row["detail_id"]; ?></td>
-                                                            <td><?php echo $row["produk_mt"]; ?></td>
-                                                            <td><?php echo $row["no_sn"]; ?></td>
-                                                            <td><?php echo $row["garansi"] == 1 ? 'Yes' : 'No'; ?></td>
+                                                            <td>                                                                
+                                                                <?php
+                                                                                                                                
+                                                                $updateProdukQuery = "UPDATE detail_maintenance SET produk_mt = ? WHERE detail_id = ?";
+                                                                $updateProdukStmt = $conn->prepare($updateProdukQuery);
+                                                                $updateProdukStmt->bind_param("si", $produk, $row["detail_id"]);
+                                                                $updateProdukStmt->execute();
+
+                                                                echo $produk;
+
+                                                                ?>
+                                                            </td>
+                                                            <td><?php echo $no_sn; ?></td>
+                                                            <td>
+                                                                <?php
+                                                                
+                                                                $garansi = ($garansi_void || $garansi_akhir < $tanggal_terima) ? 0 : 1;
+                                                                
+                                                                $updateGaransiQuery = "UPDATE detail_maintenance SET garansi = ? WHERE detail_id = ?";
+                                                                $updateGaransiStmt = $conn->prepare($updateGaransiQuery);
+                                                                $updateGaransiStmt->bind_param("ii", $garansi, $row["detail_id"]);
+                                                                $updateGaransiStmt->execute();
+
+                                                                // Check if any of the warranty conditions are met
+                                                                if ($garansi == 0) {
+                                                                    echo 'No'; // Warranty void or expired
+                                                                } else {
+                                                                    echo 'Yes'; // Warranty valid
+                                                                }
+                                                                ?>
+                                                            </td>
                                                             <td><?php echo $row["keterangan"]; ?></td>
                                                             <td style="text-align: center;">
                                                                 <div class="form-check">
