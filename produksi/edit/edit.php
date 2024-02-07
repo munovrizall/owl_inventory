@@ -44,38 +44,63 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_GET['id'])) {
 
     $stmt = $conn->prepare($query);
 
+    $tipeProduk = empty($_POST['tipeProduk']) ? null : $_POST['tipeProduk'];
+    $chipID = empty($_POST['chipID']) ? null : $_POST['chipID'];
+    $nomorSN = empty($_POST['nomorSN']) ? null : $_POST['nomorSN'];
+    $client = empty($_POST['client']) ? null : $_POST['client'];
     $garansiAwal = empty($_POST['garansiAwal']) ? null : $_POST['garansiAwal'];
     $garansiAkhir = empty($_POST['garansiAkhir']) ? null : $_POST['garansiAkhir'];
+    $garansiVoid = empty($_POST['garansiVoid']) ? null : $_POST['garansiVoid'];
+    $keteranganVoid = empty($_POST['keteranganVoid']) ? null : $_POST['keteranganVoid'];
+    $ipAddress = empty($_POST['ipAddress']) ? null : $_POST['ipAddress'];
+    $macWifi = empty($_POST['macWifi']) ? null : $_POST['macWifi'];
+    $macBluetooth = empty($_POST['macBluetooth']) ? null : $_POST['macBluetooth'];
+    $firmwareVersion = empty($_POST['firmwareVersion']) ? null : $_POST['firmwareVersion'];
+    $hardwareVersion = empty($_POST['hardwareVersion']) ? null : $_POST['hardwareVersion'];
+    $freeRam = empty($_POST['freeRam']) ? null : $_POST['freeRam'];
+    $minRam = empty($_POST['minRam']) ? null : $_POST['minRam'];
+    $battLow = empty($_POST['battLow']) ? null : $_POST['battLow'];
+    $battHigh = empty($_POST['battHigh']) ? null : $_POST['battHigh'];
+    $temp = empty($_POST['temp']) ? null : $_POST['temp'];
+    $statusError = empty($_POST['statusError']) ? null : $_POST['statusError'];
+    $gpsLatitude = empty($_POST['gpsLatitude']) ? null : $_POST['gpsLatitude'];
+    $gpsLongitude = empty($_POST['gpsLongitude']) ? null : $_POST['gpsLongitude'];
+    $statusSensor1 = empty($_POST['statusSensor1']) ? null : $_POST['statusSensor1'];
+    $statusSensor2 = empty($_POST['statusSensor2']) ? null : $_POST['statusSensor2'];
+    $statusSensor3 = empty($_POST['statusSensor3']) ? null : $_POST['statusSensor3'];
+    $statusSensor4 = empty($_POST['statusSensor4']) ? null : $_POST['statusSensor4'];
+    $statusSensor5 = empty($_POST['statusSensor5']) ? null : $_POST['statusSensor5'];
+    $statusSensor6 = empty($_POST['statusSensor6']) ? null : $_POST['statusSensor6'];
 
     $stmt->bind_param(
         "siisssissssssiiiididdssssssi",
-        $_POST['tipeProduk'],
-        $_POST['chipID'],
-        $_POST['nomorSN'],
-        $_POST['client'],
+        $tipeProduk,
+        $chipID,
+        $nomorSN,
+        $client,
         $garansiAwal,
         $garansiAkhir,
-        $_POST['garansiVoid'],
-        $_POST['keteranganVoid'],
-        $_POST['ipAddress'],
-        $_POST['macWifi'],
-        $_POST['macBluetooth'],
-        $_POST['firmwareVersion'],
-        $_POST['hardwareVersion'],
-        $_POST['freeRam'],
-        $_POST['minRam'],
-        $_POST['battLow'],
-        $_POST['battHigh'],
-        $_POST['temp'],
-        $_POST['statusError'],
-        $_POST['gpsLatitude'],
-        $_POST['gpsLongitude'],
-        $_POST['statusSensor1'],
-        $_POST['statusSensor2'],
-        $_POST['statusSensor3'],
-        $_POST['statusSensor4'],
-        $_POST['statusSensor5'],
-        $_POST['statusSensor6'],
+        $garansiVoid,
+        $keteranganVoid,
+        $ipAddress,
+        $macWifi,
+        $macBluetooth,
+        $firmwareVersion,
+        $hardwareVersion,
+        $freeRam,
+        $minRam,
+        $battLow,
+        $battHigh,
+        $temp,
+        $statusError,
+        $gpsLatitude,
+        $gpsLongitude,
+        $statusSensor1,
+        $statusSensor2,
+        $statusSensor3,
+        $statusSensor4,
+        $statusSensor5,
+        $statusSensor6,
         $getId
     );
 
@@ -529,13 +554,13 @@ if (isset($_GET['id'])) {
                                 <div class="form-group">
                                     <div>
                                         <label for="gpsLatitude">GPS Latitude</label>
-                                        <input type="text" class="form-control form-control-border border-width-2" id="gpsLatitude" name="gpsLatitude" placeholder="Masukkan GPS latitude device" value="<?php echo is_null($row['gps_latitude']) ? '' : $row['gps_latitude']; ?>">
+                                        <input type="number" class="form-control form-control-border border-width-2" id="gpsLatitude" name="gpsLatitude" placeholder="Masukkan GPS latitude device" value="<?php echo is_null($row['gps_latitude']) ? '' : $row['gps_latitude']; ?>">
                                     </div>
                                 </div>
                                 <div class="form-group">
                                     <div>
                                         <label for="gpsLongitude">GPS Longitude</label>
-                                        <input type="text" class="form-control form-control-border border-width-2" id="gpsLongitude" name="gpsLongitude" placeholder="Masukkan GPS longitude device" value="<?php echo is_null($row['gps_longitude']) ? '' : $row['gps_longitude']; ?>">
+                                        <input type="number" class="form-control form-control-border border-width-2" id="gpsLongitude" name="gpsLongitude" placeholder="Masukkan GPS longitude device" value="<?php echo is_null($row['gps_longitude']) ? '' : $row['gps_longitude']; ?>">
                                     </div>
                                 </div>
                                 <div class="form-group">
