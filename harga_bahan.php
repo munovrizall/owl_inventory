@@ -271,7 +271,7 @@ if (isset($_POST['selectedItem'])) {
                                 </p>
                             </a>
                         </li>
-                        <li class="nav-item">
+                        <li class="nav-item" style="margin-bottom: 40px;">
                             <a href="histori_transaksi.php" class="nav-link">
                                 <i class="nav-icon fas fa-history"></i>
                                 <p>

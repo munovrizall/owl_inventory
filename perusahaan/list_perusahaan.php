@@ -246,7 +246,7 @@ $result = mysqli_query($conn, $query);
                                 </p>
                             </a>
                         </li>
-                        <li class="nav-item">
+                        <li class="nav-item" style="margin-bottom: 40px;">
                             <a href="../histori_transaksi.php" class="nav-link">
                                 <i class="nav-icon fas fa-history"></i>
                                 <p>
@@ -272,7 +272,7 @@ $result = mysqli_query($conn, $query);
                         </div>
                         <div class="col-sm-6">
                             <ol class="breadcrumb float-sm-right">
-                                <li class="breadcrumb-item"><a href="homepage.php">Home</a></li>
+                                <li class="breadcrumb-item"><a href="../homepage.php">Home</a></li>
                                 <li class="breadcrumb-item active">Perusahaan</li>
                                 <li class="breadcrumb-item active">List Perusahaan</li>
                             </ol>

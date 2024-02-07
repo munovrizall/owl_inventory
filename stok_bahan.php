@@ -12,7 +12,7 @@ $result = mysqli_query($conn, $query);
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Laporan Stok</title>
+    <title>Stok Bahan</title>
 
     <link rel="icon" href="assets/adminlte/dist/img/OWLlogo.png" type="image/x-icon">
     <!-- Google Font: Source Sans Pro -->
@@ -244,7 +244,7 @@ $result = mysqli_query($conn, $query);
                                 </p>
                             </a>
                         </li>
-                        <li class="nav-item">
+                        <li class="nav-item" style="margin-bottom: 40px;">
                             <a href="histori_transaksi.php" class="nav-link">
                                 <i class="nav-icon fas fa-history"></i>
                                 <p>
@@ -266,7 +266,7 @@ $result = mysqli_query($conn, $query);
                 <div class="container-fluid">
                     <div class="row mb-2">
                         <div class="col-sm-6">
-                            <h1 class="m-0">Laporan Stok</h1>
+                            <h1 class="m-0">Laporan Stok Bahan</h1>
                         </div><!-- /.col -->
                         <div class="col-sm-6">
                             <ol class="breadcrumb float-sm-right">
@@ -300,7 +300,7 @@ $result = mysqli_query($conn, $query);
                                                 <th class="text-center lebar-kolom3">Nama</th>
                                                 <th class="text-center lebar-kolom4">Stok</th>
                                                 <th class="text-center lebar-kolom5">Harga Bahan</th>
-                                                <th class="text-center lebar-kolom6">Deskripsi</th>
+                                                <th class="text-center lebar-kolom6" style="min-width:140px">Deskripsi</th>
                                             </tr>
                                         </thead>
                                         <tbody>

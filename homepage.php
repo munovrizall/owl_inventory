@@ -264,7 +264,7 @@ if (!$result) {
                 </p>
               </a>
             </li>
-            <li class="nav-item">
+            <li class="nav-item" style="margin-bottom: 40px;">
               <a href="histori_transaksi.php" class="nav-link">
                 <i class="nav-icon fas fa-history"></i>
                 <p>
@@ -290,7 +290,7 @@ if (!$result) {
             </div><!-- /.col -->
             <div class="col-sm-6">
               <ol class="breadcrumb float-sm-right">
-                <li class="breadcrumb-item"><a href="#">Home</a></li>
+                <li class="breadcrumb-item active">Home</li>
               </ol>
             </div><!-- /.col -->
           </div><!-- /.row -->

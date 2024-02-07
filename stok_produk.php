@@ -239,7 +239,7 @@ $result = mysqli_query($conn, $query);
                                 </p>
                             </a>
                         </li>
-                        <li class="nav-item">
+                        <li class="nav-item" style="margin-bottom: 40px;">
                             <a href="histori_transaksi.php" class="nav-link">
                                 <i class="nav-icon fas fa-history"></i>
                                 <p>
@@ -291,9 +291,9 @@ $result = mysqli_query($conn, $query);
                                         <thead>
                                             <tr>
                                                 <th class="text-center lebar-kolom1">ID</th>
-                                                <th class="text-center lebar-kolom2">Nama Produk</th>
+                                                <th class="text-center lebar-kolom2" style="min-width: 120px">Nama Produk</th>
                                                 <th class="text-center lebar-kolom3">Stok</th>
-                                                <th class="text-center lebar-kolom4">Biaya Produksi</th>
+                                                <th class="text-center lebar-kolom4" style="min-width: 120px">Biaya Produksi</th>
                                             </tr>
                                         </thead>
                                         <tbody>

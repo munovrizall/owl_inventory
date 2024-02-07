@@ -238,7 +238,7 @@ $result = mysqli_query($conn, $query);
                                 </p>
                             </a>
                         </li>
-                        <li class="nav-item">
+                        <li class="nav-item" style="margin-bottom: 40px;">
                             <a href="../histori_transaksi.php" class="nav-link">
                                 <i class="nav-icon fas fa-history"></i>
                                 <p>
@@ -264,7 +264,7 @@ $result = mysqli_query($conn, $query);
                         </div>
                         <div class="col-sm-6">
                             <ol class="breadcrumb float-sm-right">
-                                <li class="breadcrumb-item"><a href="homepage.php">Home</a></li>
+                                <li class="breadcrumb-item"><a href="../homepage.php">Home</a></li>
                                 <li class="breadcrumb-item active">Maintenance</li>
                                 <li class="breadcrumb-item active">Monitoring</li>
                             </ol>
@@ -291,9 +291,9 @@ $result = mysqli_query($conn, $query);
                                             <tr>
                                                 <th class="text-center lebar-kolom1">ID Transaksi</th>
                                                 <th class="text-center lebar-kolom2">Tanggal</th>
-                                                <th class="text-center lebar-kolom3">Nama PT</th>
+                                                <th class="text-center lebar-kolom3" style="min-width: 80px">Nama PT</th>
                                                 <th class="text-center lebar-kolom4">Status</th>
-                                                <th class="text-center lebar-kolom5 aksi-column">Aksi</th>
+                                                <th class="text-center lebar-kolom5 aksi-column" style="min-width: 120px">Aksi</th>
                                             </tr>
                                         </thead>
                                         <tbody>

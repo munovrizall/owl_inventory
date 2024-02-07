@@ -267,7 +267,7 @@ if (isset($_GET['id'])) {
                                 </p>
                             </a>
                         </li>
-                        <li class="nav-item">
+                        <li class="nav-item" style="margin-bottom: 40px;">
                             <a href="../../histori_transaksi.php" class="nav-link">
                                 <i class="nav-icon fas fa-history"></i>
                                 <p>
@@ -334,14 +334,14 @@ if (isset($_GET['id'])) {
                                             <table>
                                                 <tbody>
                                                     <tr>
-                                                        <td class="table-head"><b>Nama Perusahaan :</b></td>
+                                                        <td class="table-head" style="min-width: 180px"><b>Nama Perusahaan :</b></td>
                                                         <td>
                                                             <?php
                                                             $nama_client = $row["nama_client"];
                                                             echo $nama_client !== null ? $nama_client : '-';
                                                             ?>
                                                         </td>
-                                                        <td><b>Free RAM :</b></td>
+                                                        <td class="table-head" style="min-width: 180px"><b>Free RAM :</b></td>
                                                         <td>
                                                             <?php
                                                             $free_ram = $row["free_ram"];
