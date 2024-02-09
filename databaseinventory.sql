@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 5.2.1
+-- version 5.2.0
 -- https://www.phpmyadmin.net/
 --
--- Host: 127.0.0.1
--- Generation Time: Jan 23, 2024 at 04:09 AM
--- Server version: 10.4.32-MariaDB
--- PHP Version: 8.0.30
+-- Host: localhost:3306
+-- Generation Time: Feb 09, 2024 at 08:37 AM
+-- Server version: 10.4.32-MariaDB-log
+-- PHP Version: 8.0.3
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -20,6 +20,22 @@ SET time_zone = "+00:00";
 --
 -- Database: `databaseinventory`
 --
+CREATE DATABASE IF NOT EXISTS `databaseinventory` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+USE `databaseinventory`;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `bahan_produksi`
+--
+
+CREATE TABLE `bahan_produksi` (
+  `ID` int(6) NOT NULL,
+  `produk` varchar(30) NOT NULL,
+  `nama_bahan` varchar(255) NOT NULL,
+  `quantity` int(6) NOT NULL,
+  `harga_bahan` int(10) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -29,8 +45,14 @@ SET time_zone = "+00:00";
 
 CREATE TABLE `client` (
   `client_id` int(6) NOT NULL,
-  `nama_client` varchar(255) NOT NULL
+  `nama_client` varchar(255) NOT NULL,
+  `nama_korespondensi` varchar(255) NOT NULL,
+  `alamat_perusahaan` varchar(500) NOT NULL,
+  `username` varchar(40) DEFAULT NULL,
+  `password` varchar(40) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
 
 --
 -- Table structure for table `detail_maintenance`
@@ -39,9 +61,9 @@ CREATE TABLE `client` (
 CREATE TABLE `detail_maintenance` (
   `detail_id` int(6) NOT NULL,
   `transaksi_id` int(6) NOT NULL,
-  `produk_mt` varchar(255) NOT NULL,
-  `no_sn` int(14) NOT NULL,
-  `garansi` binary(1) NOT NULL,
+  `produk_mt` varchar(255) DEFAULT NULL,
+  `no_sn` int(10) NOT NULL,
+  `garansi` binary(1) DEFAULT NULL,
   `keterangan` varchar(255) NOT NULL,
   `kedatangan` binary(1) NOT NULL,
   `cek_barang` binary(1) NOT NULL,
@@ -51,19 +73,61 @@ CREATE TABLE `detail_maintenance` (
   `no_resi` varchar(40) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+-- --------------------------------------------------------
+
 --
 -- Table structure for table `historis`
 --
 
 CREATE TABLE `historis` (
-  `ID` int(11) NOT NULL,
-  `pengguna` varchar(30) NOT NULL,
-  `stok_id` int(6) UNSIGNED NOT NULL,
-  `waktu` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `ID` int(6) NOT NULL,
+  `pengguna` varchar(40) NOT NULL,
+  `nama_barang` varchar(20) NOT NULL,
+  `waktu` datetime(6) NOT NULL,
   `quantity` int(6) NOT NULL,
-  `activity` varchar(50) NOT NULL,
+  `activity` varchar(20) NOT NULL,
   `deskripsi` varchar(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `inventaris_produk`
+--
+
+CREATE TABLE `inventaris_produk` (
+  `id` int(6) NOT NULL,
+  `type_produk` varchar(20) DEFAULT NULL,
+  `produk` varchar(40) DEFAULT NULL,
+  `chip_id` int(12) DEFAULT NULL,
+  `no_sn` int(10) DEFAULT NULL,
+  `nama_client` varchar(40) DEFAULT NULL,
+  `garansi_awal` date DEFAULT NULL,
+  `garansi_akhir` date DEFAULT NULL,
+  `garansi_void` tinyint(1) DEFAULT NULL,
+  `keterangan_void` varchar(40) DEFAULT NULL,
+  `ip_address` varchar(16) DEFAULT NULL,
+  `mac_wifi` varchar(20) DEFAULT NULL,
+  `mac_bluetooth` varchar(20) DEFAULT NULL,
+  `firmware_version` varchar(6) DEFAULT NULL,
+  `hardware_version` varchar(6) DEFAULT NULL,
+  `free_ram` int(6) DEFAULT NULL,
+  `min_ram` int(6) DEFAULT NULL,
+  `batt_low` int(4) DEFAULT NULL,
+  `batt_high` int(4) DEFAULT NULL,
+  `temperature` float DEFAULT NULL,
+  `status_error` int(4) DEFAULT NULL,
+  `gps_latitude` float DEFAULT NULL,
+  `gps_longitude` float DEFAULT NULL,
+  `status_qc_sensor_1` varchar(255) DEFAULT NULL,
+  `status_qc_sensor_2` varchar(255) DEFAULT NULL,
+  `status_qc_sensor_3` varchar(255) DEFAULT NULL,
+  `status_qc_sensor_4` varchar(255) DEFAULT NULL,
+  `status_qc_sensor_5` varchar(255) DEFAULT NULL,
+  `status_qc_sensor_6` varchar(255) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
 
 --
 -- Table structure for table `masterbahan`
@@ -74,8 +138,11 @@ CREATE TABLE `masterbahan` (
   `kelompok` varchar(255) DEFAULT NULL,
   `nama` varchar(255) NOT NULL,
   `quantity` int(12) NOT NULL,
+  `harga_bahan` int(10) DEFAULT NULL,
   `deskripsi` varchar(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
 
 --
 -- Table structure for table `masterkelompok`
@@ -86,25 +153,20 @@ CREATE TABLE `masterkelompok` (
   `nama_kelompok` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+-- --------------------------------------------------------
+
 --
 -- Table structure for table `produk`
 --
 
 CREATE TABLE `produk` (
   `produk_id` int(6) NOT NULL,
-  `nama_produk` varchar(255) NOT NULL
+  `nama_produk` varchar(20) NOT NULL,
+  `quantity` int(6) NOT NULL,
+  `hpp_produk` int(10) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Table structure for table `produksi`
---
-
-CREATE TABLE `produksi` (
-  `ID` int(6) NOT NULL,
-  `produk` varchar(30) NOT NULL,
-  `nama_bahan` varchar(255) NOT NULL,
-  `quantity` int(6) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+-- --------------------------------------------------------
 
 --
 -- Table structure for table `transaksi_maintenance`
@@ -113,8 +175,20 @@ CREATE TABLE `produksi` (
 CREATE TABLE `transaksi_maintenance` (
   `transaksi_id` int(11) NOT NULL,
   `tanggal_terima` date NOT NULL,
-  `nama_client` varchar(255) NOT NULL
+  `nama_client` varchar(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Indexes for dumped tables
+--
+
+--
+-- Indexes for table `bahan_produksi`
+--
+ALTER TABLE `bahan_produksi`
+  ADD PRIMARY KEY (`ID`),
+  ADD KEY `nama_bahan` (`nama_bahan`),
+  ADD KEY `produk` (`produk`);
 
 --
 -- Indexes for table `client`
@@ -123,37 +197,44 @@ ALTER TABLE `client`
   ADD PRIMARY KEY (`client_id`),
   ADD UNIQUE KEY `nama_client` (`nama_client`);
 
-ALTER TABLE `client` ADD `nama_korespondensi` VARCHAR(255) NULL 
-AFTER `nama_client`, ADD `alamat_perusahaan` VARCHAR(500) NULL 
-AFTER `nama_korespondensi`;
-
 --
 -- Indexes for table `detail_maintenance`
 --
 ALTER TABLE `detail_maintenance`
   ADD PRIMARY KEY (`detail_id`),
-  ADD KEY `id_transaksi` (`transaksi_id`);
+  ADD KEY `id_transaksi` (`transaksi_id`),
+  ADD KEY `produk_mt` (`produk_mt`),
+  ADD KEY `no_sn` (`no_sn`);
 
 --
 -- Indexes for table `historis`
 --
 ALTER TABLE `historis`
-  ADD PRIMARY KEY (`ID`),
-  ADD KEY `historis_ibfk_1` (`stok_id`);
+  ADD PRIMARY KEY (`ID`);
+
+--
+-- Indexes for table `inventaris_produk`
+--
+ALTER TABLE `inventaris_produk`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `no_sn` (`no_sn`),
+  ADD KEY `produk` (`produk`);
 
 --
 -- Indexes for table `masterbahan`
 --
 ALTER TABLE `masterbahan`
   ADD PRIMARY KEY (`stok_id`),
-  ADD UNIQUE KEY `nama` (`nama`);
+  ADD UNIQUE KEY `nama` (`nama`),
+  ADD KEY `kelompok` (`kelompok`);
 
 --
 -- Indexes for table `masterkelompok`
 --
 ALTER TABLE `masterkelompok`
   ADD PRIMARY KEY (`kelompok_id`),
-  ADD UNIQUE KEY `nama_kelompok` (`nama_kelompok`);
+  ADD UNIQUE KEY `nama_kelompok` (`nama_kelompok`),
+  ADD UNIQUE KEY `nama_kelompok_2` (`nama_kelompok`);
 
 --
 -- Indexes for table `produk`
@@ -161,12 +242,6 @@ ALTER TABLE `masterkelompok`
 ALTER TABLE `produk`
   ADD PRIMARY KEY (`produk_id`),
   ADD UNIQUE KEY `nama_produk` (`nama_produk`);
-
---
--- Indexes for table `produksi`
---
-ALTER TABLE `produksi`
-  ADD PRIMARY KEY (`ID`);
 
 --
 -- Indexes for table `transaksi_maintenance`
@@ -180,68 +255,89 @@ ALTER TABLE `transaksi_maintenance`
 --
 
 --
+-- AUTO_INCREMENT for table `bahan_produksi`
+--
+ALTER TABLE `bahan_produksi`
+  MODIFY `ID` int(6) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT for table `client`
 --
 ALTER TABLE `client`
-  MODIFY `client_id` int(6) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `client_id` int(6) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `detail_maintenance`
 --
 ALTER TABLE `detail_maintenance`
-  MODIFY `detail_id` int(6) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+  MODIFY `detail_id` int(6) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `historis`
 --
 ALTER TABLE `historis`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=163;
+  MODIFY `ID` int(6) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `inventaris_produk`
+--
+ALTER TABLE `inventaris_produk`
+  MODIFY `id` int(6) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `masterbahan`
 --
 ALTER TABLE `masterbahan`
-  MODIFY `stok_id` int(6) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=52;
+  MODIFY `stok_id` int(6) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `masterkelompok`
 --
 ALTER TABLE `masterkelompok`
-  MODIFY `kelompok_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `kelompok_id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `produk`
 --
 ALTER TABLE `produk`
-  MODIFY `produk_id` int(6) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
-
---
--- AUTO_INCREMENT for table `produksi`
---
-ALTER TABLE `produksi`
-  MODIFY `ID` int(6) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=35;
+  MODIFY `produk_id` int(6) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `transaksi_maintenance`
 --
 ALTER TABLE `transaksi_maintenance`
-  MODIFY `transaksi_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
+  MODIFY `transaksi_id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- Constraints for dumped tables
 --
 
 --
+-- Constraints for table `bahan_produksi`
+--
+ALTER TABLE `bahan_produksi`
+  ADD CONSTRAINT `bahan_produksi_ibfk_1` FOREIGN KEY (`nama_bahan`) REFERENCES `masterbahan` (`nama`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `bahan_produksi_ibfk_2` FOREIGN KEY (`produk`) REFERENCES `produk` (`nama_produk`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
 -- Constraints for table `detail_maintenance`
 --
 ALTER TABLE `detail_maintenance`
-  ADD CONSTRAINT `detail_maintenance_ibfk_1` FOREIGN KEY (`transaksi_id`) REFERENCES `transaksi_maintenance` (`transaksi_id`) ON DELETE CASCADE ON UPDATE CASCADE;
+  ADD CONSTRAINT `detail_maintenance_ibfk_1` FOREIGN KEY (`transaksi_id`) REFERENCES `transaksi_maintenance` (`transaksi_id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `detail_maintenance_ibfk_2` FOREIGN KEY (`produk_mt`) REFERENCES `produk` (`nama_produk`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `detail_maintenance_ibfk_3` FOREIGN KEY (`no_sn`) REFERENCES `inventaris_produk` (`no_sn`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
--- Constraints for table `historis`
+-- Constraints for table `inventaris_produk`
 --
-ALTER TABLE `historis`
-  ADD CONSTRAINT `historis_ibfk_1` FOREIGN KEY (`stok_id`) REFERENCES `masterbahan` (`stok_id`);
+ALTER TABLE `inventaris_produk`
+  ADD CONSTRAINT `inventaris_produk_ibfk_2` FOREIGN KEY (`produk`) REFERENCES `produk` (`nama_produk`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Constraints for table `masterbahan`
+--
+ALTER TABLE `masterbahan`
+  ADD CONSTRAINT `masterbahan_ibfk_1` FOREIGN KEY (`kelompok`) REFERENCES `masterkelompok` (`nama_kelompok`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Constraints for table `transaksi_maintenance`
