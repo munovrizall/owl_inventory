@@ -50,7 +50,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_GET['id'])) {
     $client = empty($_POST['client']) ? null : $_POST['client'];
     $garansiAwal = empty($_POST['garansiAwal']) ? null : $_POST['garansiAwal'];
     $garansiAkhir = empty($_POST['garansiAkhir']) ? null : $_POST['garansiAkhir'];
-    $garansiVoid = empty($_POST['garansiVoid']) ? null : $_POST['garansiVoid'];
+    $garansiVoid = $_POST['garansiVoid'];
     $keteranganVoid = empty($_POST['keteranganVoid']) ? null : $_POST['keteranganVoid'];
     $ipAddress = empty($_POST['ipAddress']) ? null : $_POST['ipAddress'];
     $macWifi = empty($_POST['macWifi']) ? null : $_POST['macWifi'];
@@ -475,8 +475,8 @@ if (isset($_GET['id'])) {
                                     <label for="garansiVoid">Apakah Garansi Void?</label>
                                     <select class="form-control select2" id="garansiVoid" name="garansiVoid">
                                         <option value="" <?php echo is_null($row['garansi_void']) ? 'selected' : ''; ?>>--- Pilih Void ---</option>
-                                        <option value="1" <?php echo ($row['garansi_void'] == 1) ? 'selected' : ''; ?>>Void</option>
-                                        <option value="0" <?php echo ($row['garansi_void'] == 0) ? 'selected' : ''; ?>>Tidak Void</option>
+                                        <option value="1" <?php echo ($row['garansi_void'] === 1) ? 'selected' : ''; ?>>Void</option>
+                                        <option value="0" <?php echo ($row['garansi_void'] === 0) ? 'selected' : ''; ?>>Tidak Void</option>
                                     </select>
                                 </div>
                                 <div class="form-group">

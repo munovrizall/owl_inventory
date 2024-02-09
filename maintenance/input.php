@@ -135,11 +135,11 @@ if (isset($_POST['tanggal'])) {
         }
 
         .lebar-kolom1 {
-            width: 30%;
+            width: 20%;
         }
 
         .lebar-kolom2 {
-            width: 15%;
+            width: 20%;
         }
 
         .lebar-kolom3 {
@@ -147,7 +147,7 @@ if (isset($_POST['tanggal'])) {
         }
 
         .lebar-kolom4 {
-            width: 30%;
+            width: 25%;
         }
 
         .lebar-kolom5 {
@@ -414,9 +414,10 @@ if (isset($_POST['tanggal'])) {
                                         <table id="tableDetail" class=" table order-list table-striped">
                                             <thead>
                                                 <tr>
-                                                    <td class="text-center lebar-kolom2" style="min-width:160px;"><b>Nomor SN <span style="color: red;">*</span></b></td>
-                                                    <td class="text-center lebar-kolom4" style="min-width:120px;"><b>Kerusakan <span style="color: red;">*</span></b></td>
-                                                    <td class="text-center lebar-kolom5" style="min-width:140px;"><b>Garansi Void <span style="color: red;">*</span></b></td>
+                                                    <td class="text-center lebar-kolom1" style="min-width:160px;"><b>Nomor SN <span style="color: red;">*</span></b></td>
+                                                    <td class="text-center lebar-kolom2" style="min-width:120px;"><b>Kerusakan <span style="color: red;">*</span></b></td>
+                                                    <td class="text-center lebar-kolom3" style="min-width:140px;"><b>Garansi Void <span style="color: red;">*</span></b></td>
+                                                    <td class="text-center lebar-kolom4" style="min-width:160px;"><b>Keterangan Void</b></td>
                                                     <td class="text-center lebar-kolom5"><b>Aksi</b></td>
                                                 </tr>
                                             </thead>
@@ -515,6 +516,7 @@ if (isset($_POST['tanggal'])) {
                         cols += '<td><input type="number" class="form-control" name="numberSN[]" value="" placeholder="Nomor SN"/></td>';
                         cols += '<td><input type="text" class="form-control" name="inputKerusakan[]" value="" placeholder="Kerusakan Device"/></td>';
                         cols += '<td><select class="form-control select2" id="pilihGaransi ' + counter + '" name="pilihGaransi[]' + counter + '">' + dropdownGaransi + '</select></td>';
+                        cols += '<td><input type="text" class="form-control" name="keteranganVoid[]" value="" placeholder="Kosongkan jika tidak void"/></td>';
                         cols += '<td class="text-center"><input type="button" class="ibtnDel btn btn-md btn-danger"  value="Delete"></td>';
 
                         newRow.append(cols);

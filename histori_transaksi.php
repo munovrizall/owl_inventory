@@ -353,7 +353,7 @@ if (!$result) {
                                                         <td><?php echo $row["pengguna"]; ?></td>
                                                         <td><?php echo $row["nama_barang"]; ?></td>
                                                         <td><?php echo $row["quantity"]; ?></td>
-                                                        <td><span class="<?php echo $badgeClass; ?>"><?php echo $row["activity"]; ?></span></td>
+                                                        <td class="text-center"><span class="<?php echo $badgeClass; ?>"><?php echo $row["activity"]; ?></span></td>
                                                         <td><?php echo $row["deskripsi"]; ?></td>
                                                         <td><?php echo $tanggal; ?></td>
                                                     </tr>
