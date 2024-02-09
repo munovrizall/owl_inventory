@@ -445,9 +445,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
                                                                 // Check if any of the warranty conditions are met
                                                                 if ($garansi == 0) {
-                                                                    echo 'No'; // Warranty void or expired
+                                                                    echo 'Tidak'; // Warranty void or expired
                                                                 } else {
-                                                                    echo 'Yes'; // Warranty valid
+                                                                    echo 'Ya'; // Warranty valid
                                                                 }
                                                                 ?>
                                                             </td>
