@@ -50,10 +50,12 @@ if (isset($_POST['tanggal'])) {
             $numberSNArray = $_POST["numberSN"];
             $keteranganArray = $_POST["inputKerusakan"];
             $pilihGaransiArray = $_POST["pilihGaransi"];
+            $keteranganVoidArray = $_POST["keteranganVoid"];
 
             foreach ($numberSNArray as $key => $no_sn) {
                 $keterangan = $keteranganArray[$key];
                 $pilihGaransi = $pilihGaransiArray[$key];
+                $keteranganVoid = !empty($keteranganVoidArray[$key]) ? $keteranganVoidArray[$key] : "-"; 
 
                 // Insert the new record into detail_maintenance table
                 $queryDetail = "INSERT INTO detail_maintenance (transaksi_id, no_sn, 
@@ -65,9 +67,9 @@ if (isset($_POST['tanggal'])) {
                     $stmtDetail->close();
 
                     // Update the garansi_void column in inventaris_produk table
-                    $queryUpdateInventaris = "UPDATE inventaris_produk SET garansi_void = ? WHERE no_sn = ?";
+                    $queryUpdateInventaris = "UPDATE inventaris_produk SET garansi_void = ?, keterangan_void = ? WHERE no_sn = ?";
                     $stmtUpdateInventaris = $conn->prepare($queryUpdateInventaris);
-                    $stmtUpdateInventaris->bind_param("ii", $pilihGaransi, $no_sn);
+                    $stmtUpdateInventaris->bind_param("isi", $pilihGaransi, $keteranganVoid, $no_sn);
 
                     if ($stmtUpdateInventaris->execute()) {
                         $stmtUpdateInventaris->close();
