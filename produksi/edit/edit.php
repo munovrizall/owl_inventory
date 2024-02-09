@@ -51,7 +51,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_GET['id'])) {
     $garansiAwal = empty($_POST['garansiAwal']) ? null : $_POST['garansiAwal'];
     $garansiAkhir = empty($_POST['garansiAkhir']) ? null : $_POST['garansiAkhir'];
     $garansiVoid = $_POST['garansiVoid'];
-    $keteranganVoid = empty($_POST['keteranganVoid']) ? null : $_POST['keteranganVoid'];
+    $keteranganVoid = empty($_POST['keteranganVoid']) ? '-' : $_POST['keteranganVoid'];
     $ipAddress = empty($_POST['ipAddress']) ? null : $_POST['ipAddress'];
     $macWifi = empty($_POST['macWifi']) ? null : $_POST['macWifi'];
     $macBluetooth = empty($_POST['macBluetooth']) ? null : $_POST['macBluetooth'];

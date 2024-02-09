@@ -55,7 +55,7 @@ if (isset($_POST['tanggal'])) {
             foreach ($numberSNArray as $key => $no_sn) {
                 $keterangan = $keteranganArray[$key];
                 $pilihGaransi = $pilihGaransiArray[$key];
-                $keteranganVoid = !empty($keteranganVoidArray[$key]) ? $keteranganVoidArray[$key] : "-"; 
+                $keteranganVoid = !empty($keteranganVoidArray[$key]) ? $keteranganVoidArray[$key] : "-";
 
                 // Insert the new record into detail_maintenance table
                 $queryDetail = "INSERT INTO detail_maintenance (transaksi_id, no_sn, 
@@ -164,6 +164,15 @@ if (isset($_POST['tanggal'])) {
         .select2-container--default .select2-results__option[data-selected="1"]:hover {
             background-color: red;
             color: white;
+        }
+
+        .column-name {
+            font-weight: bold;
+        }
+
+        .column-description {
+            font-size: 10px;
+            color: #888;
         }
     </style>
 
@@ -419,7 +428,10 @@ if (isset($_POST['tanggal'])) {
                                                     <td class="text-center lebar-kolom1" style="min-width:160px;"><b>Nomor SN <span style="color: red;">*</span></b></td>
                                                     <td class="text-center lebar-kolom2" style="min-width:120px;"><b>Kerusakan <span style="color: red;">*</span></b></td>
                                                     <td class="text-center lebar-kolom3" style="min-width:140px;"><b>Garansi Void <span style="color: red;">*</span></b></td>
-                                                    <td class="text-center lebar-kolom4" style="min-width:160px;"><b>Keterangan Void</b></td>
+                                                    <th class="text-center lebar-kolom4" style="min-width:180px;">
+                                                        <div class="column-name">Keterangan Void</div>
+                                                        <div class="column-description">Kosongkan jika tidak void</div>
+                                                    </th>
                                                     <td class="text-center lebar-kolom5"><b>Aksi</b></td>
                                                 </tr>
                                             </thead>
@@ -518,7 +530,7 @@ if (isset($_POST['tanggal'])) {
                         cols += '<td><input type="number" class="form-control" name="numberSN[]" value="" placeholder="Nomor SN"/></td>';
                         cols += '<td><input type="text" class="form-control" name="inputKerusakan[]" value="" placeholder="Kerusakan Device"/></td>';
                         cols += '<td><select class="form-control select2" id="pilihGaransi ' + counter + '" name="pilihGaransi[]' + counter + '">' + dropdownGaransi + '</select></td>';
-                        cols += '<td><input type="text" class="form-control" name="keteranganVoid[]" value="" placeholder="Kosongkan jika tidak void"/></td>';
+                        cols += '<td><input type="text" class="form-control" name="keteranganVoid[]" value="" placeholder="Keterangan Void"/></td>';
                         cols += '<td class="text-center"><input type="button" class="ibtnDel btn btn-md btn-danger"  value="Delete"></td>';
 
                         newRow.append(cols);
@@ -577,7 +589,7 @@ if (isset($_POST['tanggal'])) {
                 var numberSN = numberSNElements[i].value;
                 var keterangan = keteranganElements[i].value;
                 var garansi = garansiElements[i].value;
-                
+
 
                 if (numberSN === "" || keterangan === "" || garansi === "") {
                     Swal.fire({
