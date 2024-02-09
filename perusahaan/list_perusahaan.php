@@ -365,9 +365,6 @@ $result = mysqli_query($conn, $query);
     <script src="../assets/adminlte/plugins/bs-custom-file-input/bs-custom-file-input.min.js"></script>
     <!-- AdminLTE App -->
     <script src="../assets/adminlte/dist/js/adminlte.min.js"></script>
-    <!-- bootstrap searchable dropdown -->
-    <script src="../assets/bootstrap-5/bootstrap.bundle.min.js"></script>
-    <script src="../assets/dselect.js"></script>
     <!-- Datatables -->
     <script src="https://cdn.datatables.net/v/bs4/dt-1.13.8/b-2.4.2/b-colvis-2.4.2/b-print-2.4.2/fh-3.4.0/r-2.5.0/rg-1.4.1/sb-1.6.0/sp-2.2.0/datatables.min.js"></script>
     <script src="https:////code.jquery.com/jquery-3.7.0.js"></script>
