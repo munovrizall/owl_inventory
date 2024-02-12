@@ -7,8 +7,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $kelompok = isset($_POST["kelompok"]) ? $_POST["kelompok"] : null;
     $nama = isset($_POST["namaBahan"]) ? $_POST["namaBahan"] : null;
     $quantity = isset($_POST["quantity"]) ? $_POST["quantity"] : null;
-    $deskripsi = isset($_POST["deskripsi"]) ? $_POST["deskripsi"] : null;
     $hargaBahan = isset($_POST["price"]) ? $_POST["price"] : null;
+    $lokasiPenyimpanan = isset($_POST["lokasiPenyimpanan"]) ? $_POST["lokasiPenyimpanan"] : null;
+    $deskripsi = isset($_POST["deskripsi"]) ? $_POST["deskripsi"] : null;
 
     $namaKelompokBaru = isset($_POST["namaKelompokBaru"]) ? $_POST["namaKelompokBaru"] : null;
 
@@ -58,9 +59,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $insertStmtKB->close();
     } elseif ($kelompok !== null) {
         // Insert the new record for material
-        $insertQuery = "INSERT INTO masterbahan (kelompok, nama, quantity, harga_bahan, deskripsi) VALUES (?, ?, ?, ?, ?)";
+        $insertQuery = "INSERT INTO masterbahan (kelompok, nama, quantity, harga_bahan, lokasi_penyimpanan, deskripsi) VALUES (?, ?, ?, ?, ?, ?)";
         $insertStmt = $conn->prepare($insertQuery);
-        $insertStmt->bind_param("ssiis", $kelompok, $nama, $quantity, $hargaBahan, $deskripsi);
+        $insertStmt->bind_param("ssiiss", $kelompok, $nama, $quantity, $hargaBahan, $lokasiPenyimpanan, $deskripsi);
 
         if ($insertStmt->execute()) {
             echo "Data berhasil ditambahkan ke tabel masterbahan.";
@@ -377,7 +378,11 @@ if (!$resultKelompok) {
                                     </div>
                                 </div>
                                 <div class="form-group">
-                                    <label for="deskripsi">Deskripsi<span class="gray-italic-text"> (opsional)</span></label>
+                                    <label for="lokasiPenyimpanan">Lokasi Penyimpanan <span class="gray-italic-text"> (opsional)</span></label>
+                                    <input type="text" class="form-control form-control-border border-width-2" id="lokasiPenyimpanan" name="lokasiPenyimpanan" placeholder="Masukkan lokasi penyimpanan">
+                                </div>
+                                <div class="form-group">
+                                    <label for="deskripsi">Deskripsi <span class="gray-italic-text"> (opsional)</span></label>
                                     <textarea class="form-control" id="deskripsi" name="deskripsi" rows="3" placeholder="Masukkan keterangan bahan ..."></textarea>
                                 </div>
                             </div>
