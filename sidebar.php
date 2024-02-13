@@ -130,6 +130,14 @@ $current_page = basename($_SERVER['PHP_SELF']);
                     </a>
                 </li>
                 <li class="nav-item">
+                    <a href="/owl_inventory/lokasi_penyimpanan.php" class="nav-link <?php echo (strpos($current_page, 'lokasi_penyimpanan.php') !== false) ? 'active' : ''; ?>">
+                        <i class="nav-icon fas fa-dollar-sign"></i>
+                        <p>
+                            Lokasi Penyimpanan
+                        </p>
+                    </a>
+                </li>
+                <li class="nav-item">
                     <a href="perusahaan.php" class="nav-link">
                         <i class="nav-icon fas fa-industry"></i>
                         <p>

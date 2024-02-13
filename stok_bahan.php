@@ -57,7 +57,11 @@ $result = mysqli_query($conn, $query);
         }
         
         .lebar-kolom6 {
-            width: 30%;
+            width: 10%;
+        }
+
+        .lebar-kolom7 {
+            width: 20%;
         }
 
         .card-padding {
@@ -122,7 +126,8 @@ $result = mysqli_query($conn, $query);
                                                 <th class="text-center lebar-kolom3">Nama</th>
                                                 <th class="text-center lebar-kolom4">Stok</th>
                                                 <th class="text-center lebar-kolom5">Harga Bahan</th>
-                                                <th class="text-center lebar-kolom6" style="min-width:140px">Deskripsi</th>
+                                                <th class="text-center lebar-kolom6">Lokasi Penyimpanan</th>
+                                                <th class="text-center lebar-kolom7" style="min-width:140px">Deskripsi</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -135,6 +140,7 @@ $result = mysqli_query($conn, $query);
                                                     <td><?php echo $row["nama"]; ?></td>
                                                     <td><?php echo $row["quantity"]; ?></td>
                                                     <td>Rp <?php echo number_format($row["harga_bahan"]); ?></td>
+                                                    <td><?php echo $row["lokasi_penyimpanan"]; ?></td>
                                                     <td><?php echo $row["deskripsi"]; ?></td>
                                                 </tr>
                                             <?php
