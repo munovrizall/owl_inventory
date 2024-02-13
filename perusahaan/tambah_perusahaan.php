@@ -1,7 +1,6 @@
 <?php
 
 include "../connection.php";
-include "../sidebar.php";
 
 $response = array();
 
@@ -93,7 +92,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             </ul>
         </nav>
         <!-- /.navbar -->
-        
+        <?php include "../sidebar.php"; ?>
         <!-- Content Wrapper. Contains page content -->
         <div class="content-wrapper">
             <!-- Content Header (Page header) -->

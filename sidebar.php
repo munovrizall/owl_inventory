@@ -24,8 +24,23 @@ $current_page = basename($_SERVER['PHP_SELF']);
                 </li>
                 </li>
                 <li class="nav-header">TRANSAKSI</li>
-                <li class="nav-item <?php echo (strpos($current_page, '/owl_inventory/produksi/') !== false) ? 'menu-open' : ''; ?>">
-                    <a href="#" class="nav-link <?php echo (strpos($current_page, '/owl_inventory/produksi/') !== false) ? 'active' : ''; ?>">
+                <li class="nav-item <?php
+                                    echo (strpos($current_page, 'produksi.php') !== false ||
+                                        strpos($current_page, 'quality_control.php') !== false ||
+                                        strpos($current_page, 'inventaris_device.php') !== false ||
+                                        strpos($current_page, 'pengiriman.php') !== false) ||
+                                        strpos($_SERVER['REQUEST_URI'], '/owl_inventory/produksi/edit/edit.php') !== false ||
+                                        strpos($_SERVER['REQUEST_URI'], '/owl_inventory/produksi/detail/detail.php') !== false
+                                        ? 'menu-open'
+                                        : ''; ?>">
+                    <a href="#" class="nav-link <?php
+                                                echo (strpos($current_page, 'produksi.php') !== false ||
+                                                    strpos($current_page, 'quality_control.php') !== false ||
+                                                    strpos($current_page, 'inventaris_device.php') !== false ||
+                                                    strpos($current_page, 'pengiriman.php') !== false) ||
+                                                    strpos($_SERVER['REQUEST_URI'], '/owl_inventory/produksi/edit/edit.php') !== false ||
+                                                    strpos($_SERVER['REQUEST_URI'], '/owl_inventory/produksi/detail/detail.php') !== false
+                                                    ? 'active' : ''; ?>">
                         <i class="nav-icon fas fa-toolbox"></i>
                         <p>
                             Produksi
@@ -40,27 +55,37 @@ $current_page = basename($_SERVER['PHP_SELF']);
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="/owl_inventory/produksi/quality_control.php" class="nav-link <?php echo (strpos($current_page, 'quality_control.php') !== false) ? 'active' : ''; ?>">
+                            <a href="/owl_inventory/produksi/quality_control.php" class="nav-link <?php echo (strpos($current_page, 'quality_control.php') !== false || (strpos($_SERVER['REQUEST_URI'], '/owl_inventory/produksi/edit/edit.php') !== false)) ? 'active' : ''; ?>">
                                 <i class="far fa-circle nav-icon"></i>
                                 <p>Quality Control</p>
                             </a>
                         </li>
                         <li class="nav-item">
-                        <a href="/owl_inventory/produksi/inventaris_device.php" class="nav-link <?php echo (strpos($current_page, '/produksi/inventaris_device.php') !== false) ? 'active' : ''; ?>">
+                            <a href="/owl_inventory/produksi/inventaris_device.php" class="nav-link <?php echo (strpos($current_page, 'inventaris_device.php') !== false || strpos($_SERVER['REQUEST_URI'], '/owl_inventory/produksi/detail/detail.php') !== false) ? 'active' : ''; ?>">
                                 <i class="far fa-circle nav-icon"></i>
                                 <p>Inventaris Device</p>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="/owl_inventory/produksi/pengiriman.php" class="nav-link <?php echo (strpos($current_page, '/produksi/pengiriman.php') !== false) ? 'active' : ''; ?>">
+                            <a href="/owl_inventory/produksi/pengiriman.php" class="nav-link <?php echo (strpos($current_page, 'pengiriman.php') !== false) ? 'active' : ''; ?>">
                                 <i class="far fa-circle nav-icon"></i>
                                 <p>Pengiriman Device</p>
                             </a>
                         </li>
                     </ul>
                 </li>
-                <li class="nav-item <?php echo (strpos($current_page, '/maintenance/') !== false) ? 'menu-open' : ''; ?>">
-                    <a href="#" class="nav-link <?php echo (strpos($current_page, '/maintenance/') !== false) ? 'active' : ''; ?>">
+                <li class="nav-item <?php
+                                    echo (strpos($current_page, 'input.php') !== false ||
+                                        strpos($current_page, 'monitoring.php') !== false ||
+                                        strpos($current_page, 'update.php') !== false ||
+                                        strpos($_SERVER['REQUEST_URI'], '/owl_inventory/maintenance/edit/edit.php') !== false)
+                                        ? 'menu-open' : ''; ?>">
+                    <a href="#" class="nav-link <?php
+                                                echo (strpos($current_page, 'input.php') !== false ||
+                                                    strpos($current_page, 'monitoring.php') !== false ||
+                                                    strpos($current_page, 'update.php') !== false ||
+                                                    strpos($_SERVER['REQUEST_URI'], '/owl_inventory/maintenance/edit/edit.php') !== false)
+                                                    ? 'active' : ''; ?>">
                         <i class="nav-icon fas fa-wrench"></i>
                         <p>
                             Maintenance
@@ -75,7 +100,10 @@ $current_page = basename($_SERVER['PHP_SELF']);
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="/owl_inventory/maintenance/monitoring.php" class="nav-link <?php echo (strpos($current_page, 'monitoring.php') !== false) ? 'active' : ''; ?>">
+                            <a href="/owl_inventory/maintenance/monitoring.php" class="nav-link <?php
+                                                                                                echo (strpos($current_page, 'monitoring.php') !== false) ||
+                                                                                                    strpos($_SERVER['REQUEST_URI'], '/owl_inventory/maintenance/edit/edit.php') !== false
+                                                                                                    ? 'active' : ''; ?>">
                                 <i class="far fa-circle nav-icon"></i>
                                 <p>Monitoring</p>
                             </a>
@@ -131,14 +159,22 @@ $current_page = basename($_SERVER['PHP_SELF']);
                 </li>
                 <li class="nav-item">
                     <a href="/owl_inventory/lokasi_penyimpanan.php" class="nav-link <?php echo (strpos($current_page, 'lokasi_penyimpanan.php') !== false) ? 'active' : ''; ?>">
-                        <i class="nav-icon fas fa-dollar-sign"></i>
+                        <i class="nav-icon fas fa-box"></i>
                         <p>
                             Lokasi Penyimpanan
                         </p>
                     </a>
                 </li>
-                <li class="nav-item">
-                    <a href="perusahaan.php" class="nav-link">
+                <li class="nav-item <?php
+                                    echo (strpos($current_page, 'tambah_perusahaan.php') !== false ||
+                                        strpos($current_page, 'list_perusahaan.php') !== false) ||
+                                        strpos($_SERVER['REQUEST_URI'], '/owl_inventory/perusahaan/edit/edit.php') !== false
+                                        ? 'menu-open' : ''; ?>">
+                    <a href="perusahaan.php" class="nav-link <?php
+                                                                echo (strpos($current_page, 'tambah_perusahaan.php') !== false ||
+                                                                    strpos($current_page, 'list_perusahaan.php') !== false) ||
+                                                                    strpos($_SERVER['REQUEST_URI'], '/owl_inventory/perusahaan/edit/edit.php') !== false
+                                                                    ? 'active' : ''; ?>">
                         <i class="nav-icon fas fa-industry"></i>
                         <p>
                             Perusahaan
@@ -153,7 +189,10 @@ $current_page = basename($_SERVER['PHP_SELF']);
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="/owl_inventory/perusahaan/list_perusahaan.php" class="nav-link <?php echo (strpos($current_page, 'list_perusahaan.php') !== false) ? 'active' : ''; ?>">
+                            <a href="/owl_inventory/perusahaan/list_perusahaan.php" class="nav-link <?php
+                                                                                                    echo (strpos($current_page, 'list_perusahaan.php') !== false) ||
+                                                                                                        strpos($_SERVER['REQUEST_URI'], '/owl_inventory/perusahaan/edit/edit.php') !== false
+                                                                                                        ? 'active' : ''; ?>">
                                 <i class="far fa-circle nav-icon"></i>
                                 <p>List Perusahaan</p>
                             </a>

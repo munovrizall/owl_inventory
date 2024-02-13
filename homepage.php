@@ -1,6 +1,5 @@
 <?php
 include "connection.php";
-include "sidebar.php";
 
 $username = $_SESSION['username'];
 
@@ -86,7 +85,7 @@ if (!$result) {
       </ul>
     </nav>
     <!-- /.navbar -->
-
+    <?php include "sidebar.php";?>
     <!-- Content Wrapper. Contains page content -->
     <div class="content-wrapper">
       <!-- Content Header (Page header) -->

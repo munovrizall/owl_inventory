@@ -1,7 +1,6 @@
 <?php
 
 include "../connection.php";
-include "../sidebar.php";
 
 $query = "SELECT * FROM client";
 $result = mysqli_query($conn, $query);
@@ -78,6 +77,7 @@ $result = mysqli_query($conn, $query);
             </ul>
         </nav>
         <!-- /.navbar -->
+        <?php include "../sidebar.php"; ?>
 
         <!-- Content Wrapper. Contains page content -->
         <div class="content-wrapper">

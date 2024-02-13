@@ -1,7 +1,6 @@
 <?php
 
 include "../../connection.php";
-include "../../sidebar.php";
 
 if (isset($_GET['id'])) {
     $getId = $_GET['id'];
@@ -99,6 +98,8 @@ if (isset($_GET['id'])) {
             </ul>
         </nav>
         <!-- /.navbar -->
+
+        <?php include "../../sidebar.php"; ?>
 
         <!-- Content Wrapper. Contains page content -->
         <div class="content-wrapper">

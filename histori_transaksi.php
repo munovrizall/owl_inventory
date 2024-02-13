@@ -1,7 +1,6 @@
 <?php
 
 include "connection.php";
-include "sidebar.php";
 
 $query = "SELECT * FROM historis ORDER BY historis.ID DESC";
 $result = mysqli_query($conn, $query);
@@ -86,6 +85,7 @@ if (!$result) {
             </ul>
         </nav>
         <!-- /.navbar -->
+        <?php include "sidebar.php"; ?>
 
         <!-- Content Wrapper. Contains page content -->
         <div class="content-wrapper">

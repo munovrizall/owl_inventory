@@ -1,7 +1,6 @@
 <?php
 
 include "connection.php";
-include "sidebar.php";
 
 $queryBahan = "SELECT * FROM masterbahan ORDER BY nama";
 $resultBahan = $conn->query($queryBahan);
@@ -94,6 +93,7 @@ if (isset($_POST['selectedItem'])) {
             </ul>
         </nav>
         <!-- /.navbar -->
+        <?php include "sidebar.php"; ?>
 
         <!-- Content Wrapper. Contains page content -->
         <div class="content-wrapper">

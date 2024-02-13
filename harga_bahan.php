@@ -1,7 +1,6 @@
 <?php
 
 include "connection.php";
-include "sidebar.php";
 
 $queryBahan = "SELECT * FROM masterbahan ORDER BY nama";
 $resultBahan = $conn->query($queryBahan);
@@ -123,6 +122,8 @@ if (isset($_POST['selectedItem'])) {
                 </div><!-- /.container-fluid -->
             </section>
 
+            <?php include "sidebar.php";?>
+            
             <!-- Main content -->
             <section class="content">
                 <div class="container-fluid">
@@ -263,8 +264,8 @@ if (isset($_POST['selectedItem'])) {
                     // Hide the stock message
                     document.getElementById("successMessage").style.display = "none";
                     // Update the stock message with the fetched harga_bahan
-                    document.getElementById("priceMessage").innerText = "Harga Bahan Saat Ini: " + 
-                    formatCurrency(response.currentHargaBahan);
+                    document.getElementById("priceMessage").innerText = "Harga Bahan Saat Ini: " +
+                        formatCurrency(response.currentHargaBahan);
                 },
                 error: function(error) {
                     alert("Error, refresh the page!");

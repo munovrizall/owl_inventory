@@ -1,7 +1,6 @@
 <?php
 
 include "connection.php";
-include "sidebar.php";
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Check which fields are provided
@@ -132,6 +131,8 @@ if (!$resultKelompok) {
             </ul>
         </nav>
         <!-- /.navbar -->
+
+        <?php include "sidebar.php"; ?>
 
         <!-- Content Wrapper. Contains page content -->
         <div class="content-wrapper">

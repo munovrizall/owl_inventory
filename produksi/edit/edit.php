@@ -1,6 +1,5 @@
 <?php
 include "../../connection.php";
-include "../../sidebar.php";
 
 $queryClient = "SELECT * FROM client ORDER BY nama_client";
 $resultClient = $conn->query($queryClient);
@@ -205,6 +204,8 @@ if (isset($_GET['id'])) {
             </ul>
         </nav>
         <!-- /.navbar -->
+
+        <?php include "../../sidebar.php";?>
 
         <!-- Content Wrapper. Contains page content -->
         <div class="content-wrapper">

@@ -1,7 +1,6 @@
 <?php
 
 include "../connection.php";
-include "../sidebar.php";
 
 $queryTransaksiId = "SELECT MAX(transaksi_id) AS last_transaksi_id FROM transaksi_maintenance";
 $resultTransaksiId = $conn->query($queryTransaksiId);
@@ -194,6 +193,8 @@ if (isset($_POST['tanggal'])) {
         </nav>
         <!-- /.navbar -->
 
+        <?php include "../sidebar.php"; ?>
+        
         <!-- Content Wrapper. Contains page content -->
         <div class="content-wrapper">
             <!-- Content Header (Page header) -->

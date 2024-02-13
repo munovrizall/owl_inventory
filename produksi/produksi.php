@@ -1,7 +1,6 @@
 <?php
 
 include "../connection.php";
-include "../sidebar.php";
 
 $resultProduksi = "";
 $stokDibutuhkan = "";
@@ -236,6 +235,9 @@ if (isset($_POST['selectedDevice'])) {
             </ul>
         </nav>
         <!-- /.navbar -->
+
+        <?php include "../sidebar.php"; ?>
+
 
         <!-- Content Wrapper. Contains page content -->
         <div class="content-wrapper">

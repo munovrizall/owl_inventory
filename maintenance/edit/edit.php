@@ -1,6 +1,5 @@
 <?php
 include("../../connection.php");
-include "../../sidebar.php";
 
 if (isset($_GET['id'])) {
     $transaksi_id = $_GET['id'];
@@ -128,6 +127,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             </ul>
         </nav>
         <!-- /.navbar -->
+
+        <?php include "../../sidebar.php"; ?>
+
 
         <!-- Content Wrapper. Contains page content -->
         <div class="content-wrapper">

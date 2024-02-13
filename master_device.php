@@ -1,7 +1,6 @@
 <?php
 
 include "connection.php";
-include "sidebar.php";
 
 if (isset($_GET["getDropdownOptions"])) {
 
@@ -142,6 +141,7 @@ if (isset($_GET["getDropdownOptions"])) {
             </ul>
         </nav>
         <!-- /.navbar -->
+        <?php include "sidebar.php"; ?>
 
         <!-- Content Wrapper. Contains page content -->
         <div class="content-wrapper">
