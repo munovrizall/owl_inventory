@@ -67,6 +67,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $no_sn = $row['no_sn'];
             $response = array("no_sn" => $no_sn);
         } else {
+
             // Combination doesn't exist, generate no_sn with template
             $currentJulianDate = date('z') + 1;
             $currentYear = date('y');
@@ -96,7 +97,59 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $no_sn = intval($no_sn_prefix . '001'); // Convert to integer
                 echo $no_sn;
             }
-            echo 'insert';
+
+            $sql_update = "UPDATE inventaris_produk SET 
+                type_produk = ?, 
+                produk = ?, 
+                chip_id = ?, 
+                no_sn = ?, 
+                ip_address = ?, 
+                mac_wifi = ?, 
+                mac_bluetooth = ?, 
+                firmware_version = ?, 
+                hardware_version = ?, 
+                free_ram = ?, 
+                min_ram = ?, 
+                batt_low = ?, 
+                batt_high = ?, 
+                temperature = ?, 
+                status_error = ?, 
+                gps_latitude = ?, 
+                gps_longitude = ?, 
+                status_qc_sensor_1 = ?, 
+                status_qc_sensor_2 = ?, 
+                status_qc_sensor_3 = ?, 
+                status_qc_sensor_4 = ?, 
+                status_qc_sensor_5 = ?, 
+                status_qc_sensor_6 = ? 
+            WHERE produk = ? AND no_sn IS NULL AND id = (SELECT MIN(id) FROM inventaris_produk WHERE produk = ? AND no_sn IS NULL)";
+
+$stmt_update = $conn->prepare($sql_update);
+
+if (!$stmt_update) {
+    die('Error in preparing statement: ' . $conn->error);
+}
+
+$stmt_update->bind_param("ssssiisssssiiiididdssssss", 
+    $type_produk, $produk, $chip_id, $no_sn, $ip_address, $mac_wifi, $mac_bluetooth, 
+    $firmware_version, $hardware_version, $free_ram, $min_ram, $batt_low, $batt_high, 
+    $temperature, $status_error, $gps_latitude, $gps_longitude, $status_qc_sensor_1, 
+    $status_qc_sensor_2, $status_qc_sensor_3, $status_qc_sensor_4, $status_qc_sensor_5, $status_qc_sensor_6,
+    $produk, $produk);
+
+if ($stmt_update->execute() && $stmt_update->affected_rows > 0) {
+    echo 'Success: Record updated successfully';
+    $response = array("no_sn" => $no_sn);
+} else {
+    echo 'Error: Failed to update record';
+    $response = array("no_sn" => $no_sn);
+    die();
+}
+
+$stmt_update->close();
+
+
+/*          
             // Insert new record with the generated no_sn
             $sql_insert = "INSERT INTO inventaris_produk (type_produk, produk, chip_id, no_sn, ip_address, mac_wifi, mac_bluetooth, firmware_version, 
             hardware_version, free_ram, min_ram, batt_low, batt_high, temperature, status_error, gps_latitude, gps_longitude, 
@@ -123,7 +176,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 echo json_encode($response);
             }
             echo 'after insert';
-            
+*/            
         }
         $resultPrep['results'] = [
             "no_sn" => $no_sn,
