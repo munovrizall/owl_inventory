@@ -1,4 +1,6 @@
 <?php 
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
 
 //header("Content-Type:application/json");
 
@@ -42,8 +44,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Establish database connection
         $serverName = "localhost";
         $userNameDb = "root";
-        $password = "";
-        $dbName = "databaseinventory";
+        $password = "Sem4ng4tsukses!";
+        $dbName = "devices";
                 
         $conn = new mysqli($serverName, $userNameDb, $password, $dbName);    
 
@@ -70,7 +72,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $currentYear = date('y');
             $no_sn_prefix = $currentYear . sprintf('%03d', $currentJulianDate);
             $no_sn_like = $no_sn_prefix . '%';
-            
+            echo 'no sn like';
+            echo $no_sn_like;
+            echo 'no sn prefix';
+            echo $no_sn_prefix;
             // Check if similar no_sn exists with different endings
             $sql_check = "SELECT no_sn FROM inventaris_produk WHERE no_sn LIKE ? ORDER BY no_sn DESC LIMIT 1";
             $stmt_check = $conn->prepare($sql_check);
@@ -79,35 +84,46 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $result_check = $stmt_check->get_result();
             
             if ($result_check->num_rows > 0) {
+                echo 'similar found';
                 // Similar no_sn found, increment the last one
                 $row_check = $result_check->fetch_assoc();
                 $last_no_sn = $row_check['no_sn'];
                 $no_sn = intval($last_no_sn) + 1;
+                echo $no_sn;
             } else {
+                echo 'similar notfound new sn';
                 // No similar no_sn found, use the first one in the series
                 $no_sn = intval($no_sn_prefix . '001'); // Convert to integer
+                echo $no_sn;
             }
-            
+            echo 'insert';
             // Insert new record with the generated no_sn
             $sql_insert = "INSERT INTO inventaris_produk (type_produk, produk, chip_id, no_sn, ip_address, mac_wifi, mac_bluetooth, firmware_version, 
             hardware_version, free_ram, min_ram, batt_low, batt_high, temperature, status_error, gps_latitude, gps_longitude, 
             status_qc_sensor_1, status_qc_sensor_2, status_qc_sensor_3, status_qc_sensor_4, status_qc_sensor_5, status_qc_sensor_6)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
             $stmt_insert = $conn->prepare($sql_insert);
-            $stmt_insert->bind_param("ssisssisisssssiiiididdssssss", $type_produk, $produk, $chip_id, $nama_client, $garansi_awal, 
-                $garansi_akhir, $garansi_void, $keterangan_void, $no_sn, $ip_address, $mac_wifi, $mac_bluetooth, 
+            if (!$stmt_insert) {
+                die('Error in preparing statement: ' . $conn->error);
+            }
+            $stmt_insert->bind_param("ssiisssssiiiididdssssss",$type_produk, $produk, $chip_id, $no_sn, $ip_address, $mac_wifi, $mac_bluetooth, 
                 $firmware_version, $hardware_version, $free_ram, $min_ram, $batt_low, $batt_high, 
                 $temperature, $status_error, $gps_latitude, $gps_longitude, $status_qc_sensor_1, 
                 $status_qc_sensor_2, $status_qc_sensor_3, $status_qc_sensor_4, $status_qc_sensor_5, $status_qc_sensor_6);
-            
             // Execute the insertion statement
+            
             if ($stmt_insert->execute()) {
                 $response = array("no_sn" => $no_sn);
+                echo 'sukses insert';
+                echo json_encode($response);
             } else {
                 // Handle insertion failure
                 $response = array("error" => "Failed to insert data");
+                echo 'sukses insert';
+                echo json_encode($response);
             }
-        
+            echo 'after insert';
+            
         }
         $resultPrep['results'] = [
             "no_sn" => $no_sn,
