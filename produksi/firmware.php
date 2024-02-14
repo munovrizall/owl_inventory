@@ -39,19 +39,19 @@ if(isset($_POST['sn'], $_POST['produk'], $_POST['firmware'], $_POST['bat'], $_PO
                 readfile($file_path);
                 exit;
             } else {
-                http_response_code(202); // HTTP code for accepted, as specified in your requirement
+                http_response_code(409); // Conflict
                 echo "Posted firmware is the same as the selected active firmware. Cannot download the file.";
             }
         } else {
-            http_response_code(202); // HTTP code for accepted, as specified in your requirement
+            http_response_code(404); // Not Found
             echo "Combination of parameters does not exist in firmware_setup.";
         }
     } else {
-        http_response_code(202); // HTTP code for accepted, as specified in your requirement
+        http_response_code(400); // Bad Request
         echo "Invalid parameters!";
     }
 } else {
-    http_response_code(202); // HTTP code for accepted, as specified in your requirement
+    http_response_code(400); // Bad Request
     echo "Required parameters not provided!";
 }
 
