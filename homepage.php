@@ -66,26 +66,13 @@ if (!$result) {
 <body class="hold-transition sidebar-mini layout-fixed">
   <div class="wrapper">
 
-    <!-- Navbar -->
-    <nav class="main-header navbar navbar-expand navbar-dark navbar-dark">
-      <!-- Left navbar links -->
-      <ul class="navbar-nav">
-        <li class="nav-item">
-          <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
-        </li>
-      </ul>
+    <?php
+    $rootPath = $_SERVER['DOCUMENT_ROOT'];
+    include $rootPath . "/owl_inventory/includes/navbar.php";
+    include $rootPath . "/owl_inventory/includes/sidebar.php";
+    ?>
 
-      <!-- Right navbar links -->
-      <ul class="navbar-nav ml-auto">
-        <li class="nav-item">
-          <a class="nav-link" href="logout.php">
-            <i class="fas fa-sign-out-alt"></i> Logout
-          </a>
-        </li>
-      </ul>
-    </nav>
-    <!-- /.navbar -->
-    <?php include "sidebar.php";?>
+
     <!-- Content Wrapper. Contains page content -->
     <div class="content-wrapper">
       <!-- Content Header (Page header) -->

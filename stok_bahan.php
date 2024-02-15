@@ -33,34 +33,31 @@ $result = mysqli_query($conn, $query);
 
     <style>
         .lebar-kolom1 {
-            width: 12%;
+            width: 5%;
         }
 
         .lebar-kolom2 {
-            width: 15%;
+            width: 10%;
         }
 
         .lebar-kolom3 {
-            width: 25%;
+            width: 30%;
         }
 
         .lebar-kolom4 {
-            width: 8%;
+            width: 5%;
         }
-        
+
         .lebar-kolom5 {
-            width: 10%;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-        
-        .lebar-kolom6 {
             width: 10%;
         }
 
+        .lebar-kolom6 {
+            width: 15%;
+        }
+
         .lebar-kolom7 {
-            width: 20%;
+            width: 25%;
         }
 
         .card-padding {
@@ -73,17 +70,12 @@ $result = mysqli_query($conn, $query);
 <body class="hold-transition sidebar-mini layout-fixed">
     <div class="wrapper">
 
-        <!-- Navbar -->
-        <nav class="main-header navbar navbar-expand navbar-dark navbar-dark">
-            <!-- Left navbar links -->
-            <ul class="navbar-nav">
-                <li class="nav-item">
-                    <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
-                </li>
-            </ul>
-        </nav>
-        <!-- /.navbar -->
-        <?php include "sidebar.php"; ?>
+        <?php
+        $rootPath = $_SERVER['DOCUMENT_ROOT'];
+        include $rootPath . "/owl_inventory/includes/navbar.php";
+        include $rootPath . "/owl_inventory/includes/sidebar.php";
+        ?>
+
         <!-- Content Wrapper. Contains page content -->
         <div class="content-wrapper">
             <!-- Content Header (Page header) -->

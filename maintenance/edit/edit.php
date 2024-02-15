@@ -117,19 +117,12 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
 <body class="hold-transition sidebar-mini layout-fixed">
     <div class="wrapper">
-        <!-- Navbar -->
-        <nav class="main-header navbar navbar-expand navbar-dark navbar-dark">
-            <!-- Left navbar links -->
-            <ul class="navbar-nav">
-                <li class="nav-item">
-                    <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
-                </li>
-            </ul>
-        </nav>
-        <!-- /.navbar -->
 
-        <?php include "../../sidebar.php"; ?>
-
+        <?php
+        $rootPath = $_SERVER['DOCUMENT_ROOT'];
+        include $rootPath . "/owl_inventory/includes/navbar.php";
+        include $rootPath . "/owl_inventory/includes/sidebar.php";
+        ?>
 
         <!-- Content Wrapper. Contains page content -->
         <div class="content-wrapper">
@@ -225,7 +218,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                                                 <tbody id="transaksiTable">
                                                     <?php
                                                     $tanggal_terima = $row['tanggal_terima'];
-                                                    
+
                                                     while ($row = mysqli_fetch_assoc($result)) {
                                                         $no_sn = $row['no_sn'];
                                                         $garansiQuery = "SELECT garansi_void, garansi_akhir, produk FROM inventaris_produk WHERE no_sn = ?";
@@ -233,15 +226,15 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                                                         $garansiStmt->bind_param("s", $no_sn);
                                                         $garansiStmt->execute();
                                                         $garansiResult = $garansiStmt->get_result();
-                                                        
+
                                                         $produk = $garansi_void = $garansi_akhir = null; // Initialize variables
                                                         list($garansi_void, $garansi_akhir, $produk) = $garansiResult->fetch_row();
-                                                        ?>
+                                                    ?>
                                                         <tr>
                                                             <td><?php echo $row["detail_id"]; ?></td>
-                                                            <td>                                                                
+                                                            <td>
                                                                 <?php
-                                                                                                                                
+
                                                                 $updateProdukQuery = "UPDATE detail_maintenance SET produk_mt = ? WHERE detail_id = ?";
                                                                 $updateProdukStmt = $conn->prepare($updateProdukQuery);
                                                                 $updateProdukStmt->bind_param("si", $produk, $row["detail_id"]);
@@ -254,9 +247,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                                                             <td><?php echo $no_sn; ?></td>
                                                             <td>
                                                                 <?php
-                                                                
+
                                                                 $garansi = ($garansi_void || $garansi_akhir < $tanggal_terima) ? 0 : 1;
-                                                                
+
                                                                 $updateGaransiQuery = "UPDATE detail_maintenance SET garansi = ? WHERE detail_id = ?";
                                                                 $updateGaransiStmt = $conn->prepare($updateGaransiQuery);
                                                                 $updateGaransiStmt->bind_param("ii", $garansi, $row["detail_id"]);

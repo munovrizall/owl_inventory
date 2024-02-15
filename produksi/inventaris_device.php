@@ -93,18 +93,12 @@ $result = mysqli_query($conn, $query);
 
 <body class="hold-transition sidebar-mini layout-fixed">
     <div class="wrapper">
-        <!-- Navbar -->
-        <nav class="main-header navbar navbar-expand navbar-dark navbar-dark">
-            <!-- Left navbar links -->
-            <ul class="navbar-nav">
-                <li class="nav-item">
-                    <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
-                </li>
-            </ul>
-        </nav>
-        <!-- /.navbar -->
-
-        <?php include "../sidebar.php";?>
+        
+        <?php
+        $rootPath = $_SERVER['DOCUMENT_ROOT'];
+        include $rootPath . "/owl_inventory/includes/navbar.php";
+        include $rootPath . "/owl_inventory/includes/sidebar.php";
+        ?>
 
         <!-- Content Wrapper. Contains page content -->
         <div class="content-wrapper">
@@ -155,7 +149,7 @@ $result = mysqli_query($conn, $query);
                                             while ($row = mysqli_fetch_assoc($result)) {
                                                 $statusClass = 'bg-danger'; // Default class
                                                 $statusText = 'Tidak'; // Default text
-                                                
+
                                                 // Check if any row is missing and set default values
                                                 if (
                                                     empty($row["garansi_akhir"]) // Check if warranty expiry date is missing
@@ -169,12 +163,12 @@ $result = mysqli_query($conn, $query);
                                                     if (strtotime($row["garansi_akhir"]) < strtotime('today') || $row["garansi_void"] == 1) { // Check if warranty expiry date is before today
                                                         $allConditionsMet = false;
                                                     }
-                                                
+
                                                     if ($allConditionsMet) {
                                                         $statusClass = 'bg-success';
                                                         $statusText = 'Ya';
                                                     }
-                                                }                                                
+                                                }
 
                                                 // Output table row with appropriate status class and text
                                             ?>

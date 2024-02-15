@@ -121,18 +121,12 @@ if (!$resultKelompok) {
 
 <body class="hold-transition sidebar-mini layout-fixed">
     <div class="wrapper">
-        <!-- Navbar -->
-        <nav class="main-header navbar navbar-expand navbar-dark navbar-dark">
-            <!-- Left navbar links -->
-            <ul class="navbar-nav">
-                <li class="nav-item">
-                    <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
-                </li>
-            </ul>
-        </nav>
-        <!-- /.navbar -->
 
-        <?php include "sidebar.php"; ?>
+        <?php
+        $rootPath = $_SERVER['DOCUMENT_ROOT'];
+        include $rootPath . "/owl_inventory/includes/navbar.php";
+        include $rootPath . "/owl_inventory/includes/sidebar.php";
+        ?>
 
         <!-- Content Wrapper. Contains page content -->
         <div class="content-wrapper">
@@ -182,7 +176,7 @@ if (!$resultKelompok) {
                                 </div>
                                 <div class="form-group">
                                     <label for="namaBahan">Nama Bahan <span style="color: red;">*</span></label>
-                                    <input type="text" class="form-control form-control-border border-width-2" id="namaBahan" name="namaBahan" placeholder="Contoh : R060310k">
+                                    <input type="text" class="form-control form-control-border border-width-2" id="namaBahan" name="namaBahan" placeholder="Contoh : R060310k (jangan memasukkan tanda '' di nama bahan untuk menghindari bug)">
                                 </div>
                                 <div class="form-group">
                                     <label for="quantity">Kuantitas <span style="color: red;">*</span></label>
@@ -364,7 +358,7 @@ if (!$resultKelompok) {
                             location.reload();
                         }
                     });
-                    
+
 
                 },
                 error: function(error) {
@@ -408,12 +402,15 @@ if (!$resultKelompok) {
                 submitForm();
             }
         });
-        
+
         var kelompokBaruInput = document.getElementById('namaKelompokBaru');
         kelompokBaruInput.addEventListener('keydown', function(event) {
             if (event.keyCode === 13) {
                 event.preventDefault();
-                if(validateFormKB()) { validateSuccessKB(); resetForm(); }
+                if (validateFormKB()) {
+                    validateSuccessKB();
+                    resetForm();
+                }
             }
         });
 

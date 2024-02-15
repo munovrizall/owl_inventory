@@ -83,17 +83,12 @@ if (isset($_POST['selectedItem'])) {
 
 <body class="hold-transition sidebar-mini layout-fixed">
     <div class="wrapper">
-        <!-- Navbar -->
-        <nav class="main-header navbar navbar-expand navbar-dark navbar-dark">
-            <!-- Left navbar links -->
-            <ul class="navbar-nav">
-                <li class="nav-item">
-                    <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
-                </li>
-            </ul>
-        </nav>
-        <!-- /.navbar -->
-        <?php include "sidebar.php"; ?>
+
+        <?php
+        $rootPath = $_SERVER['DOCUMENT_ROOT'];
+        include $rootPath . "/owl_inventory/includes/navbar.php";
+        include $rootPath . "/owl_inventory/includes/sidebar.php";
+        ?>
 
         <!-- Content Wrapper. Contains page content -->
         <div class="content-wrapper">
@@ -143,7 +138,7 @@ if (isset($_POST['selectedItem'])) {
                                 <div class="form-group">
                                     <label for="lokasiPenyimpanan">Lokasi Penyimpanan Terbaru <span style="color: red;">*</span></label>
                                     <div class="input-group">
-                                        <input type="number" class="form-control" id="lokasiPenyimpanan" name="lokasiPenyimpanan" min="0" value="" placeholder="Masukkan Lokasi Penyimpanan terbaru">
+                                        <input type="text" class="form-control" id="lokasiPenyimpanan" name="lokasiPenyimpanan" min="0" value="" placeholder="Masukkan Lokasi Penyimpanan terbaru">
                                     </div>
                                 </div>
                             </div>
@@ -254,8 +249,8 @@ if (isset($_POST['selectedItem'])) {
                     // Hide the stock message
                     document.getElementById("successMessage").style.display = "none";
                     // Update the stock message with the fetched lokasiPenyimpanan
-                    document.getElementById("lokasiPenyimpananMessage").innerText = "Lokasi Penyimpanan Saat Ini: " + 
-                    response.currentLokasiPenyimpanan;
+                    document.getElementById("lokasiPenyimpananMessage").innerText = "Lokasi Penyimpanan Saat Ini: " +
+                        response.currentLokasiPenyimpanan;
                 },
                 error: function(error) {
                     alert("Error, refresh the page!");

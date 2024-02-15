@@ -88,18 +88,12 @@ if (isset($_GET['id'])) {
 
 <body class="hold-transition sidebar-mini layout-fixed">
     <div class="wrapper">
-        <!-- Navbar -->
-        <nav class="main-header navbar navbar-expand navbar-dark navbar-dark">
-            <!-- Left navbar links -->
-            <ul class="navbar-nav">
-                <li class="nav-item">
-                    <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
-                </li>
-            </ul>
-        </nav>
-        <!-- /.navbar -->
 
-        <?php include "../../sidebar.php"; ?>
+        <?php
+        $rootPath = $_SERVER['DOCUMENT_ROOT'];
+        include $rootPath . "/owl_inventory/includes/navbar.php";
+        include $rootPath . "/owl_inventory/includes/sidebar.php";
+        ?>
 
         <!-- Content Wrapper. Contains page content -->
         <div class="content-wrapper">
@@ -272,7 +266,7 @@ if (isset($_GET['id'])) {
                                                             <?php
                                                             $voidClass = 'badge bg-success';
                                                             $voidText = 'Tidak Void';
-                                                            
+
                                                             if ($row["garansi_void"] == 1) {
                                                                 $voidClass = "badge bg-danger";
                                                                 $voidText = "Void";
@@ -280,7 +274,7 @@ if (isset($_GET['id'])) {
                                                             ?>
 
                                                             <div class="<?php echo $voidClass; ?>"><?php echo $voidText; ?></div>
-                                                            
+
                                                         </td>
                                                         <td><b>GPS Longitude :</b></td>
                                                         <td>
