@@ -66,22 +66,27 @@ $result = mysqli_query($conn, $query);
         }
 
         .lebar-kolom2 {
-            width: 35%;
+            width: 15%;
         }
 
         .lebar-kolom3 {
-            width: 20%;
+            width: 25%;
         }
 
         .lebar-kolom4 {
+            width: 15%;
+        }
+
+
+        .lebar-kolom5 {
             width: 20%;
         }
 
-        .lebar-kolom5 {
+        .lebar-kolom6 {
             width: 10%;
         }
 
-        .lebar-kolom6 {
+        .lebar-kolom7 {
             width: 10%;
         }
 
@@ -93,7 +98,7 @@ $result = mysqli_query($conn, $query);
 
 <body class="hold-transition sidebar-mini layout-fixed">
     <div class="wrapper">
-        
+
         <?php
         $rootPath = $_SERVER['DOCUMENT_ROOT'];
         include $rootPath . "/owl_inventory/includes/navbar.php";
@@ -137,16 +142,39 @@ $result = mysqli_query($conn, $query);
                                         <thead>
                                             <tr>
                                                 <th class="text-center lebar-kolom1">ID</th>
-                                                <th class="text-center lebar-kolom3">Nomor SN</th>
-                                                <th class="text-center lebar-kolom2">Produk</th>
+                                                <th class="text-center lebar-kolom2">Nomor SN</th>
+                                                <th class="text-center lebar-kolom3">Produk</th>
                                                 <th class="text-center lebar-kolom4">Perusahaan</th>
-                                                <th class="text-center lebar-kolom5">Garansi</th>
-                                                <th class="text-center lebar-kolom6 aksi-column">Aksi</th>
+                                                <th class="text-center lebar-kolom5">Terakhir Online</th>
+                                                <th class="text-center lebar-kolom6">Garansi</th>
+                                                <th class="text-center lebar-kolom7 aksi-column">Aksi</th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             <?php
+                                            date_default_timezone_set('Asia/Jakarta');
+
                                             while ($row = mysqli_fetch_assoc($result)) {
+                                                $lastOnline = $row['last_online'];
+
+                                                if ($lastOnline !== null) {
+                                                    $currentDateTime = new DateTime();
+                                                    $lastOnlineDateTime = new DateTime($lastOnline);
+                                                    $timeDifference = date_diff($currentDateTime, $lastOnlineDateTime);
+                                                    $minutesAgo = $timeDifference->days * 24 * 60 + $timeDifference->h * 60 + $timeDifference->i;
+                                                    $resultLastOnline = "";
+
+                                                    if ($minutesAgo < 60) {
+                                                        $resultLastOnline = $minutesAgo . " menit yang lalu";
+                                                    } elseif ($minutesAgo < 1440) {
+                                                        $resultLastOnline = floor($minutesAgo / 60) . " jam yang lalu";
+                                                    } else {
+                                                        $resultLastOnline = floor($minutesAgo / 1440) . " hari yang lalu";
+                                                    }
+                                                } else {
+                                                    $resultLastOnline = "-";
+                                                }
+
                                                 $statusClass = 'bg-danger'; // Default class
                                                 $statusText = 'Tidak'; // Default text
 
@@ -177,6 +205,7 @@ $result = mysqli_query($conn, $query);
                                                     <td><?php echo $row["no_sn"]; ?></td>
                                                     <td><?php echo $row["produk"] ?></td>
                                                     <td><?php echo !empty($row["nama_client"]) ? $row["nama_client"] : '-' ?></td>
+                                                    <td><?php echo $resultLastOnline ?></td>
                                                     <td class="text-center"><span class="badge <?php echo $statusClass; ?>"><?php echo $statusText; ?></span></td>
                                                     <td class="text-center">
                                                         <div class="row">
