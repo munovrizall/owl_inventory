@@ -1,7 +1,6 @@
 <?php
 include("../../connection.php");
 
-
 if (isset($_GET['id'])) {
     $transaksi_id = $_GET['id'];
 
@@ -118,199 +117,12 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
 <body class="hold-transition sidebar-mini layout-fixed">
     <div class="wrapper">
-        <!-- Navbar -->
-        <nav class="main-header navbar navbar-expand navbar-dark navbar-dark">
-            <!-- Left navbar links -->
-            <ul class="navbar-nav">
-                <li class="nav-item">
-                    <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
-                </li>
-            </ul>
-        </nav>
-        <!-- /.navbar -->
 
-        <!-- Main Sidebar Container -->
-        <aside class="main-sidebar sidebar-dark-primary elevation-4 fixed">
-            <!-- Brand Logo -->
-            <a href="../../homepage.php" class="brand-link">
-                <img src="../../assets/adminlte/dist/img/OWLlogo.png" alt="OWL Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
-                <span class="brand-text font-weight-heavy">OWL RnD</span>
-            </a>
-
-            <!-- Sidebar -->
-            <div class="sidebar">
-                <!-- Sidebar Menu -->
-                <nav class="mt-2">
-                    <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
-                        <!-- Add icons to the links using the .nav-icon class
-               with font-awesome or any other icon font library -->
-                        <li class="nav-item">
-                            <a href="../../homepage.php" class="nav-link">
-                                <i class="nav-icon fas fa-th"></i>
-                                <p>Home</p>
-                            </a>
-                        </li>
-                        </li>
-                        <li class="nav-header">TRANSAKSI</li>
-                        <li class="nav-item">
-                            <a href="produksi.php" class="nav-link">
-                                <i class="nav-icon fas fa-toolbox"></i>
-                                <p>
-                                    Produksi
-                                    <i class="right fas fa-angle-left"></i>
-                                </p>
-                            </a>
-                            <ul class="nav nav-treeview">
-                                <li class="nav-item">
-                                    <a href="../../produksi/produksi.php" class="nav-link">
-                                        <i class="far fa-circle nav-icon"></i>
-                                        <p>Produksi Device</p>
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="../../produksi/quality_control.php" class="nav-link">
-                                        <i class="far fa-circle nav-icon"></i>
-                                        <p>Quality Control</p>
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="../../produksi/inventaris_device.php" class="nav-link">
-                                        <i class="far fa-circle nav-icon"></i>
-                                        <p>Inventaris Device</p>
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="../../produksi/pengiriman.php" class="nav-link">
-                                        <i class="far fa-circle nav-icon"></i>
-                                        <p>Pengiriman Device</p>
-                                    </a>
-                                </li>
-                            </ul>
-                        </li>
-                        <li class="nav-item">
-                            <a href="../../maintenance.php" class="nav-link active">
-                                <i class="nav-icon fas fa-wrench"></i>
-                                <p>
-                                    Maintenance
-                                    <i class="right fas fa-angle-left"></i>
-                                </p>
-                            </a>
-                            <ul class="nav nav-treeview">
-                                <li class="nav-item">
-                                    <a href="../input.php" class="nav-link">
-                                        <i class="far fa-circle nav-icon"></i>
-                                        <p>Input</p>
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="../monitoring.php" class="nav-link active">
-                                        <i class="far fa-circle nav-icon"></i>
-                                        <p>Monitoring</p>
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="../update.php" class="nav-link">
-                                        <i class="far fa-circle nav-icon"></i>
-                                        <p>Update</p>
-                                    </a>
-                                </li>
-                            </ul>
-                        </li>
-                        <li class="nav-item">
-                            <a href="../../prototype.php" class="nav-link">
-                                <i class="nav-icon fas fa-screwdriver"></i>
-                                <p>
-                                    Prototype
-                                </p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="../../restock.php" class="nav-link">
-                                <i class="nav-icon fas fa-shopping-cart"></i>
-                                <p>
-                                    Restock
-                                </p>
-                            </a>
-                        </li>
-                        <li class="nav-header">TAMBAH DATA</li>
-                        <li class="nav-item">
-                            <a href="../../master_bahan.php" class="nav-link">
-                                <i class="nav-icon fa fa-pen"></i>
-                                <p>
-                                    Master Bahan
-                                </p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="../../master_device.php" class="nav-link">
-                                <i class="nav-icon fas fa-cube"></i>
-                                <p>
-                                    Master Device
-                                </p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="../../harga_bahan.php" class="nav-link">
-                                <i class="nav-icon fas fa-dollar-sign"></i>
-                                <p>
-                                    Harga Bahan
-                                </p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="perusahaan.php" class="nav-link">
-                                <i class="nav-icon fas fa-industry"></i>
-                                <p>
-                                    Perusahaan
-                                    <i class="right fas fa-angle-left"></i>
-                                </p>
-                            </a>
-                            <ul class="nav nav-treeview">
-                                <li class="nav-item">
-                                    <a href="../../perusahaan/tambah_perusahaan.php" class="nav-link">
-                                        <i class="far fa-circle nav-icon"></i>
-                                        <p>Tambah Perusahaan</p>
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="../../perusahaan/list_perusahaan.php" class="nav-link">
-                                        <i class="far fa-circle nav-icon"></i>
-                                        <p>List Perusahaan</p>
-                                    </a>
-                                </li>
-                            </ul>
-                        </li>
-                        <li class="nav-header">PELAPORAN</li>
-                        <li class="nav-item">
-                            <a href="../../stok_bahan.php" class="nav-link">
-                                <i class="nav-icon ion ion-pie-graph"></i>
-                                <p>
-                                    Stok Bahan
-                                </p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="../../stok_produk.php" class="nav-link">
-                                <i class="nav-icon fas fa-microchip"></i>
-                                <p>
-                                    Stok Produk
-                                </p>
-                            </a>
-                        </li>
-                        <li class="nav-item" style="margin-bottom: 40px;">
-                            <a href="../../histori_transaksi.php" class="nav-link">
-                                <i class="nav-icon fas fa-history"></i>
-                                <p>
-                                    Histori Transaksi
-                                </p>
-                            </a>
-                        </li>
-                    </ul>
-                </nav>
-                <!-- /.sidebar-menu -->
-            </div>
-            <!-- /.sidebar -->
-        </aside>
+        <?php
+        $rootPath = $_SERVER['DOCUMENT_ROOT'];
+        include $rootPath . "/owl_inventory/includes/navbar.php";
+        include $rootPath . "/owl_inventory/includes/sidebar.php";
+        ?>
 
         <!-- Content Wrapper. Contains page content -->
         <div class="content-wrapper">
@@ -406,7 +218,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                                                 <tbody id="transaksiTable">
                                                     <?php
                                                     $tanggal_terima = $row['tanggal_terima'];
-                                                    
+
                                                     while ($row = mysqli_fetch_assoc($result)) {
                                                         $no_sn = $row['no_sn'];
                                                         $garansiQuery = "SELECT garansi_void, garansi_akhir, produk FROM inventaris_produk WHERE no_sn = ?";
@@ -414,15 +226,15 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                                                         $garansiStmt->bind_param("s", $no_sn);
                                                         $garansiStmt->execute();
                                                         $garansiResult = $garansiStmt->get_result();
-                                                        
+
                                                         $produk = $garansi_void = $garansi_akhir = null; // Initialize variables
                                                         list($garansi_void, $garansi_akhir, $produk) = $garansiResult->fetch_row();
-                                                        ?>
+                                                    ?>
                                                         <tr>
                                                             <td><?php echo $row["detail_id"]; ?></td>
-                                                            <td>                                                                
+                                                            <td>
                                                                 <?php
-                                                                                                                                
+
                                                                 $updateProdukQuery = "UPDATE detail_maintenance SET produk_mt = ? WHERE detail_id = ?";
                                                                 $updateProdukStmt = $conn->prepare($updateProdukQuery);
                                                                 $updateProdukStmt->bind_param("si", $produk, $row["detail_id"]);
@@ -435,9 +247,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                                                             <td><?php echo $no_sn; ?></td>
                                                             <td>
                                                                 <?php
-                                                                
+
                                                                 $garansi = ($garansi_void || $garansi_akhir < $tanggal_terima) ? 0 : 1;
-                                                                
+
                                                                 $updateGaransiQuery = "UPDATE detail_maintenance SET garansi = ? WHERE detail_id = ?";
                                                                 $updateGaransiStmt = $conn->prepare($updateGaransiQuery);
                                                                 $updateGaransiStmt->bind_param("ii", $garansi, $row["detail_id"]);

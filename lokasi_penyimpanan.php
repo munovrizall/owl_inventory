@@ -5,59 +5,41 @@ include "connection.php";
 $queryBahan = "SELECT * FROM masterbahan ORDER BY nama";
 $resultBahan = $conn->query($queryBahan);
 
-$stockQuantity = ""; // Default value, replace it with the actual stock quantity based on the selected item from the database
-$newStockQuantity = "";
+$currentLokasiPenyimpanan = "";
+$newLokasiPenyimpanan = "";
 
-if (isset($_POST['quantity'])) {
-    $selectedItemId = $_POST['selectedItem'];
-    $submittedQuantity = $_POST['quantity'];
+if (isset($_POST['selectedItem'])) {
+    $selectedItem = $_POST['selectedItem'];
+    $newLokasiPenyimpanan = $_POST['lokasiPenyimpanan'];
 
     // Fetch the username from the POST data
     $pengguna = isset($_SESSION['username']) ? $_SESSION['username'] : '';
 
 
-    // Fetch the stock quantity from the database based on the selected item
-    $query = "SELECT quantity FROM masterbahan WHERE stok_id = ?";
+    // Fetch the stock lokasi_penyimpanan from the database based on the selected item
+    $query = "SELECT lokasi_penyimpanan FROM masterbahan WHERE nama = ?";
     $stmt = $conn->prepare($query);
-    $stmt->bind_param("i", $selectedItemId);
+    $stmt->bind_param("s", $selectedItem);
     $stmt->execute();
-    $stmt->bind_result($stockQuantity);
+    $stmt->bind_result($currentLokasiPenyimpanan);
     $stmt->fetch();
     $stmt->close();
 
-    if ($submittedQuantity == "") {
-        echo json_encode(array('currentStock' => $stockQuantity, 'newStock' => $newStockQuantity));
-        exit();
-    } elseif ($submittedQuantity <= 0) {
-        echo "Kuantitas yang dimasukkan harus lebih besar dari 0";
+    if ($newLokasiPenyimpanan == "") {
+        echo json_encode(array('currentLokasiPenyimpanan' => $currentLokasiPenyimpanan, 'newLokasiPenyimpanan' => $newLokasiPenyimpanan));
         exit();
     }
 
-    // Update the database with the new stock quantity
-    $newStockQuantity = $stockQuantity + $submittedQuantity;
-    $updateQueryStock = "UPDATE masterbahan SET quantity = ? WHERE stok_id = ?";
-    $updateStmt = $conn->prepare($updateQueryStock);
-    $updateStmt->bind_param("ii", $newStockQuantity, $selectedItemId);
-    $updateStmt->execute();
-    $updateStmt->close();
+    // Update the database with the new stock lokasiPenyimpanan
 
-    $queryNamaBahan = "SELECT nama FROM masterbahan WHERE stok_id = ?";
-    $stmtNamaBahan = $conn->prepare($queryNamaBahan);
-    $stmtNamaBahan->bind_param("i", $selectedItemId);
-    $stmtNamaBahan->execute();
-    $stmtNamaBahan->bind_result($namaBahan);
-    $stmtNamaBahan->fetch();
-    $stmtNamaBahan->close();
+    $updateQueryHarga = "UPDATE masterbahan SET lokasi_penyimpanan = ? WHERE nama = ?";
+    $updateStmtHarga = $conn->prepare($updateQueryHarga);
+    $updateStmtHarga->bind_param("ss", $newLokasiPenyimpanan, $selectedItem);
+    $updateStmtHarga->execute();
+    $updateStmtHarga->close();
 
-    // Insert a new record into the 'historis' table
-    $insertQueryHistoris = "INSERT INTO historis (pengguna, nama_barang, waktu, quantity, activity, deskripsi) VALUES (?, ?, NOW(), ?, 'Restock', ?)";
-    $insertStmt = $conn->prepare($insertQueryHistoris);
-    $insertStmt->bind_param("ssis", $pengguna, $namaBahan, $submittedQuantity, $_POST['deskripsi']);
-    $insertStmt->execute();
-    $insertStmt->close();
-
-    // Return the updated stock quantity
-    echo json_encode(array('currentStock' => $stockQuantity, 'newStock' => $newStockQuantity));
+    // Return the updated stock lokasiPenyimpanan
+    echo json_encode(array('currentLokasiPenyimpanan' => $currentLokasiPenyimpanan, 'newLokasiPenyimpanan' => $newLokasiPenyimpanan));
     exit();
 }
 
@@ -68,7 +50,7 @@ if (isset($_POST['quantity'])) {
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Restock</title>
+    <title>Lokasi Penyimpanan</title>
 
     <link rel="icon" href="assets/adminlte/dist/img/OWLlogo.png" type="image/x-icon">
     <!-- Google Font: Source Sans Pro -->
@@ -115,12 +97,12 @@ if (isset($_POST['quantity'])) {
                 <div class="container-fluid">
                     <div class="row mb-2">
                         <div class="col-sm-6">
-                            <h1>Restock</h1>
+                            <h1>Lokasi Penyimpanan</h1>
                         </div>
                         <div class="col-sm-6">
                             <ol class="breadcrumb float-sm-right">
                                 <li class="breadcrumb-item"><a href="homepage.php">Home</a></li>
-                                <li class="breadcrumb-item active">Restock</li>
+                                <li class="breadcrumb-item active">Lokasi Penyimpanan</li>
                             </ol>
                         </div>
                     </div>
@@ -134,35 +116,30 @@ if (isset($_POST['quantity'])) {
                     <!-- general form elements -->
                     <div class="card card-primary">
                         <div class="card-header">
-                            <h3 class="card-title">Menambah Stok Bahan</h3>
+                            <h3 class="card-title">Mengupdate Lokasi Penyimpanan</h3>
                         </div>
                         <!-- /.card-header -->
                         <!-- form start -->
-                        <form id="restockForm">
+                        <form id="lokasiPenyimpananForm">
                             <div class="card-body">
                                 <div class="form-group">
-                                    <label for="pilihBahanRestock">Pilih Bahan <span style="color: red;">*</span></label>
-                                    <select class="form-control select2" id="pilihBahanRestock" name="selectedItem">
+                                    <label for="pilihBahan">Pilih Bahan <span style="color: red;">*</span></label>
+                                    <select class="form-control select2" id="pilihBahan" name="selectedItem">
                                         <option value="">--- Pilih Bahan ---</option>
                                         <?php
                                         while ($row = $resultBahan->fetch_assoc()) {
-                                            echo '<option value="' . $row['stok_id'] . '">' . $row['nama'] . '</option>';
+                                            echo '<option value="' . $row['nama'] . '">' . $row['nama'] . '</option>';
                                         }
                                         ?>
                                     </select>
                                 </div>
+                                <p id="lokasiPenyimpananMessage">Lokasi Penyimpanan Saat ini: <?php echo $currentLokasiPenyimpanan; ?></p>
+                                <p id="successMessage">Lokasi Penyimpanan Terbaru: <?php echo $newLokasiPenyimpanan; ?></p>
                                 <div class="form-group">
-                                    <label for="quantity">Kuantitas <span style="color: red;">*</span></label>
+                                    <label for="lokasiPenyimpanan">Lokasi Penyimpanan Terbaru <span style="color: red;">*</span></label>
                                     <div class="input-group">
-                                        <input type="number" class="form-control" id="quantity" name="quantity" min="0" value="">
+                                        <input type="text" class="form-control" id="lokasiPenyimpanan" name="lokasiPenyimpanan" min="0" value="" placeholder="Masukkan Lokasi Penyimpanan terbaru">
                                     </div>
-                                </div>
-                                <p id="stockMessage">Stok Bahan Tersisa: <?php echo $stockQuantity; ?></p>
-                                <p id="successMessage">Stok Bahan Terkini: <?php echo $newStockQuantity; ?></p>
-                                <div class="form-group">
-                                    <label for="deskripsi">Deskripsi<span class="gray-italic-text"> (opsional)</span>
-                                    </label>
-                                    <textarea class="form-control" id="deskripsi" name="deskripsi" rows="3" placeholder="Masukkan keterangan pembelian bahan ..."></textarea>
                                 </div>
                             </div>
                             <!-- /.card-body -->
@@ -222,16 +199,16 @@ if (isset($_POST['quantity'])) {
             bsCustomFileInput.init();
 
             // Add an event listener to the select element
-            $("#pilihBahanRestock").change(function() {
-                validateCurrentStock();
+            $("#pilihBahan").change(function() {
+                validatecurrentLokasiPenyimpanan();
             });
         });
 
         function validateForm() {
-            var selectedItem = document.getElementById("pilihBahanRestock").value;
-            var quantity = document.getElementById("quantity").value;
+            var selectedItem = document.getElementById("pilihBahan").value;
+            var lokasiPenyimpanan = document.getElementById("lokasiPenyimpanan").value;
 
-            if (selectedItem === "" || quantity === "" || quantity <= 0) {
+            if (selectedItem === "" || lokasiPenyimpanan === "") {
                 Swal.fire({
                     icon: 'error',
                     title: 'Oops...',
@@ -250,30 +227,30 @@ if (isset($_POST['quantity'])) {
             return true;
         }
 
-        function updateStockMessage() {
-            var stockMessage = document.getElementById("stockMessage");
-            var selectedQuantity = parseInt(document.getElementById("quantity").value, 10);
+        function updatelokasiPenyimpananMessage() {
+            var lokasiPenyimpananMessage = document.getElementById("lokasiPenyimpananMessage");
+            var selectedlokasiPenyimpanan = parseInt(document.getElementById("lokasiPenyimpanan").value, 10);
 
-            // Update stock message dynamically based on the selected item's stock quantity
-            stockMessage.innerText = "Stok Bahan Tersisa: " + (<?php echo $stockQuantity; ?> + selectedQuantity);
+            // Update stock message dynamically based on the selected item's stock lokasiPenyimpanan
+            lokasiPenyimpananMessage.innerText = "Lokasi Penyimpaan Saat Ini: " + (<?php echo $currentLokasiPenyimpanan; ?> + selectedlokasiPenyimpanan);
         }
 
-        function validateCurrentStock() {
+        function validatecurrentLokasiPenyimpanan() {
             // Get the form data
-            var formData = $("#restockForm").serialize();
+            var formData = $("#lokasiPenyimpananForm").serialize();
 
-            // Use AJAX to submit the form data and fetch the updated stock quantity
+            // Use AJAX to submit the form data and fetch the updated stock lokasiPenyimpanan
             $.ajax({
                 type: "POST",
-                url: "restock.php",
+                url: "lokasi_penyimpanan.php",
                 data: formData,
                 dataType: "json",
                 success: function(response) {
                     // Hide the stock message
                     document.getElementById("successMessage").style.display = "none";
-                    // Update the stock message with the fetched quantity
-                    document.getElementById("stockMessage").innerText = "Stok Bahan Tersisa: " + response
-                        .currentStock;
+                    // Update the stock message with the fetched lokasiPenyimpanan
+                    document.getElementById("lokasiPenyimpananMessage").innerText = "Lokasi Penyimpanan Saat Ini: " +
+                        response.currentLokasiPenyimpanan;
                 },
                 error: function(error) {
                     alert("Error, refresh the page!");
@@ -283,21 +260,21 @@ if (isset($_POST['quantity'])) {
 
         function validateSuccess() {
             // Get the form data
-            var formData = $("#restockForm").serialize();
+            var formData = $("#lokasiPenyimpananForm").serialize();
 
-            // Use AJAX to submit the form data and fetch the updated stock quantity
+            // Use AJAX to submit the form data and fetch the updated stock lokasiPenyimpanan
             $.ajax({
                 type: "POST",
-                url: "restock.php",
+                url: "lokasi_penyimpanan.php",
                 data: formData,
                 dataType: "json",
                 success: function(response) {
-                    document.getElementById("stockMessage").innerText = "Stok Bahan Tersisa: ";
+                    document.getElementById("lokasiPenyimpananMessage").innerText = "Lokasi Penyimpanan Saat Ini: ";
 
                     Swal.fire({
                         icon: 'success',
-                        title: 'Stok berhasil ditambahkan!',
-                        text: 'Stok terbaru adalah ' + response.newStock + ' bahan',
+                        title: 'Lokasi Penyimpanan berhasil diperbarui!',
+                        text: 'Lokasi Penyimpanan terbaru adalah ' + response.newLokasiPenyimpanan,
                         showCancelButton: false,
                         confirmButtonColor: '#3085d6',
                         confirmButtonText: 'OK (enter)'
@@ -309,19 +286,19 @@ if (isset($_POST['quantity'])) {
 
                 },
                 error: function(error) {
-                    alert("Error fetching new stock quantity.");
+                    alert("Error fetching new material lokasiPenyimpanan.");
                 }
             });
         }
 
         function resetForm() {
-            document.getElementById("restockForm").reset();
+            document.getElementById("lokasiPenyimpananForm").reset();
             resetDropdown();
-            disableQuantityInput();
+            disablelokasiPenyimpananInput();
         }
 
         function resetDropdown() {
-            const dropdown = document.getElementById("pilihBahanRestock");
+            const dropdown = document.getElementById("pilihBahan");
             dropdown.selectedIndex = 0; // reset ke pilihan pertama
 
             // jika multiple selection
@@ -333,34 +310,26 @@ if (isset($_POST['quantity'])) {
             dropdown.dispatchEvent(new Event('change'));
         }
 
-        // Quantity input disabled to prevent bugs
+        // lokasiPenyimpanan input disabled to prevent bugs
         document.addEventListener("DOMContentLoaded", function() {
-            disableQuantityInput();
+            disablelokasiPenyimpananInput();
         });
 
-        function disableQuantityInput() {
-            const quantityInput = document.getElementById("quantity");
-            quantityInput.placeholder = "Pilih bahan terlebih dahulu";
-            quantityInput.disabled = true;
+        function disablelokasiPenyimpananInput() {
+            const lokasiPenyimpananInput = document.getElementById("lokasiPenyimpanan");
+            lokasiPenyimpananInput.placeholder = "Pilih bahan terlebih dahulu";
+            lokasiPenyimpananInput.disabled = true;
         }
 
-        $("#pilihBahanRestock").change(function() {
-            const quantityInput = document.getElementById("quantity");
-            quantityInput.placeholder = "Masukkan jumlah stok bahan yang dibeli";
-            quantityInput.disabled = false;
+        $("#pilihBahan").change(function() {
+            const lokasiPenyimpananInput = document.getElementById("lokasiPenyimpanan");
+            lokasiPenyimpananInput.placeholder = "Masukkan jumlah stok bahan yang dibeli";
+            lokasiPenyimpananInput.disabled = false;
         });
 
         // When user press enter on keyboard
-        var quantityInput = document.getElementById('quantity');
-        quantityInput.addEventListener('keydown', function(event) {
-            if (event.keyCode === 13) {
-                event.preventDefault();
-                submitForm();
-            }
-        });
-
-        var deksripsiInput = document.getElementById('deskripsi');
-        deksripsiInput.addEventListener('keydown', function(event) {
+        var lokasiPenyimpananInput = document.getElementById('lokasiPenyimpanan');
+        lokasiPenyimpananInput.addEventListener('keydown', function(event) {
             if (event.keyCode === 13) {
                 event.preventDefault();
                 submitForm();
