@@ -212,6 +212,11 @@ $result = mysqli_query($conn, $query);
                                                             <div class="col">
                                                                 <a href='detail/detail.php?id=<?php echo $row["id"]; ?>' class="btn btn-info btn-block">Detail</a>
                                                             </div>
+                                                            <div class="col">
+                                                                <button class="btn btn-block btn-outline-danger" data-id="<?php echo $row['id']; ?>" id="downloadBarcode">
+                                                                    <i class="fas fa-barcode" style="margin-right: 8px;"></i>Barcode
+                                                                </button>
+                                                            </div>
                                                         </div>
                                                     </td>
                                                 </tr>
@@ -335,7 +340,30 @@ $result = mysqli_query($conn, $query);
                 // Lakukan redirect dengan menyertakan ID sebagai parameter
                 window.location.href = 'edit/edit.php?id=' + idToEdit;
             });
+            
+            $('#tableInventaris').on('click', '#downloadBarcode', function() {
+                // Get the data-id attribute value from the clicked button
+                var rowId = $(this).data('id');
 
+                var xhr = new XMLHttpRequest();
+                xhr.open("GET", "generate_barcode/barcode.php?id=" + rowId);
+                xhr.responseType = "blob";
+
+                xhr.onload = function() {
+                    if (xhr.status === 200) {
+                        var url = window.URL.createObjectURL(xhr.response);
+                        var link = document.createElement("a");
+                        link.href = url;
+                        link.download = "combined_barcodes.png";
+                        document.body.appendChild(link);
+                        link.click();
+                        window.URL.revokeObjectURL(url);
+                        document.body.removeChild(link);
+                    }
+                };
+
+                xhr.send();
+            });
         });
     </script>
 
