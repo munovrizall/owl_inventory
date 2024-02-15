@@ -128,7 +128,7 @@ if (isset($_POST['selectedItem'])) {
                                         <option value="">--- Pilih Bahan ---</option>
                                         <?php
                                         while ($row = $resultBahan->fetch_assoc()) {
-                                            echo '<option value="' . $row['nama'] . '">' . $row['nama'] . '</option>';
+                                            echo '<option value="' . $row['nama'] . '">'  . $row['kelompok'] . ' - ' .  $row['nama'] . '</option>';
                                         }
                                         ?>
                                     </select>

@@ -167,7 +167,7 @@ if (isset($_POST['quantity'])) {
                                         <option value="">--- Pilih Bahan ---</option>
                                         <?php
                                         while ($row = $resultBahan->fetch_assoc()) {
-                                            echo '<option value="' . $row['stok_id'] . '">' . $row['nama'] . '</option>';
+                                            echo '<option value="' . $row['stok_id'] . '">'  . $row['kelompok'] . ' - ' .  $row['nama'] . '</option>';
                                         }
                                         ?>
                                     </select>

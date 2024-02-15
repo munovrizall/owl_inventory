@@ -4,7 +4,7 @@ include "connection.php";
 
 if (isset($_GET["getDropdownOptions"])) {
 
-    $queryMasterBahan = "SELECT nama FROM masterbahan ORDER BY nama";
+    $queryMasterBahan = "SELECT kelompok, nama FROM masterbahan ORDER BY nama";
 
     $resultMasterBahan = $conn->query($queryMasterBahan);
 
@@ -12,7 +12,7 @@ if (isset($_GET["getDropdownOptions"])) {
 
     if ($resultMasterBahan && $resultMasterBahan->num_rows > 0) {
         while ($row = $resultMasterBahan->fetch_assoc()) {
-            $options .= '<option value="' . $row['nama'] . '">' . $row['nama'] . '</option>';
+            $options .= '<option value="' . $row['nama'] . '">'  . $row['kelompok'] . ' - ' .  $row['nama'] . '</option>';
         }
     }
     echo $options;
