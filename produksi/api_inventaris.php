@@ -1,4 +1,6 @@
-<?php 
+<?php
+//error_reporting(E_ALL);
+//ini_set('display_errors', 1);
 
 //header("Content-Type:application/json");
 
@@ -7,8 +9,8 @@ $resultPrep = array();
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // echo 'masuk post';
     if (isset($_POST['chip_id']) AND isset($_POST['produk'])) {
-        
-        echo 'Semua parameter ada';
+
+        //echo 'Semua parameter ada';
 
         $type_produk = isset($_POST['type_produk']) ? $_POST['type_produk'] : '';
         $produk = $_POST['produk'];
@@ -37,15 +39,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $status_qc_sensor_4 = isset($_POST['status_qc_sensor_4']) ? $_POST['status_qc_sensor_4'] : '';
         $status_qc_sensor_5 = isset($_POST['status_qc_sensor_5']) ? $_POST['status_qc_sensor_5'] : '';
         $status_qc_sensor_6 = isset($_POST['status_qc_sensor_6']) ? $_POST['status_qc_sensor_6'] : '';
-        
 
         // Establish database connection
         $serverName = "localhost";
         $userNameDb = "root";
-        $password = "";
-        $dbName = "databaseinventory";
-                
-        $conn = new mysqli($serverName, $userNameDb, $password, $dbName);    
+        $password = "Sem4ng4tsukses!";
+        $dbName = "devices";
+
+        $conn = new mysqli($serverName, $userNameDb, $password, $dbName);
 
         // Check for database connection errors
         if ($conn->connect_error) {
@@ -58,70 +59,110 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt->bind_param("is", $chip_id, $produk);
         $stmt->execute();
         $result = $stmt->get_result();
-        
+
         if ($result->num_rows > 0) {
             // Combination exists, send the existing no_sn back to the hardware
             $row = $result->fetch_assoc();
             $no_sn = $row['no_sn'];
             $response = array("no_sn" => $no_sn);
         } else {
+
             // Combination doesn't exist, generate no_sn with template
             $currentJulianDate = date('z') + 1;
             $currentYear = date('y');
             $no_sn_prefix = $currentYear . sprintf('%03d', $currentJulianDate);
             $no_sn_like = $no_sn_prefix . '%';
-            
+            //echo 'no sn like';
+            //echo $no_sn_like;
+            //echo 'no sn prefix';
+            //echo $no_sn_prefix;
             // Check if similar no_sn exists with different endings
             $sql_check = "SELECT no_sn FROM inventaris_produk WHERE no_sn LIKE ? ORDER BY no_sn DESC LIMIT 1";
             $stmt_check = $conn->prepare($sql_check);
             $stmt_check->bind_param("s", $no_sn_like);
             $stmt_check->execute();
             $result_check = $stmt_check->get_result();
-            
+
             if ($result_check->num_rows > 0) {
+                //echo 'similar found';
                 // Similar no_sn found, increment the last one
                 $row_check = $result_check->fetch_assoc();
                 $last_no_sn = $row_check['no_sn'];
                 $no_sn = intval($last_no_sn) + 1;
+                //echo $no_sn;
             } else {
+                //echo 'similar notfound new sn';
                 // No similar no_sn found, use the first one in the series
                 $no_sn = intval($no_sn_prefix . '001'); // Convert to integer
+                //echo $no_sn;
             }
-            
-            // Insert new record with the generated no_sn
-            $sql_insert = "INSERT INTO inventaris_produk (type_produk, produk, chip_id, no_sn, ip_address, mac_wifi, mac_bluetooth, firmware_version, 
-            hardware_version, free_ram, min_ram, batt_low, batt_high, temperature, status_error, gps_latitude, gps_longitude, 
-            status_qc_sensor_1, status_qc_sensor_2, status_qc_sensor_3, status_qc_sensor_4, status_qc_sensor_5, status_qc_sensor_6)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-            $stmt_insert = $conn->prepare($sql_insert);
-            $stmt_insert->bind_param("ssisssisisssssiiiididdssssss", $type_produk, $produk, $chip_id, $nama_client, $garansi_awal, 
-                $garansi_akhir, $garansi_void, $keterangan_void, $no_sn, $ip_address, $mac_wifi, $mac_bluetooth, 
-                $firmware_version, $hardware_version, $free_ram, $min_ram, $batt_low, $batt_high, 
-                $temperature, $status_error, $gps_latitude, $gps_longitude, $status_qc_sensor_1, 
-                $status_qc_sensor_2, $status_qc_sensor_3, $status_qc_sensor_4, $status_qc_sensor_5, $status_qc_sensor_6);
-            
-            // Execute the insertion statement
-            if ($stmt_insert->execute()) {
+
+            $sql_update = "UPDATE inventaris_produk SET 
+                type_produk = ?, 
+                produk = ?, 
+                chip_id = ?, 
+                no_sn = ?, 
+                ip_address = ?, 
+                mac_wifi = ?, 
+                mac_bluetooth = ?, 
+                firmware_version = ?, 
+                hardware_version = ?, 
+                free_ram = ?, 
+                min_ram = ?, 
+                batt_low = ?, 
+                batt_high = ?, 
+                temperature = ?, 
+                status_error = ?, 
+                gps_latitude = ?, 
+                gps_longitude = ?, 
+                status_qc_sensor_1 = ?, 
+                status_qc_sensor_2 = ?, 
+                status_qc_sensor_3 = ?, 
+                status_qc_sensor_4 = ?, 
+                status_qc_sensor_5 = ?, 
+                status_qc_sensor_6 = ? 
+            WHERE produk = ? AND no_sn IS NULL AND id = (SELECT MIN(id) FROM inventaris_produk WHERE produk = ? AND no_sn IS NULL)";
+
+            $stmt_update = $conn->prepare($sql_update);
+
+            if (!$stmt_update) {
+                http_response_code(500);
+                die('Error in preparing statement: ' . $conn->error);
+            }
+
+            $stmt_update->bind_param("ssssiisssssiiiididdssssss",
+                $type_produk, $produk, $chip_id, $no_sn, $ip_address, $mac_wifi, $mac_bluetooth,
+                $firmware_version, $hardware_version, $free_ram, $min_ram, $batt_low, $batt_high,
+                $temperature, $status_error, $gps_latitude, $gps_longitude, $status_qc_sensor_1,
+                $status_qc_sensor_2, $status_qc_sensor_3, $status_qc_sensor_4, $status_qc_sensor_5, $status_qc_sensor_6,
+                $produk, $produk);
+
+            if ($stmt_update->execute() && $stmt_update->affected_rows > 0) {
+                http_response_code(200);
+                //echo 'Success: Record updated successfully';
                 $response = array("no_sn" => $no_sn);
             } else {
-                // Handle insertion failure
-                $response = array("error" => "Failed to insert data");
+                http_response_code(500);
+                //echo 'Error: Failed to update record';
+                $response = array("no_sn" => $no_sn);
             }
-        
+
+            $stmt_update->close();
         }
-        $resultPrep['results'] = [
+        $resultPrep=[
             "no_sn" => $no_sn,
             "chip_id" => $chip_id,
             "produk"=> $produk,
         ];
-    } 
-    else {
+    } else {
+        http_response_code(400);
         $resultPrep['status'] = [
             "code" => 400,
             "description" => 'Parameter invalid'
         ];    
     }
 } else {
+    http_response_code(400);
     $resultPrep['status'] = [
         "code" => 400,
         "description" => 'Method invalid'

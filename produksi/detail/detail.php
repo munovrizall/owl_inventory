@@ -147,15 +147,15 @@ if (isset($_GET['id'])) {
                                             <table>
                                                 <tbody>
                                                     <tr>
-                                                        <td class="table-head" style="min-width: 180px"><b>Nama Perusahaan :</b></td>
-                                                        <td>
+                                                        <td class="table-head" style="min-width: 160px"><b>Nama Perusahaan :</b></td>
+                                                        <td style="min-width: 140px">
                                                             <?php
                                                             $nama_client = $row["nama_client"];
                                                             echo $nama_client !== null ? $nama_client : '-';
                                                             ?>
                                                         </td>
-                                                        <td class="table-head" style="min-width: 180px"><b>Free RAM :</b></td>
-                                                        <td>
+                                                        <td class="table-head" style="min-width: 160px"><b>Free RAM :</b></td>
+                                                        <td style="min-width: 140px">
                                                             <?php
                                                             $free_ram = $row["free_ram"];
                                                             echo "{$free_ram}";
@@ -294,7 +294,10 @@ if (isset($_GET['id'])) {
                                                         </td>
                                                         <td><b>Status QC Sensor 1 :</b></td>
                                                         <td>
-                                                            <span class="badge bg-success">OK</span>
+                                                            <?php
+                                                            $status_qc_sensor_1 = $row["status_qc_sensor_1"];
+                                                            echo "{$status_qc_sensor_1}";
+                                                            ?>
                                                         </td>
                                                     </tr>
                                                     <tr>
@@ -313,7 +316,10 @@ if (isset($_GET['id'])) {
                                                         </td>
                                                         <td><b>Status QC Sensor 2 :</b></td>
                                                         <td>
-                                                            <span class="badge bg-danger">FAIL</span>
+                                                            <?php
+                                                            $status_qc_sensor_2 = $row["status_qc_sensor_2"];
+                                                            echo "{$status_qc_sensor_2}";
+                                                            ?>
                                                         </td>
                                                     </tr>
                                                     <tr>
@@ -326,7 +332,10 @@ if (isset($_GET['id'])) {
                                                         </td>
                                                         <td><b>Status QC Sensor 3 :</b></td>
                                                         <td>
-                                                            <span class="badge bg-success">OK</span>
+                                                            <?php
+                                                            $status_qc_sensor_3 = $row["status_qc_sensor_3"];
+                                                            echo "{$status_qc_sensor_3}";
+                                                            ?>
                                                         </td>
                                                     </tr>
                                                     <tr>
@@ -339,7 +348,10 @@ if (isset($_GET['id'])) {
                                                         </td>
                                                         <td><b>Status QC Sensor 4 :</b></td>
                                                         <td>
-                                                            <span class="badge bg-success">OK</span>
+                                                            <?php
+                                                            $status_qc_sensor_4 = $row["status_qc_sensor_4"];
+                                                            echo "{$status_qc_sensor_4}";
+                                                            ?>
                                                         </td>
                                                     </tr>
                                                     <tr>
@@ -352,7 +364,10 @@ if (isset($_GET['id'])) {
                                                         </td>
                                                         <td><b>Status QC Sensor 5 :</b></td>
                                                         <td>
-                                                            <span class="badge bg-success">OK</span>
+                                                            <?php
+                                                            $status_qc_sensor_5 = $row["status_qc_sensor_5"];
+                                                            echo "{$status_qc_sensor_5}";
+                                                            ?>
                                                         </td>
                                                     </tr>
                                                     <tr>
@@ -365,7 +380,10 @@ if (isset($_GET['id'])) {
                                                         </td>
                                                         <td><b>Status QC Sensor 6 :</b></td>
                                                         <td>
-                                                            <span class="badge bg-success">OK</span>
+                                                            <?php
+                                                            $status_qc_sensor_6 = $row["status_qc_sensor_6"];
+                                                            echo "{$status_qc_sensor_6}";
+                                                            ?>
                                                         </td>
                                                     </tr>
                                                     <tr>
@@ -374,6 +392,13 @@ if (isset($_GET['id'])) {
                                                             <?php
                                                             $hardware_version = $row["hardware_version"];
                                                             echo "{$hardware_version}";
+                                                            ?>
+                                                        </td>
+                                                        <td><b>Last Online :</b></td>
+                                                        <td>
+                                                            <?php
+                                                            $last_online = $row["last_online"];
+                                                            echo "{$last_online}";
                                                             ?>
                                                         </td>
 

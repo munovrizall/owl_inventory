@@ -62,7 +62,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_GET['id'])) {
     $battLow = empty($_POST['battLow']) ? null : $_POST['battLow'];
     $battHigh = empty($_POST['battHigh']) ? null : $_POST['battHigh'];
     $temp = empty($_POST['temp']) ? null : $_POST['temp'];
-    $statusError = empty($_POST['statusError']) ? null : $_POST['statusError'];
+    $statusError = $_POST['statusError'];
     $gpsLatitude = empty($_POST['gpsLatitude']) ? null : $_POST['gpsLatitude'];
     $gpsLongitude = empty($_POST['gpsLongitude']) ? null : $_POST['gpsLongitude'];
     $statusSensor1 = empty($_POST['statusSensor1']) ? null : $_POST['statusSensor1'];

@@ -21,20 +21,30 @@ if (isset($_GET["getDropdownOptions"])) {
 
     // Handle the POST request for submitting form data
     $namaDevice = $_POST["namaDevice"];
+    
+    // Check if the 'nama_produk' already exists
+    $checkQuery = "SELECT COUNT(*) FROM produk WHERE nama_produk = ?";
+    $checkStmt = $conn->prepare($checkQuery);
+    $checkStmt->bind_param("s", $namaDevice);
+    $checkStmt->execute();
+    $checkStmt->bind_result($count);
+    $checkStmt->fetch();
+    $checkStmt->close();
 
-    $queryProduk = "INSERT INTO produk (nama_produk, quantity) VALUES (?, '0')";
-    $stmtProduk = $conn->prepare($queryProduk);
-    $stmtProduk->bind_param("s", $namaDevice);
-    $stmtProduk->execute();
-    $stmtProduk->close();
+    // If 'nama_produk' doesn't exist, insert it into the 'produk' table
+    if ($count == 0) {
+        $queryProduk = "INSERT INTO produk (nama_produk, quantity) VALUES (?, '0')";
+        $stmtProduk = $conn->prepare($queryProduk);
+        $stmtProduk->bind_param("s", $namaDevice);
+        $stmtProduk->execute();
+        $stmtProduk->close();
+    }
 
     // Check if 'bahan' and 'quantity' arrays are set in POST
     if (isset($_POST["pilihNamaBahan"]) && isset($_POST["quantity"])) {
         $bahanArray = $_POST["pilihNamaBahan"];
         $quantityArray = $_POST["quantity"];
 
-
-        // Loop through the arrays and insert records
         foreach ($bahanArray as $key => $bahan) {
             $quantity = $quantityArray[$key];
 
@@ -48,7 +58,11 @@ if (isset($_GET["getDropdownOptions"])) {
             $checkStmt->close();
 
             if ($count > 0) {
-                echo "Error: Device and Bahan combination already exists in the database.";
+                $updateQuery = "UPDATE bahan_produksi SET quantity = ? WHERE produk = ? AND nama_bahan = ?";
+                $updateStmt = $conn->prepare($updateQuery);
+                $updateStmt->bind_param("iss", $quantity, $namaDevice, $bahan);
+                $updateStmt->execute();
+                $updateStmt->close();
             } else {
                 $queryHarga = "SELECT harga_bahan FROM masterbahan WHERE nama = ?";
                 $stmtHarga = $conn->prepare($queryHarga);
@@ -71,12 +85,6 @@ if (isset($_GET["getDropdownOptions"])) {
             }
         }
 
-        // Insert the new record into masterbahan table
-        $queryMasterDevice = "INSERT INTO masterbahan (kelompok, nama, quantity) VALUES ('Barang Jadi', ?, 0)";
-        $stmtMasterBahan = $conn->prepare($queryMasterDevice);
-        $stmtMasterBahan->bind_param("s", $namaDevice);
-        $stmtMasterBahan->execute();
-        $stmtMasterBahan->close();
     } else {
         echo "Error: Bahan and Quantity arrays are not set.";
     }
