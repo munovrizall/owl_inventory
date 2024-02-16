@@ -2,16 +2,18 @@
 
 include "../connection.php";
 
-$queryClient = "SELECT * FROM client WHERE nama_client != 'OWL' ORDER BY nama_client";
+$queryClient = "SELECT * FROM client ORDER BY nama_client";
 $resultClient = $conn->query($queryClient);
 
 if (!$resultClient) {
     die("Error fetching kelompok data: " . $conn->error);
 }
+$queryProduk = "SELECT nama_produk FROM produk ORDER BY nama_produk";
+$resultProduk = $conn->query($queryProduk);
 
 if (isset($_GET["getDropdownOptions"])) {
 
-    $queryProduk = "SELECT produk, no_sn FROM inventaris_produk WHERE nama_client = 'OWL' ORDER BY no_sn DESC";
+    $queryProduk = "SELECT produk, no_sn, nama_client FROM inventaris_produk ORDER BY no_sn DESC";
 
     $resultProduk = $conn->query($queryProduk);
 
@@ -19,42 +21,11 @@ if (isset($_GET["getDropdownOptions"])) {
 
     if ($resultProduk && $resultProduk->num_rows > 0) {
         while ($row = $resultProduk->fetch_assoc()) {
-            $options .= '<option value="' . $row['no_sn'] . '">'  . $row['no_sn'] . ' - ' .  $row['produk'] . '</option>';
+            $options .= '<option value="' . $row['produk'] . '">'  . $row['no_sn'] . ' - ' .  $row['produk'] . '</option>';
         }
     }
     echo $options;
     exit();
-}elseif ($_SERVER["REQUEST_METHOD"] == "POST") {
-    
-    $pengguna = isset($_SESSION['username']) ? $_SESSION['username'] : '';
-    $pilihClient = $_POST["pilihClient"];
-
-    // Check if 'bahan' and 'quantity' arrays are set in POST
-    if (isset($_POST["pilihProduk"])) {
-        $produkArray = $_POST["pilihProduk"];
-
-        foreach ($produkArray as $key => $produk) {
-            $updateQuery = "UPDATE inventaris_produk SET nama_client = ? WHERE no_sn = ?";
-            $updateStmt = $conn->prepare($updateQuery);
-            $updateStmt->bind_param("si", $pilihClient, $produk);
-            $updateStmt->execute();
-            $updateStmt->close();
-
-            $queryProductName = "SELECT produk FROM inventaris_produk WHERE no_sn = ?";
-            $queryStmt = $conn->prepare($queryProductName);
-            $queryStmt->bind_param("i", $produk);
-            $queryStmt->execute();
-            $queryStmt->bind_result($namaProduk);
-            $queryStmt->fetch();
-            $queryStmt->close();
-
-            $insertQueryHistoris = "INSERT INTO historis (pengguna, nama_barang, waktu, quantity, activity, deskripsi) VALUES (?, ?, NOW(), 1, 'Pengiriman', ?)";
-            $insertStmt = $conn->prepare($insertQueryHistoris);
-            $insertStmt->bind_param("sss", $pengguna, $namaProduk, $_POST['deskripsi']);
-            $insertStmt->execute();
-            $insertStmt->close();
-        }
-    }
 }
 
 ?>
@@ -64,7 +35,7 @@ if (isset($_GET["getDropdownOptions"])) {
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Pengiriman Device</title>
+    <title>Penggantian Device</title>
 
     <link rel="icon" href="../assets/adminlte/dist/img/OWLlogo.png" type="image/x-icon">
     <!-- Google Font: Source Sans Pro -->
@@ -88,10 +59,14 @@ if (isset($_GET["getDropdownOptions"])) {
         }
 
         .lebar-kolom1 {
-            width: 90%;
+            width: 45%;
         }
 
         .lebar-kolom2 {
+            width: 45%;
+        }
+
+        .lebar-kolom3 {
             width: 10%;
         }
 
@@ -119,13 +94,13 @@ if (isset($_GET["getDropdownOptions"])) {
                 <div class="container-fluid">
                     <div class="row mb-2">
                         <div class="col-sm-6">
-                            <h1>Pengiriman Device</h1>
+                            <h1>Penggantian Device</h1>
                         </div>
                         <div class="col-sm-6">
                             <ol class="breadcrumb float-sm-right">
                                 <li class="breadcrumb-item"><a href="../homepage.php">Home</a></li>
                                 <li class="breadcrumb-item active">Pengelolaan Device</li>
-                                <li class="breadcrumb-item active">Pengiriman</li>
+                                <li class="breadcrumb-item active">Penggantian</li>
                             </ol>
                         </div>
                     </div>
@@ -139,15 +114,15 @@ if (isset($_GET["getDropdownOptions"])) {
                     <!-- general form elements -->
                     <div class="card card-primary">
                         <div class="card-header">
-                            <h3 class="card-title">Mengirim Device ke Client</h3>
+                            <h3 class="card-title">Menukar Device dari OWL ke Client</h3>
                         </div>
                         <!-- /.card-header -->
                         <!-- form start -->
-                        <form id="pengirimanForm">
+                        <form id="PenggantianForm">
                             <div class="card-body">
                                 <div class="form-group">
                                     <label for="pilihClient">Pilih PT <span style="color: red;">*</span></label>
-                                    <select class="form-control select2" id="pilihClient" name="pilihClient">
+                                    <select class="form-control select2" id="pilihClient" name="client">
                                         <option value="">--- Pilih PT ---</option>
                                         <?php
                                         while ($row = $resultClient->fetch_assoc()) {
@@ -156,13 +131,17 @@ if (isset($_GET["getDropdownOptions"])) {
                                         ?>
                                     </select>
                                 </div>
+                                <div style="margin-bottom: 16px;">
+                                    <button type="button" class="btn btn-outline-info btn-block" id="cekButton" name="cekButton" style="margin-top: 10px; max-width: 180px;"><i class="fas fa-sync-alt" style="margin-right: 8px;" onclick="cekProduksi()"></i>Cek</button>
+                                </div>
                                 <div class="card-body p-0">
                                     <div class="table-responsive">
                                         <table id="myTable" class=" table order-list table-striped">
                                             <thead>
                                                 <tr>
-                                                    <td class="text-center lebar-kolom1"><b>Nama Produk <span style="color: red;">*</span></b></td>
-                                                    <td class="text-center lebar-kolom2"><b>Aksi</b></td>
+                                                    <td class="text-center lebar-kolom1"><b>Produk Client <span style="color: red;">*</span></b></td>
+                                                    <td class="text-center lebar-kolom2"><b>Produk OWL <span style="color: red;">*</span></b></td>
+                                                    <td class="text-center lebar-kolom3"><b>Aksi</b></td>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -182,7 +161,7 @@ if (isset($_GET["getDropdownOptions"])) {
                                 </div>
                                 <div class="form-group">
                                     <label for="deksripsi">Deskripsi<span class="gray-italic-text"> (opsional)</span></label>
-                                    <textarea class="form-control" id="deskripsi" name="deskripsi" rows="3" placeholder="Masukkan keterangan pengiriman produk ..."></textarea>
+                                    <textarea class="form-control" id="deskripsi" name="deskripsi" rows="3" placeholder="Masukkan keterangan Penggantian produk ..."></textarea>
                                 </div>
                             </div>
 
@@ -239,11 +218,12 @@ if (isset($_GET["getDropdownOptions"])) {
 
             $("#pilihClient").change(function() {
                 var selectedPT = $("#pilihClient").val();
+                console.log(selectedPT);
                 // Extract the value you want from the selectedTransaksi
                 var extractedValue = ""; // Update this based on your logic
 
                 // Update the deskripsi field
-                $("#deskripsi").val("Pengiriman untuk " + selectedPT);
+                $("#deskripsi").val("Penggantian untuk " + selectedPT);
             });
         });
 
@@ -261,14 +241,15 @@ if (isset($_GET["getDropdownOptions"])) {
 
             // Make an AJAX request to fetch dropdown options
             $.ajax({
-                url: 'pengiriman.php?getDropdownOptions',
+                url: 'Penggantian.php?getDropdownOptions',
                 type: 'GET',
                 success: function(dropdownOptions) {
 
                     var newRow = $("<tr>");
                     var cols = "";
 
-                    cols += '<td><select class="form-control select2 pilihProduk" name="pilihProduk[]" style="min-width:140px;">' + dropdownOptions + '</select></td>';
+                    cols += '<td><select class="form-control select2 pilihNamaProduk" name="pilihNamaProduk[]" style="min-width:140px;">' + dropdownOptions + '</select></td>';
+                    cols += '<td><select class="form-control select2 pilihNamaProduk" name="pilihNamaProduk[]" style="min-width:140px;">' + dropdownOptions + '</select></td>';
                     cols += '<td><input type="button" class="ibtnDel btn btn-md btn-danger"  value="Delete"></td>';
 
                     newRow.append(cols);
@@ -288,62 +269,46 @@ if (isset($_GET["getDropdownOptions"])) {
         }
 
         function validateForm() {
-            var selectedItem = document.getElementById("pilihClient").value;
-            var namaElements = document.querySelectorAll(".pilihProduk");
+            var selectedItem = document.getElementById("pilihProdukPenggantian").value;
+            var quantity = document.getElementById("quantity").value;
 
-            // Check each row
-            for (var i = 0; i < namaElements.length; i++) {
-                var nama = namaElements[i].value;
-
-                if (selectedItem === "" || nama === "") {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Oops...',
-                        text: 'Harap lengkapi semua formulir!',
-                    });
-                    return false;
-                }
+            if (selectedItem === "" || quantity === "" || quantity <= 0) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: 'Harap lengkapi semua formulir!',
+                    showCancelButton: false,
+                    confirmButtonColor: '#3085d6',
+                    confirmButtonText: 'OK (enter)'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        resetForm();
+                    }
+                });
+                return false;
             }
 
             return true;
         }
 
-        function validateSuccess() {
-            var formData = new FormData(document.getElementById("pengirimanForm"));
-
-            $.ajax({
-                type: "POST",
-                url: "pengiriman.php",
-                data: formData,
-                processData: false,
-                contentType: false,
-                success: function(response) {
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Pengiriman berhasil dicatat!',
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            location.reload();
-                        }
-                    });
-                },
-                error: function(error) {
-                }
-            });
-        }
-
         function resetForm() {
-            document.getElementById("pengirimanForm").reset();
+            document.getElementById("PenggantianForm").reset();
             resetDropdown();
             disableQuantityInput();
         }
 
         function resetDropdown() {
-            const dropdown = document.getElementById("pilihProduk");
+            const dropdown = document.getElementById("pilihProdukPenggantian");
             dropdown.selectedIndex = 0;
             // reset ke pilihan pertama
             dropdown.dispatchEvent(new Event('change'));
         }
+
+        $("#pilihProdukPenggantian").change(function() {
+            const quantityInput = document.getElementById("quantity");
+            quantityInput.placeholder = "Masukkan jumlah stok produk yang ingin dikirim";
+            quantityInput.disabled = false;
+        });
 
         var deksripsiInput = document.getElementById('deskripsi');
         deksripsiInput.addEventListener('keydown', function(event) {
