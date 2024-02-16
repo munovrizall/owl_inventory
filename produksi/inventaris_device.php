@@ -66,15 +66,15 @@ $result = mysqli_query($conn, $query);
         }
 
         .lebar-kolom2 {
-            width: 15%;
+            width: 10%;
         }
 
         .lebar-kolom3 {
-            width: 25%;
+            width: 20%;
         }
 
         .lebar-kolom4 {
-            width: 15%;
+            width: 10%;
         }
 
 
@@ -87,7 +87,7 @@ $result = mysqli_query($conn, $query);
         }
 
         .lebar-kolom7 {
-            width: 10%;
+            width: 25%;
         }
 
         .card-padding {
@@ -143,11 +143,11 @@ $result = mysqli_query($conn, $query);
                                             <tr>
                                                 <th class="text-center lebar-kolom1">ID</th>
                                                 <th class="text-center lebar-kolom2">Nomor SN</th>
-                                                <th class="text-center lebar-kolom3">Produk</th>
+                                                <th class="text-center lebar-kolom3" style="min-width: 100px">Produk</th>
                                                 <th class="text-center lebar-kolom4">Perusahaan</th>
                                                 <th class="text-center lebar-kolom5">Terakhir Online</th>
                                                 <th class="text-center lebar-kolom6">Garansi</th>
-                                                <th class="text-center lebar-kolom7 aksi-column">Aksi</th>
+                                                <th class="text-center lebar-kolom7 aksi-column" style="min-width: 180px">Aksi</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -210,11 +210,11 @@ $result = mysqli_query($conn, $query);
                                                     <td class="text-center">
                                                         <div class="row">
                                                             <div class="col">
-                                                                <a href='detail/detail.php?id=<?php echo $row["id"]; ?>' class="btn btn-info btn-block">Detail</a>
+                                                                <a href='detail/detail.php?id=<?php echo $row["id"]; ?>' class="btn btn-info btn-block" style="height:62px; display: flex; align-items: center; justify-content: center;">Detail</a>
                                                             </div>
                                                             <div class="col">
-                                                                <button class="btn btn-block btn-outline-danger" data-id="<?php echo $row['id']; ?>" id="downloadBarcode">
-                                                                    <i class="fas fa-barcode" style="margin-right: 8px;"></i>Barcode
+                                                                <button class="btn btn-block btn-outline-info" data-id="<?php echo $row['id']; ?>" id="downloadBarcode">
+                                                                    <i class="fas fa-barcode"></i>Barcode
                                                                 </button>
                                                             </div>
                                                         </div>

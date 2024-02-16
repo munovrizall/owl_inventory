@@ -398,7 +398,7 @@ if (isset($_GET['id'])) {
                                                         <td>
                                                             <?php
                                                             $last_online = $row["last_online"];
-                                                            echo "{$last_online}";
+                                                            echo date('H:i d-m-Y', strtotime($last_online));
                                                             ?>
                                                         </td>
 
