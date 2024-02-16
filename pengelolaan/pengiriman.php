@@ -8,70 +8,23 @@ $resultClient = $conn->query($queryClient);
 if (!$resultClient) {
     die("Error fetching kelompok data: " . $conn->error);
 }
-
-$stockQuantity = ""; // Default value, replace it with the actual stock quantity based on the selected item from the database
-$newStockQuantity = "";
-
 $queryProduk = "SELECT nama_produk FROM produk ORDER BY nama_produk";
 $resultProduk = $conn->query($queryProduk);
 
-if (isset($_POST['quantity'])) {
-    $selectedNamaProduk = $_POST['selectedItem'];
+if (isset($_GET["getDropdownOptions"])) {
 
-    // Fetch the username from the POST data
-    $pengguna = isset($_SESSION['username']) ? $_SESSION['username'] : '';
+    $queryProduk = "SELECT produk, no_sn, nama_client FROM inventaris_produk ORDER BY no_sn DESC";
 
+    $resultProduk = $conn->query($queryProduk);
 
-    // Fetch the stock quantity from the database based on the selected item
-    $query = "SELECT quantity FROM produk WHERE nama_produk = ?";
-    $stmt = $conn->prepare($query);
-    $stmt->bind_param("s", $selectedNamaProduk);
-    $stmt->execute();
-    $stmt->bind_result($stockQuantity);
-    $stmt->fetch();
-    $stmt->close();
+    $options = '<option value="" selected disabled>Pilih Produk</option>';
 
-    $submittedQuantity = $_POST['quantity'];
-    if ($submittedQuantity == "") {
-        echo json_encode(array('currentStock' => $stockQuantity, 'newStock' => $newStockQuantity));
-        exit();
-    } elseif ($submittedQuantity <= 0) {
-        echo "Kuantitas yang dimasukkan harus lebih besar dari 0";
-        exit();
+    if ($resultProduk && $resultProduk->num_rows > 0) {
+        while ($row = $resultProduk->fetch_assoc()) {
+            $options .= '<option value="' . $row['produk'] . '">'  . $row['no_sn'] . ' - ' .  $row['produk'] . '</option>';
+        }
     }
-
-    // Update the database with the new stock quantity
-    $newStockQuantity = $stockQuantity - $submittedQuantity;
-
-    if ($newStockQuantity < 0) {
-        echo "Stok bahan tidak mencukupi untuk keperluan pengiriman.";
-        exit();
-    }
-
-    $updateQueryStock = "UPDATE produk SET quantity = ? WHERE nama_produk = ?";
-    $updateStmt = $conn->prepare($updateQueryStock);
-    $updateStmt->bind_param("is", $newStockQuantity, $selectedNamaProduk);
-    $updateStmt->execute();
-    $updateStmt->close();
-
-    $queryProdukId = "SELECT nama_produk FROM produk WHERE nama_produk = ?";
-    $stmtProdukId = $conn->prepare($queryProdukId);
-    $stmtProdukId->bind_param("s", $selectedNamaProduk);
-    $stmtProdukId->execute();
-    $stmtProdukId->bind_result($nama_produk);
-    $stmtProdukId->fetch();
-    $stmtProdukId->close();
-
-    // Insert a new record into the 'historis' table
-    $insertQueryHistoris = "INSERT INTO historis (pengguna, nama_barang, waktu, quantity, activity, deskripsi) VALUES (?, ?, NOW(), ?, 'Pengiriman', ?)";
-    $insertStmt = $conn->prepare($insertQueryHistoris);
-    $insertStmt->bind_param("ssis", $pengguna, $nama_produk, $submittedQuantity, $_POST['deskripsi']);
-
-    $insertStmt->execute();
-    $insertStmt->close();
-
-    // Return the updated stock quantity
-    echo json_encode(array('currentStock' => $stockQuantity, 'newStock' => $newStockQuantity));
+    echo $options;
     exit();
 }
 
@@ -105,6 +58,14 @@ if (isset($_POST['quantity'])) {
             /* Hide the success message initially */
         }
 
+        .lebar-kolom1 {
+            width: 90%;
+        }
+
+        .lebar-kolom2 {
+            width: 10%;
+        }
+
         .gray-italic-text {
             color: #808080;
             font-style: italic;
@@ -134,8 +95,8 @@ if (isset($_POST['quantity'])) {
                         <div class="col-sm-6">
                             <ol class="breadcrumb float-sm-right">
                                 <li class="breadcrumb-item"><a href="../homepage.php">Home</a></li>
-                                <li class="breadcrumb-item active">Produksi</li>
-                                <li class="breadcrumb-item active">Pengiriman Device</li>
+                                <li class="breadcrumb-item active">Pengelolaan Device</li>
+                                <li class="breadcrumb-item active">Pengiriman</li>
                             </ol>
                         </div>
                     </div>
@@ -149,34 +110,14 @@ if (isset($_POST['quantity'])) {
                     <!-- general form elements -->
                     <div class="card card-primary">
                         <div class="card-header">
-                            <h3 class="card-title">Mengurangi Stok Device Untuk Pengiriman</h3>
+                            <h3 class="card-title">Mengirim Device ke Client</h3>
                         </div>
                         <!-- /.card-header -->
                         <!-- form start -->
                         <form id="pengirimanForm">
                             <div class="card-body">
                                 <div class="form-group">
-                                    <label for="pilihProdukPengiriman">Pilih Produk <span style="color: red;">*</span></label>
-                                    <select class="form-control select2" id="pilihProdukPengiriman" name="selectedItem">
-                                        <option value="">--- Pilih Produk ---</option>
-                                        <?php
-                                        while ($row = $resultProduk->fetch_assoc()) {
-                                            echo '<option value="' . $row['nama_produk'] . '">' . $row['nama_produk'] . '</option>';
-                                        }
-                                        ?>
-                                    </select>
-                                </div>
-                                <div class="form-group">
-                                    <label for="quantity">Kuantitas <span style="color: red;">*</span></label>
-                                    <div class="input-group">
-                                        <!-- Input untuk kuantitas -->
-                                        <input type="number" class="form-control" id="quantity" name="quantity" min="0" value="">
-                                    </div>
-                                </div>
-                                <p id="stockMessage">Stok Bahan Tersisa: <?php echo $stockQuantity; ?></p>
-                                <p id="successMessage">Stok Bahan Terkini: <?php echo $newStockQuantity; ?></p>
-                                <div class="form-group">
-                                    <label for="pilihClient">Pilih PT <span class="gray-italic-text"> (opsional)</span></label>
+                                    <label for="pilihClient">Pilih PT <span style="color: red;">*</span></label>
                                     <select class="form-control select2" id="pilihClient" name="client">
                                         <option value="">--- Pilih PT ---</option>
                                         <?php
@@ -185,6 +126,33 @@ if (isset($_POST['quantity'])) {
                                         }
                                         ?>
                                     </select>
+                                </div>
+                                <div style="margin-bottom: 16px;">
+                                    <button type="button" class="btn btn-outline-info btn-block" id="cekButton" name="cekButton" style="margin-top: 10px; max-width: 180px;"><i class="fas fa-sync-alt" style="margin-right: 8px;" onclick="cekProduksi()"></i>Cek</button>
+                                </div>
+                                <div class="card-body p-0">
+                                    <div class="table-responsive">
+                                        <table id="myTable" class=" table order-list table-striped">
+                                            <thead>
+                                                <tr>
+                                                    <td class="text-center lebar-kolom1"><b>Nama Produk <span style="color: red;">*</span></b></td>
+                                                    <td class="text-center lebar-kolom2"><b>Aksi</b></td>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+
+                                                </tr>
+                                            </tbody>
+                                            <tfoot>
+                                                <tr>
+                                                    <td colspan="5" style="text-align: left;">
+                                                        <input type="button" class="btn btn-outline-info btn-block" id="addrow" value="+  Tambah Produk" />
+                                                    </td>
+                                                </tr>
+                                            </tfoot>
+                                        </table>
+                                    </div>
                                 </div>
                                 <div class="form-group">
                                     <label for="deksripsi">Deskripsi<span class="gray-italic-text"> (opsional)</span></label>
@@ -254,14 +222,45 @@ if (isset($_POST['quantity'])) {
             });
         });
 
-        $(function() {
-            bsCustomFileInput.init();
-
-            // Add an event listener to the select element
-            $("#pilihProdukPengiriman").change(function() {
-                validateCurrentStock();
-            });
+        var counter = 0;
+        $("#addrow").on("click", function() {
+            addRow();
         });
+
+        $("table.order-list").on("click", ".ibtnDel", function(event) {
+            $(this).closest("tr").remove();
+            calculateGrandTotal();
+        });
+
+        function addRow() {
+
+            // Make an AJAX request to fetch dropdown options
+            $.ajax({
+                url: 'pengiriman.php?getDropdownOptions',
+                type: 'GET',
+                success: function(dropdownOptions) {
+
+                    var newRow = $("<tr>");
+                    var cols = "";
+
+                    cols += '<td><select class="form-control select2 pilihNamaProduk" name="pilihNamaProduk[]" style="min-width:140px;">' + dropdownOptions + '</select></td>';
+                    cols += '<td><input type="button" class="ibtnDel btn btn-md btn-danger"  value="Delete"></td>';
+
+                    newRow.append(cols);
+                    $("table.order-list").append(newRow);
+                    counter++;
+
+                    $('.select2').select2({
+                        theme: 'bootstrap4',
+                        width: '100%',
+                        containerCssClass: 'height-40px',
+                    });
+                },
+                error: function(error) {
+                    console.log("Error fetching dropdown options: " + error);
+                }
+            });
+        }
 
         function validateForm() {
             var selectedItem = document.getElementById("pilihProdukPengiriman").value;
@@ -286,83 +285,6 @@ if (isset($_POST['quantity'])) {
             return true;
         }
 
-        function updateStockMessage() {
-            var stockMessage = document.getElementById("stockMessage");
-            var selectedQuantity = parseInt(document.getElementById("quantity").value, 10);
-
-            // Update stock message dynamically based on the selected item's stock quantity
-            stockMessage.innerText = "Stok Bahan Tersisa: " + (<?php echo $stockQuantity; ?> - selectedQuantity);
-        }
-
-        function validateCurrentStock() {
-            // Get the form data
-            var formData = $("#pengirimanForm").serialize();
-
-            // Use AJAX to submit the form data and fetch the updated stock quantity
-            $.ajax({
-                type: "POST",
-                url: "pengiriman.php",
-                data: formData,
-                dataType: "json",
-                success: function(response) {
-                    // Hide the stock message
-                    document.getElementById("successMessage").style.display = "none";
-                    // Update the stock message with the fetched quantity
-                    document.getElementById("stockMessage").innerText = "Stok Bahan Tersisa: " + response.currentStock;
-                },
-                error: function(error) {
-                    alert("Error, refresh the page!");
-                }
-            });
-        }
-
-        function validateSuccess() {
-            // Get the form data
-            var formData = $("#pengirimanForm").serialize();
-
-            // Use AJAX to submit the form data and fetch the updated stock quantity
-            $.ajax({
-                type: "POST",
-                url: "pengiriman.php",
-                data: formData,
-                dataType: "json",
-                success: function(response) {
-                    // Hide the stock message
-                    document.getElementById("stockMessage").innerText = "Stok Bahan Tersisa: ";
-
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Stok berhasil diambil!',
-                        text: 'Stok terbaru adalah ' + response.newStock + ' bahan',
-                        showCancelButton: false,
-                        confirmButtonColor: '#3085d6',
-                        confirmButtonText: 'OK (enter)'
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            resetForm();
-                        }
-                    });
-
-                    resetForm();
-
-                },
-                error: function(error) {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Stok Kurang',
-                        text: 'Kurangi kuantitas yang diinput!',
-                        showCancelButton: false,
-                        confirmButtonColor: '#3085d6',
-                        confirmButtonText: 'OK (enter)'
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            resetForm();
-                        }
-                    });
-                }
-            });
-        }
-
         function resetForm() {
             document.getElementById("pengirimanForm").reset();
             resetDropdown();
@@ -376,30 +298,10 @@ if (isset($_POST['quantity'])) {
             dropdown.dispatchEvent(new Event('change'));
         }
 
-        // Quantity input disabled to prevent bugs
-        document.addEventListener("DOMContentLoaded", function() {
-            disableQuantityInput();
-        });
-
-        function disableQuantityInput() {
-            const quantityInput = document.getElementById("quantity");
-            quantityInput.placeholder = "Pilih produk terlebih dahulu";
-            quantityInput.disabled = true;
-        }
-
         $("#pilihProdukPengiriman").change(function() {
             const quantityInput = document.getElementById("quantity");
             quantityInput.placeholder = "Masukkan jumlah stok produk yang ingin dikirim";
             quantityInput.disabled = false;
-        });
-
-        // When user press enter on keyboard
-        var quantityInput = document.getElementById('quantity');
-        quantityInput.addEventListener('keydown', function(event) {
-            if (event.keyCode === 13) {
-                event.preventDefault();
-                submitForm();
-            }
         });
 
         var deksripsiInput = document.getElementById('deskripsi');
