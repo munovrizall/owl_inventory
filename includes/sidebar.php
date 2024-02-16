@@ -18,7 +18,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
         with font-awesome or any other icon font library -->
                 <li class="nav-item">
                     <a href="/owl_inventory/homepage.php" class="nav-link <?php echo (strpos($current_page, 'homepage.php') !== false) ? 'active' : ''; ?>">
-                        <i class="nav-icon fas fa-th"></i>
+                        <i class="nav-icon fas fa-home"></i>
                         <p>Home</p>
                     </a>
                 </li>

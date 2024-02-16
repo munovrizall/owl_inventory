@@ -49,7 +49,7 @@ $result = mysqli_query($conn, $query);
     <!-- Google Font: Source Sans Pro -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
     <!-- Font Awesome -->
-    <link rel="stylesheet" href="../assets/adminlte/plugins/fontawesome-free/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <!-- Theme style -->
     <link rel="stylesheet" href="../assets/adminlte/dist/css/adminlte.min.css">
     <!-- Ionicons -->
@@ -147,7 +147,7 @@ $result = mysqli_query($conn, $query);
                                                 <th class="text-center lebar-kolom4">Perusahaan</th>
                                                 <th class="text-center lebar-kolom5">Terakhir Online</th>
                                                 <th class="text-center lebar-kolom6">Garansi</th>
-                                                <th class="text-center lebar-kolom7 aksi-column" style="min-width: 180px">Aksi</th>
+                                                <th class="text-center lebar-kolom7 aksi-column" style="min-width:140px;">Aksi</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -210,11 +210,11 @@ $result = mysqli_query($conn, $query);
                                                     <td class="text-center">
                                                         <div class="row">
                                                             <div class="col">
-                                                                <a href='detail/detail.php?id=<?php echo $row["id"]; ?>' class="btn btn-info btn-block" style="height:62px; display: flex; align-items: center; justify-content: center;">Detail</a>
+                                                                <a href='detail/detail.php?id=<?php echo $row["id"]; ?>' class="btn btn-info btn-block" ">Detail</a>
                                                             </div>
                                                             <div class="col">
-                                                                <button class="btn btn-block btn-outline-info" data-id="<?php echo $row['id']; ?>" id="downloadBarcode">
-                                                                    <i class="fas fa-barcode"></i>Barcode
+                                                                <button class="btn btn-block btn-outline-info" data-id="<?php echo $row['id']; ?>" id="downloadBarcode" >
+                                                                    <i class="fas fa-barcode"></i>
                                                                 </button>
                                                             </div>
                                                         </div>
