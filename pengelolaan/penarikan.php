@@ -11,7 +11,7 @@ if (!$resultClient) {
 
 if (isset($_GET["getDropdownOptions"])) {
 
-    $queryProduk = "SELECT produk, no_sn FROM inventaris_produk WHERE nama_client = 'OWL' ORDER BY no_sn DESC";
+    $queryProduk = "SELECT produk, no_sn, nama_client FROM inventaris_produk WHERE nama_client != 'OWL' ORDER BY no_sn DESC";
 
     $resultProduk = $conn->query($queryProduk);
 
@@ -19,7 +19,7 @@ if (isset($_GET["getDropdownOptions"])) {
 
     if ($resultProduk && $resultProduk->num_rows > 0) {
         while ($row = $resultProduk->fetch_assoc()) {
-            $options .= '<option value="' . $row['no_sn'] . '">'  . $row['no_sn'] . ' - ' .  $row['produk'] . '</option>';
+            $options .= '<option value="' . $row['no_sn'] . '">'  . $row['nama_client'] . ' - ' . $row['no_sn'] . ' - ' .  $row['produk'] . '</option>';
         }
     }
     echo $options;
@@ -34,9 +34,9 @@ if (isset($_GET["getDropdownOptions"])) {
         $produkArray = $_POST["pilihProduk"];
 
         foreach ($produkArray as $key => $produk) {
-            $updateQuery = "UPDATE inventaris_produk SET nama_client = ? WHERE no_sn = ?";
+            $updateQuery = "UPDATE inventaris_produk SET nama_client = 'OWL' WHERE no_sn = ?";
             $updateStmt = $conn->prepare($updateQuery);
-            $updateStmt->bind_param("si", $pilihClient, $produk);
+            $updateStmt->bind_param("i", $produk);
             $updateStmt->execute();
             $updateStmt->close();
 
@@ -48,7 +48,7 @@ if (isset($_GET["getDropdownOptions"])) {
             $queryStmt->fetch();
             $queryStmt->close();
 
-            $insertQueryHistoris = "INSERT INTO historis (pengguna, nama_barang, waktu, quantity, activity, deskripsi) VALUES (?, ?, NOW(), 1, 'Pengiriman', ?)";
+            $insertQueryHistoris = "INSERT INTO historis (pengguna, nama_barang, waktu, quantity, activity, deskripsi) VALUES (?, ?, NOW(), 1, 'Penarikan', ?)";
             $insertStmt = $conn->prepare($insertQueryHistoris);
             $insertStmt->bind_param("sss", $pengguna, $namaProduk, $_POST['deskripsi']);
             $insertStmt->execute();
@@ -64,7 +64,7 @@ if (isset($_GET["getDropdownOptions"])) {
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Pengiriman Device</title>
+    <title>Penarikan Device</title>
 
     <link rel="icon" href="../assets/adminlte/dist/img/OWLlogo.png" type="image/x-icon">
     <!-- Google Font: Source Sans Pro -->
@@ -119,13 +119,13 @@ if (isset($_GET["getDropdownOptions"])) {
                 <div class="container-fluid">
                     <div class="row mb-2">
                         <div class="col-sm-6">
-                            <h1>Pengiriman Device</h1>
+                            <h1>Penarikan Device</h1>
                         </div>
                         <div class="col-sm-6">
                             <ol class="breadcrumb float-sm-right">
                                 <li class="breadcrumb-item"><a href="../homepage.php">Home</a></li>
                                 <li class="breadcrumb-item active">Pengelolaan Device</li>
-                                <li class="breadcrumb-item active">Pengiriman</li>
+                                <li class="breadcrumb-item active">Penarikan</li>
                             </ol>
                         </div>
                     </div>
@@ -139,11 +139,11 @@ if (isset($_GET["getDropdownOptions"])) {
                     <!-- general form elements -->
                     <div class="card card-primary">
                         <div class="card-header">
-                            <h3 class="card-title">Mengirim Device ke Client</h3>
+                            <h3 class="card-title">Menarik Device dari Client</h3>
                         </div>
                         <!-- /.card-header -->
                         <!-- form start -->
-                        <form id="pengirimanForm">
+                        <form id="penarikanForm">
                             <div class="card-body">
                                 <div class="form-group">
                                     <label for="pilihClient">Pilih PT <span style="color: red;">*</span></label>
@@ -182,7 +182,7 @@ if (isset($_GET["getDropdownOptions"])) {
                                 </div>
                                 <div class="form-group">
                                     <label for="deksripsi">Deskripsi<span class="gray-italic-text"> (opsional)</span></label>
-                                    <textarea class="form-control" id="deskripsi" name="deskripsi" rows="3" placeholder="Masukkan keterangan pengiriman produk ..."></textarea>
+                                    <textarea class="form-control" id="deskripsi" name="deskripsi" rows="3" placeholder="Masukkan keterangan penarikan produk ..."></textarea>
                                 </div>
                             </div>
 
@@ -243,7 +243,7 @@ if (isset($_GET["getDropdownOptions"])) {
                 var extractedValue = ""; // Update this based on your logic
 
                 // Update the deskripsi field
-                $("#deskripsi").val("Pengiriman untuk " + selectedPT);
+                $("#deskripsi").val("Penarikan untuk " + selectedPT);
             });
         });
 
@@ -261,7 +261,7 @@ if (isset($_GET["getDropdownOptions"])) {
 
             // Make an AJAX request to fetch dropdown options
             $.ajax({
-                url: 'pengiriman.php?getDropdownOptions',
+                url: 'penarikan.php?getDropdownOptions',
                 type: 'GET',
                 success: function(dropdownOptions) {
 
@@ -309,18 +309,18 @@ if (isset($_GET["getDropdownOptions"])) {
         }
 
         function validateSuccess() {
-            var formData = new FormData(document.getElementById("pengirimanForm"));
+            var formData = new FormData(document.getElementById("penarikanForm"));
 
             $.ajax({
                 type: "POST",
-                url: "pengiriman.php",
+                url: "penarikan.php",
                 data: formData,
                 processData: false,
                 contentType: false,
                 success: function(response) {
                     Swal.fire({
                         icon: 'success',
-                        title: 'Pengiriman berhasil dicatat!',
+                        title: 'Penarikan berhasil dicatat!',
                     }).then((result) => {
                         if (result.isConfirmed) {
                             location.reload();
@@ -333,7 +333,7 @@ if (isset($_GET["getDropdownOptions"])) {
         }
 
         function resetForm() {
-            document.getElementById("pengirimanForm").reset();
+            document.getElementById("penarikanForm").reset();
             resetDropdown();
             disableQuantityInput();
         }
