@@ -2,18 +2,26 @@
 
 include "../connection.php";
 
-$queryClient = "SELECT * FROM client ORDER BY nama_client";
+$queryClient = "SELECT * FROM client  WHERE nama_client != 'OWL' ORDER BY nama_client";
 $resultClient = $conn->query($queryClient);
 
 if (!$resultClient) {
     die("Error fetching kelompok data: " . $conn->error);
 }
-$queryProduk = "SELECT nama_produk FROM produk ORDER BY nama_produk";
-$resultProduk = $conn->query($queryProduk);
 
 if (isset($_GET["getDropdownOptions"])) {
+    // Check the parameter value to determine which dropdown options to fetch
+    $dropdownType = $_GET["getDropdownOptions"];
 
-    $queryProduk = "SELECT produk, no_sn, nama_client FROM inventaris_produk ORDER BY no_sn DESC";
+    $queryProduk = "";
+
+    if ($dropdownType === "client") {
+        $queryProduk = "SELECT produk, no_sn, nama_client FROM inventaris_produk WHERE nama_client != 'OWL' 
+        ORDER BY nama_client DESC, produk DESC, no_sn DESC";
+    } elseif ($dropdownType === "owl") {
+        $queryProduk = "SELECT produk, no_sn, nama_client FROM inventaris_produk WHERE nama_client = 'OWL' 
+        ORDER BY produk DESC, no_sn DESC";
+    }
 
     $resultProduk = $conn->query($queryProduk);
 
@@ -21,11 +29,64 @@ if (isset($_GET["getDropdownOptions"])) {
 
     if ($resultProduk && $resultProduk->num_rows > 0) {
         while ($row = $resultProduk->fetch_assoc()) {
-            $options .= '<option value="' . $row['produk'] . '">'  . $row['no_sn'] . ' - ' .  $row['produk'] . '</option>';
+            $options .= '<option value="' . $row['no_sn'] . '">'  . $row['nama_client'] . ' - ' . $row['produk'] . ' - ' .  $row['no_sn'] . '</option>';
         }
     }
     echo $options;
     exit();
+} elseif ($_SERVER["REQUEST_METHOD"] == "POST") {
+    
+    $pengguna = isset($_SESSION['username']) ? $_SESSION['username'] : '';
+    $pilihClient = $_POST["pilihClient"];
+
+    if (isset($_POST["pilihProdukClient"]) &&  isset($_POST["pilihProdukOWL"])) {
+        $produkArrayClient = $_POST["pilihProdukClient"];
+        $produkArrayOWL = $_POST["pilihProdukOWL"];
+
+        foreach ($produkArrayClient as $key => $produkClient) {
+            $produkOWL = $produkArrayOWL[$key];
+
+            $updateQueryClient = "UPDATE inventaris_produk SET nama_client = 'OWL' WHERE no_sn = ?";
+            $updateStmtClient = $conn->prepare($updateQueryClient);
+            $updateStmtClient->bind_param("i", $produkClient);
+            $updateStmtClient->execute();
+            $updateStmtClient->close();
+
+            $updateQueryOWL = "UPDATE inventaris_produk SET nama_client = ? WHERE no_sn = ?";
+            $updateStmtOWL = $conn->prepare($updateQueryOWL);
+            $updateStmtOWL->bind_param("si", $pilihClient, $produkOWL);
+            $updateStmtOWL->execute();
+            $updateStmtOWL->close();
+
+            $queryProductClient = "SELECT produk FROM inventaris_produk WHERE no_sn = ?";
+            $queryStmtClient = $conn->prepare($queryProductClient);
+            $queryStmtClient->bind_param("i", $produkClient);
+            $queryStmtClient->execute();
+            $queryStmtClient->bind_result($namaProdukClient);
+            $queryStmtClient->fetch();
+            $queryStmtClient->close();
+
+            $queryProductOWL = "SELECT produk FROM inventaris_produk WHERE no_sn = ?";
+            $queryStmtOWL = $conn->prepare($queryProductOWL);
+            $queryStmtOWL->bind_param("i", $produkOWL);
+            $queryStmtOWL->execute();
+            $queryStmtOWL->bind_result($namaProdukOWL);
+            $queryStmtOWL->fetch();
+            $queryStmtOWL->close();
+
+            $insertQueryHistorisClient = "INSERT INTO historis (pengguna, nama_barang, waktu, quantity, activity, deskripsi) VALUES (?, ?, NOW(), 1, 'Penggantian', ?)";
+            $insertStmtClient = $conn->prepare($insertQueryHistorisClient);
+            $insertStmtClient->bind_param("sss", $pengguna, $namaProdukClient, $_POST['deskripsi']);
+            $insertStmtClient->execute();
+            $insertStmtClient->close();
+
+            $insertQueryHistorisOWL = "INSERT INTO historis (pengguna, nama_barang, waktu, quantity, activity, deskripsi) VALUES (?, ?, NOW(), 1, 'Penggantian', ?)";
+            $insertStmtOWL = $conn->prepare($insertQueryHistorisOWL);
+            $insertStmtOWL->bind_param("sss", $pengguna, $namaProdukOWL, $_POST['deskripsi']);
+            $insertStmtOWL->execute();
+            $insertStmtOWL->close();
+        }
+    }
 }
 
 ?>
@@ -118,11 +179,11 @@ if (isset($_GET["getDropdownOptions"])) {
                         </div>
                         <!-- /.card-header -->
                         <!-- form start -->
-                        <form id="PenggantianForm">
+                        <form id="penggantianForm">
                             <div class="card-body">
                                 <div class="form-group">
                                     <label for="pilihClient">Pilih PT <span style="color: red;">*</span></label>
-                                    <select class="form-control select2" id="pilihClient" name="client">
+                                    <select class="form-control select2" id="pilihClient" name="pilihClient">
                                         <option value="">--- Pilih PT ---</option>
                                         <?php
                                         while ($row = $resultClient->fetch_assoc()) {
@@ -130,9 +191,6 @@ if (isset($_GET["getDropdownOptions"])) {
                                         }
                                         ?>
                                     </select>
-                                </div>
-                                <div style="margin-bottom: 16px;">
-                                    <button type="button" class="btn btn-outline-info btn-block" id="cekButton" name="cekButton" style="margin-top: 10px; max-width: 180px;"><i class="fas fa-sync-alt" style="margin-right: 8px;" onclick="cekProduksi()"></i>Cek</button>
                                 </div>
                                 <div class="card-body p-0">
                                     <div class="table-responsive">
@@ -238,61 +296,99 @@ if (isset($_GET["getDropdownOptions"])) {
         });
 
         function addRow() {
-
-            // Make an AJAX request to fetch dropdown options
+            // Make an AJAX request to fetch dropdown options for Client
             $.ajax({
-                url: 'Penggantian.php?getDropdownOptions',
+                url: 'Penggantian.php?getDropdownOptions=client',
                 type: 'GET',
-                success: function(dropdownOptions) {
+                success: function(clientDropdownOptions) {
 
-                    var newRow = $("<tr>");
-                    var cols = "";
+                    // Make an AJAX request to fetch dropdown options for OWL
+                    $.ajax({
+                        url: 'Penggantian.php?getDropdownOptions=owl',
+                        type: 'GET',
+                        success: function(owlDropdownOptions) {
 
-                    cols += '<td><select class="form-control select2 pilihNamaProduk" name="pilihNamaProduk[]" style="min-width:140px;">' + dropdownOptions + '</select></td>';
-                    cols += '<td><select class="form-control select2 pilihNamaProduk" name="pilihNamaProduk[]" style="min-width:140px;">' + dropdownOptions + '</select></td>';
-                    cols += '<td><input type="button" class="ibtnDel btn btn-md btn-danger"  value="Delete"></td>';
+                            var newRow = $("<tr>");
+                            var cols = "";
 
-                    newRow.append(cols);
-                    $("table.order-list").append(newRow);
-                    counter++;
+                            // Populate the Client dropdown
+                            cols += '<td><select class="form-control select2 pilihProdukClient" name="pilihProdukClient[]" style="min-width:140px;">' + clientDropdownOptions + '</select></td>';
 
-                    $('.select2').select2({
-                        theme: 'bootstrap4',
-                        width: '100%',
-                        containerCssClass: 'height-40px',
+                            // Populate the OWL dropdown
+                            cols += '<td><select class="form-control select2 pilihProdukOWL" name="pilihProdukOWL[]" style="min-width:140px;">' + owlDropdownOptions + '</select></td>';
+
+                            cols += '<td><input type="button" class="ibtnDel btn btn-md btn-danger"  value="Delete"></td>';
+
+                            newRow.append(cols);
+                            $("table.order-list").append(newRow);
+                            counter++;
+
+                            $('.select2').select2({
+                                theme: 'bootstrap4',
+                                width: '100%',
+                                containerCssClass: 'height-40px',
+                            });
+                        },
+                        error: function(error) {
+                            console.log("Error fetching OWL dropdown options: " + error);
+                        }
                     });
                 },
                 error: function(error) {
-                    console.log("Error fetching dropdown options: " + error);
+                    console.log("Error fetching Client dropdown options: " + error);
                 }
             });
         }
 
         function validateForm() {
-            var selectedItem = document.getElementById("pilihProdukPenggantian").value;
-            var quantity = document.getElementById("quantity").value;
+            var selectedItem = document.getElementById("pilihClient").value;
+            var namaElementsClient = document.querySelectorAll(".pilihProdukClient");
+            var namaElementsOWL = document.querySelectorAll(".pilihProdukOWL");
 
-            if (selectedItem === "" || quantity === "" || quantity <= 0) {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Oops...',
-                    text: 'Harap lengkapi semua formulir!',
-                    showCancelButton: false,
-                    confirmButtonColor: '#3085d6',
-                    confirmButtonText: 'OK (enter)'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        resetForm();
-                    }
-                });
-                return false;
+            // Check each row
+            for (var i = 0; i < namaElementsClient.length; i++) {
+                var namaClient = namaElementsClient[i].value;
+                var namaOWL = namaElementsOWL[i].value;
+
+                if (selectedItem === "" || namaClient === "" || namaOWL === "") {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops...',
+                        text: 'Harap lengkapi semua formulir!',
+                    });
+                    return false;
+                }
             }
 
             return true;
         }
 
+        function validateSuccess() {
+            var formData = new FormData(document.getElementById("penggantianForm"));
+
+            $.ajax({
+                type: "POST",
+                url: "penggantian.php",
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function(response) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Penggantian berhasil dicatat!',
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            location.reload();
+                        }
+                    });
+                },
+                error: function(error) {
+                }
+            });
+        }
+
         function resetForm() {
-            document.getElementById("PenggantianForm").reset();
+            document.getElementById("penggantianForm").reset();
             resetDropdown();
             disableQuantityInput();
         }
@@ -303,12 +399,6 @@ if (isset($_GET["getDropdownOptions"])) {
             // reset ke pilihan pertama
             dropdown.dispatchEvent(new Event('change'));
         }
-
-        $("#pilihProdukPenggantian").change(function() {
-            const quantityInput = document.getElementById("quantity");
-            quantityInput.placeholder = "Masukkan jumlah stok produk yang ingin dikirim";
-            quantityInput.disabled = false;
-        });
 
         var deksripsiInput = document.getElementById('deskripsi');
         deksripsiInput.addEventListener('keydown', function(event) {

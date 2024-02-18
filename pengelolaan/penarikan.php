@@ -11,7 +11,7 @@ if (!$resultClient) {
 
 if (isset($_GET["getDropdownOptions"])) {
 
-    $queryProduk = "SELECT produk, no_sn, nama_client FROM inventaris_produk WHERE nama_client != 'OWL' ORDER BY no_sn DESC";
+    $queryProduk = "SELECT produk, no_sn, nama_client FROM inventaris_produk WHERE nama_client != 'OWL' ORDER BY nama_client DESC, produk DESC, no_sn DESC";
 
     $resultProduk = $conn->query($queryProduk);
 
@@ -19,12 +19,12 @@ if (isset($_GET["getDropdownOptions"])) {
 
     if ($resultProduk && $resultProduk->num_rows > 0) {
         while ($row = $resultProduk->fetch_assoc()) {
-            $options .= '<option value="' . $row['no_sn'] . '">'  . $row['nama_client'] . ' - ' . $row['no_sn'] . ' - ' .  $row['produk'] . '</option>';
+            $options .= '<option value="' . $row['no_sn'] . '">'  . $row['nama_client'] . ' - ' . $row['produk'] . ' - ' .  $row['no_sn'] . '</option>';
         }
     }
     echo $options;
     exit();
-}elseif ($_SERVER["REQUEST_METHOD"] == "POST") {
+} elseif ($_SERVER["REQUEST_METHOD"] == "POST") {
     
     $pengguna = isset($_SESSION['username']) ? $_SESSION['username'] : '';
     $pilihClient = $_POST["pilihClient"];
@@ -70,7 +70,7 @@ if (isset($_GET["getDropdownOptions"])) {
     <!-- Google Font: Source Sans Pro -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
     <!-- Font Awesome -->
-    <link rel="stylesheet" href="../assets/adminlte/plugins/fontawesome-free/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <!-- Theme style -->
     <link rel="stylesheet" href="../assets/adminlte/dist/css/adminlte.min.css">
     <!-- Sweetalert2 -->
