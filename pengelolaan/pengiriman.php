@@ -50,7 +50,8 @@ if (isset($_GET["getDropdownOptions"])) {
 
             $insertQueryHistoris = "INSERT INTO historis (pengguna, nama_barang, waktu, quantity, activity, deskripsi) VALUES (?, ?, NOW(), 1, 'Pengiriman', ?)";
             $insertStmt = $conn->prepare($insertQueryHistoris);
-            $insertStmt->bind_param("sss", $pengguna, $namaProduk, $_POST['deskripsi']);
+            $deskripsi =  $_POST['deskripsi'] . ' (' . $produk . ')';
+            $insertStmt->bind_param("sss", $pengguna, $namaProduk, $deskripsi);
             $insertStmt->execute();
             $insertStmt->close();
         }

@@ -69,25 +69,12 @@ if (isset($_GET["getDropdownOptions"])) {
             $queryStmtClient->fetch();
             $queryStmtClient->close();
 
-            $queryProductOWL = "SELECT produk FROM inventaris_produk WHERE no_sn = ?";
-            $queryStmtOWL = $conn->prepare($queryProductOWL);
-            $queryStmtOWL->bind_param("i", $produkOWL);
-            $queryStmtOWL->execute();
-            $queryStmtOWL->bind_result($namaProdukOWL);
-            $queryStmtOWL->fetch();
-            $queryStmtOWL->close();
-
             $insertQueryHistorisClient = "INSERT INTO historis (pengguna, nama_barang, waktu, quantity, activity, deskripsi) VALUES (?, ?, NOW(), 1, 'Penggantian', ?)";
             $insertStmtClient = $conn->prepare($insertQueryHistorisClient);
-            $insertStmtClient->bind_param("sss", $pengguna, $namaProdukClient, $_POST['deskripsi']);
+            $deskripsi = $_POST['deskripsi'] . ' (' . $produkClient . ' -> ' . $produkOWL . ')';
+            $insertStmtClient->bind_param("sss", $pengguna, $namaProdukClient, $deskripsi);
             $insertStmtClient->execute();
             $insertStmtClient->close();
-
-            $insertQueryHistorisOWL = "INSERT INTO historis (pengguna, nama_barang, waktu, quantity, activity, deskripsi) VALUES (?, ?, NOW(), 1, 'Penggantian', ?)";
-            $insertStmtOWL = $conn->prepare($insertQueryHistorisOWL);
-            $insertStmtOWL->bind_param("sss", $pengguna, $namaProdukOWL, $_POST['deskripsi']);
-            $insertStmtOWL->execute();
-            $insertStmtOWL->close();
         }
     }
 }
