@@ -10,10 +10,14 @@ if (!$resultClient) {
 }
 
 if (isset($_GET["getDropdownOptions"])) {
+    // Get the selected client
+    $selectedClient = $_GET["selectedClient"];
 
-    $queryProduk = "SELECT produk, no_sn, nama_client FROM inventaris_produk WHERE nama_client != 'OWL' ORDER BY nama_client DESC, produk DESC, no_sn DESC";
-
-    $resultProduk = $conn->query($queryProduk);
+    $queryProduk = "SELECT produk, no_sn, nama_client FROM inventaris_produk WHERE nama_client = ? ORDER BY nama_client DESC, produk DESC, no_sn DESC";
+    $stmt = $conn->prepare($queryProduk);
+    $stmt->bind_param("s", $selectedClient);
+    $stmt->execute();
+    $resultProduk = $stmt->get_result();
 
     $options = '<option value="" selected disabled>Pilih Produk</option>';
 
@@ -237,8 +241,17 @@ if (isset($_GET["getDropdownOptions"])) {
                 containerCssClass: 'height-40px',
             });
 
+            $("#addrow").prop("disabled", true);
+
+            // Enable the "Tambah Produk" button when a client is selected
             $("#pilihClient").change(function() {
                 var selectedPT = $("#pilihClient").val();
+                if (selectedPT) {
+                    $("#addrow").prop("disabled", false);
+                } else {
+                    $("#addrow").prop("disabled", true);
+                }
+
                 // Extract the value you want from the selectedTransaksi
                 var extractedValue = ""; // Update this based on your logic
 
@@ -248,7 +261,16 @@ if (isset($_GET["getDropdownOptions"])) {
         });
 
         var counter = 0;
+
         $("#addrow").on("click", function() {
+            var selectedClient = $("#pilihClient").val();
+
+            // Check if a client is selected before adding a row
+            if (!selectedClient) {
+                alert("Harap pilih PT terlebih dahulu.");
+                return;
+            }
+
             addRow();
         });
 
@@ -258,13 +280,13 @@ if (isset($_GET["getDropdownOptions"])) {
         });
 
         function addRow() {
+            var selectedClient = $("#pilihClient").val();
 
-            // Make an AJAX request to fetch dropdown options
+            // Make an AJAX request to fetch dropdown options for the selected client
             $.ajax({
-                url: 'penarikan.php?getDropdownOptions',
+                url: 'penarikan.php?getDropdownOptions&selectedClient=' + selectedClient,
                 type: 'GET',
                 success: function(dropdownOptions) {
-
                     var newRow = $("<tr>");
                     var cols = "";
 
