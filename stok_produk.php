@@ -2,10 +2,15 @@
 
 include "connection.php";
 
-$query = "SELECT * FROM produk";
+$query = "SELECT p.produk_id, p.nama_produk, COALESCE(COUNT(ip.produk), 0) AS stok, p.hpp_produk
+          FROM produk p
+          LEFT JOIN inventaris_produk ip ON p.nama_produk = ip.produk AND ip.nama_client = 'OWL'
+          GROUP BY p.produk_id, p.nama_produk, p.hpp_produk";
+            
 $result = mysqli_query($conn, $query);
 
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -113,7 +118,7 @@ $result = mysqli_query($conn, $query);
                                                 <tr>
                                                     <td><?php echo $row["produk_id"]; ?></td>
                                                     <td><?php echo $row["nama_produk"]; ?></td>
-                                                    <td><?php echo $row["quantity"]; ?></td>
+                                                    <td><?php echo $row["stok"]; ?></td>
                                                     <td>Rp <?php echo number_format($row["hpp_produk"]); ?></td>
                                                 </tr>
                                             <?php
