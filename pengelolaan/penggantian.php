@@ -43,11 +43,31 @@ if (isset($_GET["getDropdownOptions"])) {
     $pilihClient = $_POST["pilihClient"];
 
     if (isset($_POST["pilihProdukClient"]) &&  isset($_POST["pilihProdukOWL"])) {
-        $produkArrayClient = $_POST["pilihProdukClient"];
-        $produkArrayOWL = $_POST["pilihProdukOWL"];
+        $produkArrayClient = array_unique($_POST["pilihProdukClient"]);
+        $produkArrayOWL = array_unique($_POST["pilihProdukOWL"]);
 
         foreach ($produkArrayClient as $key => $produkClient) {
             $produkOWL = $produkArrayOWL[$key];
+            
+            $queryProductClient = "SELECT produk FROM inventaris_produk WHERE no_sn = ?";
+            $queryStmtClient = $conn->prepare($queryProductClient);
+            $queryStmtClient->bind_param("i", $produkClient);
+            $queryStmtClient->execute();
+            $queryStmtClient->bind_result($namaProdukClient);
+            $queryStmtClient->fetch();
+            $queryStmtClient->close();
+
+            $queryProductOWL = "SELECT produk FROM inventaris_produk WHERE no_sn = ?";
+            $queryStmtOWL = $conn->prepare($queryProductOWL);
+            $queryStmtOWL->bind_param("i", $produkOWL);
+            $queryStmtOWL->execute();
+            $queryStmtOWL->bind_result($namaProdukOWL);
+            $queryStmtOWL->fetch();
+            $queryStmtOWL->close();
+
+            if ($namaProdukClient !== $namaProdukOWL) {
+                continue;
+            }
 
             $updateQueryClient = "UPDATE inventaris_produk SET nama_client = 'OWL' WHERE no_sn = ?";
             $updateStmtClient = $conn->prepare($updateQueryClient);
@@ -60,14 +80,6 @@ if (isset($_GET["getDropdownOptions"])) {
             $updateStmtOWL->bind_param("si", $pilihClient, $produkOWL);
             $updateStmtOWL->execute();
             $updateStmtOWL->close();
-
-            $queryProductClient = "SELECT produk FROM inventaris_produk WHERE no_sn = ?";
-            $queryStmtClient = $conn->prepare($queryProductClient);
-            $queryStmtClient->bind_param("i", $produkClient);
-            $queryStmtClient->execute();
-            $queryStmtClient->bind_result($namaProdukClient);
-            $queryStmtClient->fetch();
-            $queryStmtClient->close();
 
             $insertQueryHistorisClient = "INSERT INTO historis (pengguna, nama_barang, waktu, quantity, activity, deskripsi) VALUES (?, ?, NOW(), 1, 'Penggantian', ?)";
             $insertStmtClient = $conn->prepare($insertQueryHistorisClient);
@@ -352,13 +364,23 @@ if (isset($_GET["getDropdownOptions"])) {
             var selectedItem = document.getElementById("pilihClient").value;
             var namaElementsClient = document.querySelectorAll(".pilihProdukClient");
             var namaElementsOWL = document.querySelectorAll(".pilihProdukOWL");
+            var selectedProducts = [];
+
+            if (selectedItem === "") {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: 'Harap lengkapi semua formulir!',
+                });
+                return false;
+            }
 
             // Check each row
             for (var i = 0; i < namaElementsClient.length; i++) {
                 var namaClient = namaElementsClient[i].value;
                 var namaOWL = namaElementsOWL[i].value;
 
-                if (selectedItem === "" || namaClient === "" || namaOWL === "") {
+                if (namaClient === "" || namaOWL === "") {
                     Swal.fire({
                         icon: 'error',
                         title: 'Oops...',
@@ -366,6 +388,19 @@ if (isset($_GET["getDropdownOptions"])) {
                     });
                     return false;
                 }
+
+                // Check uniqueness of selected products
+                if (selectedProducts.includes(namaClient) || selectedProducts.includes(namaOWL)) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops...',
+                        text: 'Produk tidak boleh sama dalam satu baris!',
+                    });
+                    return false;
+                }
+
+                selectedProducts.push(namaClient);
+                selectedProducts.push(namaOWL);
             }
 
             return true;
