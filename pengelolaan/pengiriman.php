@@ -31,7 +31,7 @@ if (isset($_GET["getDropdownOptions"])) {
 
     // Check if 'bahan' and 'quantity' arrays are set in POST
     if (isset($_POST["pilihProduk"])) {
-        $produkArray = $_POST["pilihProduk"];
+        $produkArray = array_unique($_POST["pilihProduk"]);
 
         foreach ($produkArray as $key => $produk) {
             $updateQuery = "UPDATE inventaris_produk SET nama_client = ? WHERE no_sn = ?";
@@ -291,12 +291,22 @@ if (isset($_GET["getDropdownOptions"])) {
         function validateForm() {
             var selectedItem = document.getElementById("pilihClient").value;
             var namaElements = document.querySelectorAll(".pilihProduk");
+            var selectedProducts = [];
+
+            if (selectedItem === "") {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: 'Harap lengkapi semua formulir!',
+                });
+                return false;
+            }
 
             // Check each row
             for (var i = 0; i < namaElements.length; i++) {
                 var nama = namaElements[i].value;
 
-                if (selectedItem === "" || nama === "") {
+                if (nama === "") {
                     Swal.fire({
                         icon: 'error',
                         title: 'Oops...',
@@ -304,6 +314,18 @@ if (isset($_GET["getDropdownOptions"])) {
                     });
                     return false;
                 }
+
+                // Check uniqueness of selected products
+                if (selectedProducts.includes(nama)) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops...',
+                        text: 'Produk tidak boleh sama dalam satu baris!',
+                    });
+                    return false;
+                }
+
+                selectedProducts.push(nama);
             }
 
             return true;
