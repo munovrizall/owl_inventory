@@ -9,44 +9,45 @@ if (isset($_POST['pilihClient'])) {
     $selectedClient = $_POST['pilihClient'];
 
     // Milih bahan untuk produksi
-    $query = "SELECT id, nama_client, produk, no_sn, firmware_version, hardware_version, temperature, last_online, bat, pt, unit, status_error
-    FROM inventaris_produk 
-    WHERE nama_client = ? AND
-    id IS NOT NULL AND 
-    type_produk IS NOT NULL AND 
-    produk IS NOT NULL AND 
-    chip_id IS NOT NULL AND 
-    no_sn IS NOT NULL AND 
-    nama_client IS NOT NULL AND 
-    garansi_awal IS NOT NULL AND 
-    garansi_akhir IS NOT NULL AND 
-    garansi_void IS NOT NULL AND 
-    keterangan_void IS NOT NULL AND 
-    ip_address IS NOT NULL AND 
-    mac_wifi IS NOT NULL AND 
-    mac_bluetooth IS NOT NULL AND 
-    firmware_version IS NOT NULL AND 
-    hardware_version IS NOT NULL AND 
-    free_ram IS NOT NULL AND 
-    min_ram IS NOT NULL AND 
-    batt_low IS NOT NULL AND 
-    batt_high IS NOT NULL AND 
-    temperature IS NOT NULL AND 
-    status_error IS NOT NULL AND 
-    gps_latitude IS NOT NULL AND 
-    gps_longitude IS NOT NULL AND 
-    status_qc_sensor_1 IS NOT NULL AND 
-    status_qc_sensor_2 IS NOT NULL AND 
-    status_qc_sensor_3 IS NOT NULL AND 
-    status_qc_sensor_4 IS NOT NULL AND 
-    status_qc_sensor_5 IS NOT NULL AND 
-    status_qc_sensor_6 IS NOT NULL
-    ORDER BY last_online DESC";
+    $query = "SELECT i.id, i.nama_client, i.produk, i.no_sn, i.firmware_version, i.hardware_version, i.temperature, i.last_online, i.bat, i.pt, i.unit, i.status_error, p.gambar_produk
+    FROM inventaris_produk i
+    JOIN produk p ON i.produk = p.nama_produk
+    WHERE i.nama_client = ? AND
+        i.id IS NOT NULL AND 
+        i.type_produk IS NOT NULL AND 
+        i.produk IS NOT NULL AND 
+        i.chip_id IS NOT NULL AND 
+        i.no_sn IS NOT NULL AND 
+        i.nama_client IS NOT NULL AND 
+        i.garansi_awal IS NOT NULL AND 
+        i.garansi_akhir IS NOT NULL AND 
+        i.garansi_void IS NOT NULL AND 
+        i.keterangan_void IS NOT NULL AND 
+        i.ip_address IS NOT NULL AND 
+        i.mac_wifi IS NOT NULL AND 
+        i.mac_bluetooth IS NOT NULL AND 
+        i.firmware_version IS NOT NULL AND 
+        i.hardware_version IS NOT NULL AND 
+        i.free_ram IS NOT NULL AND 
+        i.min_ram IS NOT NULL AND 
+        i.batt_low IS NOT NULL AND 
+        i.batt_high IS NOT NULL AND 
+        i.temperature IS NOT NULL AND 
+        i.status_error IS NOT NULL AND 
+        i.gps_latitude IS NOT NULL AND 
+        i.gps_longitude IS NOT NULL AND 
+        i.status_qc_sensor_1 IS NOT NULL AND 
+        i.status_qc_sensor_2 IS NOT NULL AND 
+        i.status_qc_sensor_3 IS NOT NULL AND 
+        i.status_qc_sensor_4 IS NOT NULL AND 
+        i.status_qc_sensor_5 IS NOT NULL AND 
+        i.status_qc_sensor_6 IS NOT NULL
+    ORDER BY i.last_online DESC";
 
     $stmt = $conn->prepare($query);
     $stmt->bind_param("s", $selectedClient);
     $stmt->execute();
-    $stmt->bind_result($id, $namaClient, $produk, $noSN, $firmwareVersion, $hardwareVersion, $temperature, $lastOnline, $battery, $pt, $unit, $statusError);
+    $stmt->bind_result($id, $namaClient, $produk, $noSN, $firmwareVersion, $hardwareVersion, $temperature, $lastOnline, $battery, $pt, $unit, $statusError, $gambarProduk);
     $resultDevices = array();
     while ($stmt->fetch()) {
         $resultDevices[] = array(
@@ -61,7 +62,8 @@ if (isset($_POST['pilihClient'])) {
             'battery' => $battery,
             'pt' => $pt,
             'unit' => $unit,
-            'statusError' => $statusError
+            'statusError' => $statusError,
+            'gambarProduk' => $gambarProduk,
         );
     }
 
@@ -296,20 +298,19 @@ if (isset($_POST['pilihClient'])) {
                         var mainHeading = document.createElement("h3");
                         mainHeading.className = "main-heading mt-0";
                         mainHeading.style.marginBottom = "4px";
-                        mainHeading.textContent = device.produk; // Use the relevant property from the response
+                        mainHeading.textContent = device.produk;
 
                         var imageContainer = document.createElement("div");
                         imageContainer.className = "image";
 
-                        if (device.produk === "FP307-BW-GPS") {
-                            var deviceImage = 'https://i.imgur.com/ju6cuPO.png';
-                        } else {
-                            var deviceImage = 'https://i.imgur.com/gmJReHy.jpeg';
-                        }
                         var image = document.createElement("img");
-                        image.src = deviceImage; // Use the relevant property from the response
-                        image.height = "160";
 
+                        if (device.gambarProduk != null) {
+                            image.src = device.gambarProduk; 
+                        } else {
+                            image.src = "assets/adminlte/dist/img/OWL.png"
+                        }
+                        image.height = "160";
 
                         var blinkingImage = document.createElement("img");
                         var lastOnlineMoment = moment(device.lastOnline);
@@ -325,6 +326,14 @@ if (isset($_POST['pilihClient'])) {
                         } else {
                             blinkingImage.style.display = "none";
                         }
+                        var owlImage = document.createElement("img");
+                        owlImage.src = 'assets/adminlte/dist/img/owl.png'; // Set the path to your blinking GIF
+                        owlImage.style.position = "absolute";
+                        owlImage.style.height = "24px";
+                        owlImage.style.width = "24px";
+                        owlImage.style.top = "8px";
+                        owlImage.style.left = "16px";
+                        owlImage.style.display = "block";
 
                         var description = document.createElement("p");
                         if (device.pt == null) {
@@ -398,6 +407,7 @@ if (isset($_POST['pilihClient'])) {
                         headerContainer.appendChild(titleContainer);
                         headerContainer.appendChild(imageContainer.appendChild(image));
                         headerContainer.appendChild(blinkingImage);
+                        headerContainer.appendChild(owlImage);
                         card.appendChild(headerContainer);
                         card.appendChild(mainHeading);
                         card.appendChild(description);
