@@ -21,6 +21,7 @@ if (isset($_GET["getDropdownOptions"])) {
 
     // Handle the POST request for submitting form data
     $namaDevice = $_POST["namaDevice"];
+    $gambarProduk = $_POST["gambar"];
     
     // Check if the 'nama_produk' already exists
     $checkQuery = "SELECT COUNT(*) FROM produk WHERE nama_produk = ?";
@@ -33,9 +34,9 @@ if (isset($_GET["getDropdownOptions"])) {
 
     // If 'nama_produk' doesn't exist, insert it into the 'produk' table
     if ($count == 0) {
-        $queryProduk = "INSERT INTO produk (nama_produk, quantity) VALUES (?, '0')";
+        $queryProduk = "INSERT INTO produk (nama_produk, quantity, gambar_produk) VALUES (?, '0', ?)";
         $stmtProduk = $conn->prepare($queryProduk);
-        $stmtProduk->bind_param("s", $namaDevice);
+        $stmtProduk->bind_param("ss", $namaDevice, $gambarProduk);
         $stmtProduk->execute();
         $stmtProduk->close();
     }
@@ -182,6 +183,15 @@ if (isset($_GET["getDropdownOptions"])) {
                                         <div class="col">
                                             <label for="namaDevice">Nama Device <span style="color: red;">*</span></label>
                                             <input type="text" class="form-control form-control-border border-width-2" id="namaDevice" name="namaDevice" placeholder="Masukkan nama device baru">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="row">
+                                        <div class="col">
+                                            <label for="picture">Link Gambar</label>
+                                            <button onclick="window.open('https://img.doerig.dev/', '_blank')" class="btn btn-outline-info">Generate Gambar</button>
+                                            <input type="text" class="form-control form-control-border border-width-2" id="gambar" name="gambar" placeholder="Masukkan link imgur yang telah dibuat">
                                         </div>
                                     </div>
                                 </div>
