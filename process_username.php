@@ -2,18 +2,50 @@
 // Start a session
 session_start();
 
-// Fetch the username from the POST data
-$username = isset($_POST['username']) ? $_POST['username'] : '';
+// Check if the username is provided in the POST data
+if(isset($_POST['username'])) {
+    // Fetch the username from the POST data
+    $username = $_POST['username'];
 
-// Check if the username is not empty
-if (!empty($username)) {
-    // Save the username in a session variable
-    $_SESSION['username'] = $username;
+    // Database connection parameters
+    $serverName = "localhost";
+    $userNameDb = "root";
+    $password = "";
+    $dbName = "databaseinventory";
 
-    // Return a success message or any other response if needed
-    echo "Username successfully saved in session.";
+    // Create a new database connection
+    $conn = new mysqli($serverName, $userNameDb, $password, $dbName);
+
+    // Check if the connection was successful
+    if ($conn->connect_error) {
+        die("Connection failed: " . $conn->connect_error);
+    }
+
+    // Prepare and execute the query to fetch the full name based on the username
+    $queryNama = "SELECT nama_lengkap, role FROM account WHERE username = ?";
+    $stmt = $conn->prepare($queryNama);
+    $stmt->bind_param("s", $username);
+    $stmt->execute();
+    $stmt->bind_result($nama, $role);
+    $stmt->fetch();
+    $stmt->close();
+
+    if ($nama) {
+        // Save the full name in a session variable
+        $_SESSION['username'] = $nama;
+        $_SESSION['role'] = $role;
+
+        $userData = array(
+            'username' => $username,
+            'role' => $role
+        );
+    
+        // Return the user data as JSON
+        echo json_encode($userData);
+    } else {
+        echo "Error: Full name not found for the provided username.";
+    }
 } else {
-    // Return an error message or handle the case where the username is empty
-    echo "Error: Username cannot be empty.";
+    echo "Error: Username not provided.";
 }
 ?>

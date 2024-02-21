@@ -1,6 +1,7 @@
 <?php
 
 include "../connection.php";
+include "../admin_privilege.php";
 
 $query = "SELECT * FROM client";
 $result = mysqli_query($conn, $query);

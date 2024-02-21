@@ -1,19 +1,72 @@
 <?php
 session_start();
 
+$serverName = "localhost";
+$userNameDb = "root";
+$password = "";
+$dbName = "databaseinventory";
+
+mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
+
+$conn = new mysqli($serverName, $userNameDb, $password, $dbName);
+
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+
+$queryAccount = "SELECT * FROM account";
+$result = $conn->query($queryAccount);
+
+// Cek apakah hasil query kosong
+if (empty($result)) {
+    $result = "Tidak ada data";
+}
+
+$data = array();
+while ($row = $result->fetch_assoc()) {
+    $data[] = array(
+        'namaLengkap' => $row['nama_lengkap'],
+        'username' => $row['username'],
+        'password' => $row['password'],
+        'role' => $row['role'],
+    );
+}
+
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-  $username = $_POST['username'];
+    $username = $_POST['username'];
+    $password = $_POST['password'];
 
-  // Check if the username is not empty
-  if (!empty($username)) {
-    // Save the username in a session variable
-    $_SESSION['username'] = $username;
+    $queryAccount = "SELECT * FROM account WHERE username = ? AND password = ?";
+    $stmt = $conn->prepare($queryAccount);
+    $stmt->bind_param("ss", $username, $password);
+    $stmt->execute();
+    $resultAccount = $stmt->get_result();
+    $stmt->close();
 
+    if ($resultAccount->num_rows > 0) {
+        $accountData = $resultAccount->fetch_assoc();
 
-    exit();
-  } else {
-    echo "Username cannot be empty";
-  }
+        // Verify the hashed password using password_verify
+        if ($password === $accountData['password'] && $username === $accountData['username']) {
+            if ($accountData['role'] == "admin") {
+                $_SESSION['username'] = $username;
+                $_SESSION['role'] = "admin";
+                header("location: homepage.php");
+                exit();
+            } elseif ($accountData['role'] == "user") {
+                $_SESSION['username'] = $username;
+                $_SESSION['role'] = "user";
+                header("location: stok_bahan.php");
+                exit();
+            } else {
+                echo "Akun tidak terdaftar";
+            }
+        } else {
+            echo "Password salah";
+        }
+    } else {
+        echo "Akun tidak terdaftar";
+    }
 }
 ?>
 
@@ -53,15 +106,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         <form id="loginForm">
           <div class="input-group mb-3">
-            <select class="form-control" placeholder="Username" id="usernameInput">
-              <option value="" selected disabled>User</option>
-              <option value="Riki Muhamad Rifai">Riki Muhamad Rifai</option>
-              <option value="Ahmad Sabhadi">Ahmad Sabhadi</option>
-              <option value="Moh Tatang Sutisna">Moh Tatang Sutisna</option>
-              <option value="Ella Oktaviani">Ella Oktaviani</option>
-              <option value="Riri">Riri</option>
-              <option value="Ghilman">Ghilman</option>
-            </select>
+            <input type="text" class="form-control" placeholder="Username" id="usernameInput" name="username" onkeypress="checkEnter(event)">
             <div class="input-group-append">
               <div class="input-group-text">
                 <span class="fas fa-user"></span>
@@ -69,7 +114,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             </div>
           </div>
           <div class="input-group mb-3">
-            <input type="password" class="form-control" placeholder="Password" id="passwordInput" onkeypress="checkEnter(event)">
+            <input type="password" class="form-control" placeholder="Password" id="passwordInput" name="password" onkeypress="checkEnter(event)">
             <div class="input-group-append">
               <div class="input-group-text">
                 <span id="togglePassword" onclick="togglePasswordVisibility()" style="cursor: pointer;">
@@ -97,94 +142,118 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   <script src="assets/adminlte/plugins/sweetalert2/sweetalert2.min.js"></script>
 
   <script>
-    function checkEnter(event) {
-      if (event.key === "Enter") {
-        performLogin();
-      }
-    }
+      var accountData = <?php echo json_encode($data); ?>;
 
-    function performLogin() {
-      var username = document.getElementById("usernameInput").value;
-      var password = document.getElementById("passwordInput").value;
-
-      if (username.trim() !== "") {
-        if (password === 'origin') {
-          // Save the username to local storage
-          localStorage.setItem("username", username);
-
-          // Perform AJAX request to send username to server
-          $.ajax({
-            type: "POST",
-            url: "process_username.php",
-            data: {
-              username: username
-            },
-            success: function(response) {
-              console.log(response); // Handle the server response if needed
-              window.location.href = "homepage.php";
-            },
-            error: function(error) {
-              console.error("Error sending username to server: " + error);
-            }
-          });
-        } else {
-          Swal.fire({
-            icon: 'error',
-            title: 'Password Salah',
-            text: 'Masukkan password yang benar!',
-            showCancelButton: false,
-            confirmButtonColor: '#3085d6',
-            confirmButtonText: 'OK (enter)'
-          }).then((result) => {
-            if (result.isConfirmed) {
-              resetForm();
-            }
-          });
-        }
-      } else {
-        Swal.fire({
-          icon: 'error',
-          title: 'Username Kosong',
-          text: 'Pilih username terlebih dahulu!',
-          showCancelButton: false,
-          confirmButtonColor: '#3085d6',
-          confirmButtonText: 'OK (enter)'
-        }).then((result) => {
-          if (result.isConfirmed) {
-            resetForm();
+      function checkEnter(event) {
+          if (event.key === "Enter") {
+              performLogin();
           }
-        });
       }
-    }
 
-    function resetForm() {
-      document.getElementById("loginForm").reset();
-    }
+      function performLogin() {
+          var inputUsername = document.getElementById('usernameInput').value;
+          var inputPassword = document.getElementById('passwordInput').value;
 
-    // When user press enter on keyboard
-    var passwordInput = document.getElementById('passwordInput');
-    passwordInput.addEventListener('keyup', function(event) {
-      if (event.keyCode === 13) {
-        submitForm();
+          if (inputUsername.trim() !== "") {
+              var isUsernameValid = false;
+              var isPasswordValid = false;
+
+              // Melakukan iterasi pada array accountData untuk mencocokkan username dan password
+              for (var i = 0; i < accountData.length; i++) {
+                  if (accountData[i].username === inputUsername) {
+                      isUsernameValid = true;
+
+                      // Jika username valid, lanjutkan untuk memeriksa password
+                      if (accountData[i].password === inputPassword) {
+                          isPasswordValid = true;
+                          break; // Jika password valid, keluar dari loop
+                      }
+                  }
+              }
+
+              if (!isUsernameValid) {
+                  Swal.fire({
+                      icon: 'error',
+                      title: 'Username tidak ditemukan',
+                      text: 'Masukkan username yang benar!',
+                      showCancelButton: false,
+                      confirmButtonColor: '#3085d6',
+                      confirmButtonText: 'OK (enter)'
+                  });
+              } else {
+                  if (!isPasswordValid) {
+                      Swal.fire({
+                          icon: 'error',
+                          title: 'Password Salah',
+                          text: 'Masukkan password yang benar!',
+                          showCancelButton: false,
+                          confirmButtonColor: '#3085d6',
+                          confirmButtonText: 'OK (enter)'
+                      });
+                  } else {
+                      localStorage.setItem("username", inputUsername);
+
+                      // Perform AJAX request to send username to server
+                      $.ajax({
+                          type: "POST",
+                          url: "process_username.php",
+                          data: {
+                              username: inputUsername
+                          },
+                          success: function (response) {
+                              // Parse the response as JSON
+                              var responseData = JSON.parse(response);
+
+                              // Check the role and redirect accordingly
+                              if (responseData.role === "admin") {
+                                  window.location.href = "homepage.php";
+                              } else {
+                                  window.location.href = "user/homepage.php";
+                              }
+                          },
+                          error: function(error) {
+                              console.error("Error sending username to server: " + error);
+                          }
+                      });
+                  }
+              }
+          } else {
+              Swal.fire({
+                  icon: 'error',
+                  title: 'Username Kosong',
+                  text: 'Mohon lengkapi form login!',
+                  showCancelButton: false,
+                  confirmButtonColor: '#3085d6',
+                  confirmButtonText: 'OK (enter)'
+              })
+          }
       }
-    });
 
-    function submitForm() {
-      document.getElementById('submitButton').click();
-    }
 
-    function togglePasswordVisibility() {
+      // When user press enter on keyboard
       var passwordInput = document.getElementById('passwordInput');
-      var togglePassword = document.getElementById('togglePassword');
+      passwordInput.addEventListener('keyup', function(event) {
+          if (event.keyCode === 13) {
+              submitForm();
+          }
+      });
 
-      if (passwordInput.type === 'password') {
-        passwordInput.type = 'text';
-        togglePassword.innerHTML = '<i class="fas fa-eye-slash"></i>';
-      } else {
-        passwordInput.type = 'password';
-        togglePassword.innerHTML = '<i class="fas fa-eye"></i>';
+      function submitForm() {
+          document.getElementById('submitButton').click();
       }
-    }
+
+      function togglePasswordVisibility() {
+          var passwordInput = document.getElementById('passwordInput');
+          var togglePassword = document.getElementById('togglePassword');
+
+          if (passwordInput.type === 'password') {
+              passwordInput.type = 'text';
+              togglePassword.innerHTML = '<i class="fas fa-eye-slash"></i>';
+          } else {
+              passwordInput.type = 'password';
+              togglePassword.innerHTML = '<i class="fas fa-eye"></i>';
+          }
+      }
   </script>
 </body>
 

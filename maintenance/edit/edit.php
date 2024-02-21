@@ -1,5 +1,6 @@
 <?php
 include("../../connection.php");
+include "../../admin_privilege.php";
 
 if (isset($_GET['id'])) {
     $transaksi_id = $_GET['id'];
