@@ -22,7 +22,7 @@ if (isset($_GET["getDropdownOptions"])) {
     // Handle the POST request for submitting form data
     $namaDevice = $_POST["namaDevice"];
     $gambarProduk = $_POST["gambar"];
-    
+
     // Check if the 'nama_produk' already exists
     $checkQuery = "SELECT COUNT(*) FROM produk WHERE nama_produk = ?";
     $checkStmt = $conn->prepare($checkQuery);
@@ -85,7 +85,6 @@ if (isset($_GET["getDropdownOptions"])) {
                 $stmt->close();
             }
         }
-
     } else {
         echo "Error: Bahan and Quantity arrays are not set.";
     }
@@ -131,6 +130,11 @@ if (isset($_GET["getDropdownOptions"])) {
 
         .lebar-kolom3 {
             width: 10%;
+        }
+
+        .gray-italic-text {
+            color: #808080;
+            font-style: italic;
         }
     </style>
 
@@ -187,14 +191,17 @@ if (isset($_GET["getDropdownOptions"])) {
                                     </div>
                                 </div>
                                 <div class="form-group">
-                                    <div class="row">
-                                        <div class="col">
-                                            <label for="picture">Link Gambar</label>
-                                            <button onclick="window.open('https://img.doerig.dev/', '_blank')" class="btn btn-outline-info">Generate Gambar</button>
-                                            <input type="text" class="form-control form-control-border border-width-2" id="gambar" name="gambar" placeholder="Masukkan link imgur yang telah dibuat">
+                                    <label for="picture">Gambar Device <span class="gray-italic-text"> (opsional)</span></label>
+                                    <div class="input-group mb-3">
+                                        <div class="input-group-prepend">
+                                            <button onclick="window.open('https://img.doerig.dev/', '_blank')" class="btn btn-primary">
+                                                <i class="fas fa-upload"></i> Upload
+                                            </button>
                                         </div>
+                                        <input type="text" class="form-control" id="gambar" name="gambar" placeholder="Copy dan paste disini link imgur yang telah dibuat">
                                     </div>
                                 </div>
+
                                 <div class="card-body p-0">
                                     <div class="table-responsive">
                                         <table id="myTable" class=" table order-list table-striped">
