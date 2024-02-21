@@ -201,6 +201,14 @@ $current_page = basename($_SERVER['PHP_SELF']);
                 </li>
                 <li class="nav-header">PELAPORAN</li>
                 <li class="nav-item">
+                    <a href="/owl_inventory/status_device.php" class="nav-link <?php echo (strpos($current_page, 'status_device.php') !== false) ? 'active' : ''; ?>">
+                        <i class="nav-icon fas fa-walkie-talkie"></i>
+                        <p>
+                            Status Device
+                        </p>
+                    </a>
+                </li>
+                <li class="nav-item">
                     <a href="/owl_inventory/stok_bahan.php" class="nav-link <?php echo (strpos($current_page, 'stok_bahan.php') !== false) ? 'active' : ''; ?>">
                         <i class="nav-icon ion ion-pie-graph"></i>
                         <p>
