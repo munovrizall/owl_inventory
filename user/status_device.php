@@ -9,7 +9,7 @@ if (isset($_POST['pilihClient'])) {
     $selectedClient = $_POST['pilihClient'];
 
     // Milih bahan untuk produksi
-    $query = "SELECT i.id, i.nama_client, i.produk, i.no_sn, i.firmware_version, i.hardware_version, i.temperature, i.last_online, i.bat, i.pt, i.unit, i.status_error, p.gambar_produk
+    $query = "SELECT i.id, i.nama_client, i.produk, i.no_sn, i.firmware_version, i.hardware_version, i.temperature, i.last_online, i.bat, i.pt, i.unit, i.status_error, i.ip_address, p.gambar_produk
     FROM inventaris_produk i
     JOIN produk p ON i.produk = p.nama_produk
     WHERE i.nama_client = ? AND
@@ -47,7 +47,7 @@ if (isset($_POST['pilihClient'])) {
     $stmt = $conn->prepare($query);
     $stmt->bind_param("s", $selectedClient);
     $stmt->execute();
-    $stmt->bind_result($id, $namaClient, $produk, $noSN, $firmwareVersion, $hardwareVersion, $temperature, $lastOnline, $battery, $pt, $unit, $statusError, $gambarProduk);
+    $stmt->bind_result($id, $namaClient, $produk, $noSN, $firmwareVersion, $hardwareVersion, $temperature, $lastOnline, $battery, $pt, $unit, $statusError, $ipAddress, $gambarProduk);
     $resultDevices = array();
     while ($stmt->fetch()) {
         $resultDevices[] = array(
@@ -63,6 +63,7 @@ if (isset($_POST['pilihClient'])) {
             'pt' => $pt,
             'unit' => $unit,
             'statusError' => $statusError,
+            'ipAddress' => $ipAddress,
             'gambarProduk' => $gambarProduk,
         );
     }
@@ -286,10 +287,15 @@ if (isset($_POST['pilihClient'])) {
                         var hardware = document.createElement("p");
                         hardware.className = "version-text";
                         hardware.textContent = "Hardware: v" + device.hardwareVersion; // Use the relevant property from the response
+                        
+                        var ipAddress = document.createElement("p");
+                        ipAddress.className = "version-text";
+                        ipAddress.textContent = device.ipAddress; // Use the relevant property from the response
 
                         titleContainer.appendChild(snNumber);
                         titleContainer.appendChild(firmware);
                         titleContainer.appendChild(hardware);
+                        titleContainer.appendChild(ipAddress);
 
                         var productDetailsContainer = document.createElement("div");
                         productDetailsContainer.className = "mt-5";
@@ -307,7 +313,7 @@ if (isset($_POST['pilihClient'])) {
                         if (device.gambarProduk != null) {
                             image.src = device.gambarProduk; 
                         } else {
-                            image.src = "assets/adminlte/dist/img/OWL.png"
+                            image.src = "../assets/adminlte/dist/img/owl.png"
                         }
                         image.height = "160";
 
@@ -317,7 +323,7 @@ if (isset($_POST['pilihClient'])) {
                         var minutesAgo = now.diff(lastOnlineMoment, 'minutes');
 
                         if (minutesAgo < 60) {
-                            blinkingImage.src = 'assets/adminlte/dist/img/online.gif'; // Set the path to your blinking GIF
+                            blinkingImage.src = '../assets/adminlte/dist/img/online.gif'; // Set the path to your blinking GIF
                             blinkingImage.style.position = "absolute";
                             blinkingImage.style.top = "8px";
                             blinkingImage.style.right = "8px";
@@ -326,7 +332,7 @@ if (isset($_POST['pilihClient'])) {
                             blinkingImage.style.display = "none";
                         }
                         var owlImage = document.createElement("img");
-                        owlImage.src = 'assets/adminlte/dist/img/owl.png'; // Set the path to your blinking GIF
+                        owlImage.src = '../assets/adminlte/dist/img/owl.png'; // Set the path to your blinking GIF
                         owlImage.style.position = "absolute";
                         owlImage.style.height = "24px";
                         owlImage.style.width = "24px";

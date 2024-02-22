@@ -103,7 +103,7 @@ if (!$result) {
                   <h3><sup style="font-size: 24px">Status Device</sup></h3>
                 </div>
                 <div class="icon">
-                  <i class="nav-icon fas fa-toolbox"></i>
+                  <i class="nav-icon fas fa-walkie-talkie"></i>
                 </div>
                 <a href="status_device.php" class="small-box-footer">Go <i class="fas fa-arrow-circle-right"></i></a>
               </div>
@@ -116,7 +116,7 @@ if (!$result) {
                   <h3><sup style="font-size: 24px">Stok Bahan</sup></h3>
                 </div>
                 <div class="icon">
-                  <i class="nav-icon fas fa-wrench"></i>
+                  <i class="nav-icon ion ion-pie-graph"></i>
                 </div>
                 <a href="stok_bahan.php" class="small-box-footer">Go <i class="fas fa-arrow-circle-right"></i></a>
               </div>
@@ -129,7 +129,7 @@ if (!$result) {
                   <h3><sup style="font-size: 24px">Stok Produk</sup></h3>
                 </div>
                 <div class="icon">
-                  <i class="fas fa-screwdriver"></i>
+                  <i class="fas fa-microchip"></i>
                 </div>
                 <a href="stok_produk.php" class="small-box-footer">Go <i class="fas fa-arrow-circle-right"></i></a>
               </div>
@@ -141,7 +141,7 @@ if (!$result) {
                   <h3><sup style="font-size: 24px">Histori Transaksi</sup></h3>
                 </div>
                 <div class="icon">
-                  <i class="nav-icon fas fa-shopping-cart"></i>
+                  <i class="nav-icon fas fa-history"></i>
                 </div>
                 <a href="histori_transaksi.php" class="small-box-footer">Go <i class="fas fa-arrow-circle-right"></i></a>
               </div>

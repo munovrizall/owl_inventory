@@ -308,7 +308,7 @@ if (isset($_POST['pilihClient'])) {
                         if (device.gambarProduk != null) {
                             image.src = device.gambarProduk; 
                         } else {
-                            image.src = "assets/adminlte/dist/img/OWL.png"
+                            image.src = "assets/adminlte/dist/img/owl.png"
                         }
                         image.height = "160";
 

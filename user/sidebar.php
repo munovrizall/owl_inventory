@@ -80,7 +80,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
                 </li>
                 <li class="nav-header">PELAPORAN</li>
                 <li class="nav-item">
-                    <a href="/owl_inventory/user/status_device.php" class="nav-link <?php echo (strpos($current_page, 'status Device.php') !== false) ? 'active' : ''; ?>">
+                    <a href="/owl_inventory/user/status_device.php" class="nav-link <?php echo (strpos($current_page, 'status_device.php') !== false) ? 'active' : ''; ?>">
                         <i class="nav-icon fas fa-walkie-talkie"></i>
                         <p>
                             Status Device
