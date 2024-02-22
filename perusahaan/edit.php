@@ -1,7 +1,7 @@
 <?php
 
-include "../../connection.php";
-include "../../admin_privilege.php";
+include "../connection.php";
+include "../admin_privilege.php";
 
 
 if (isset($_GET['id'])) {
