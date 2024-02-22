@@ -30,6 +30,8 @@ $result = mysqli_query($conn, $query);
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/jquery.dataTables.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.dataTables.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap4.min.css">
+    <!-- Sweetalert2 -->
+    <link rel="stylesheet" href="../assets/adminlte/plugins/sweetalert2-theme-bootstrap-4/bootstrap-4.min.css">
 
     <style>
         .lebar-kolom1 {
@@ -37,7 +39,7 @@ $result = mysqli_query($conn, $query);
         }
 
         .lebar-kolom2 {
-            width: 45%;
+            width: 40%;
         }
 
         .lebar-kolom3 {
@@ -57,7 +59,7 @@ $result = mysqli_query($conn, $query);
         }
 
         .lebar-kolom7 {
-            width: 10%;
+            width: 15%;
         }
 
         .card-padding {
@@ -116,7 +118,7 @@ $result = mysqli_query($conn, $query);
                             <!-- /.card-header -->
                             <div class="card-body p-0">
                                 <div class="table-responsive card-padding">
-                                    <table id="tablePerusahaan" class="table table order-list table-striped table-bordered">
+                                    <table id="tableUser" class="table table order-list table-striped table-bordered">
                                         <thead>
                                             <tr>
                                                 <th class="text-center lebar-kolom1">ID</th>
@@ -150,9 +152,10 @@ $result = mysqli_query($conn, $query);
                                                         ?>
                                                     </td>
                                                     <td class="text-center">
-                                                        <div class="col">
-                                                            <a href='edit.php?id=<?php echo $row["account_id"]; ?>' class="btn btn-info btn-block">Edit</a>
+                                                        <div style="display: inline-block;">
+                                                            <a href='edit.php?id=<?php echo $row["account_id"]; ?>' class="btn btn-info"><i class="fas fa-pencil"></i></a>
                                                         </div>
+                                                        <a href='#' class='btn btn-danger delete-btn' data-id='<?php echo $row["account_id"]; ?>'><i class="fas fa-trash"></i></a>
                                                     </td>
                                                 </tr>
                                             <?php
@@ -204,11 +207,36 @@ $result = mysqli_query($conn, $query);
     <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.html5.min.js"></script>
     <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.print.min.js"></script>
     <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.bootstrap4.min.js"></script>
+    <!-- SweetAlert2 Toast -->
+    <script src="../assets/adminlte/plugins/sweetalert2/sweetalert2.min.js"></script>
 
     <!-- Page specific script -->
     <script>
         $(document).ready(function() {
-            var table = $('#tablePerusahaan').DataTable({
+
+            $('#tableUser').on('click', '.delete-btn', function(e) {
+                e.preventDefault();
+                var userId = $(this).data('id');
+
+                // Tampilkan konfirmasi SweetAlert
+                Swal.fire({
+                    title: 'Apakah Anda yakin?',
+                    text: 'Data pengguna ini akan dihapus!',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Ya, hapus!',
+                    cancelButtonText: 'Batal'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // Jika dikonfirmasi, lakukan penghapusan
+                        window.location.href = 'delete.php?id=' + userId;
+                    }
+                });
+            });
+
+            var table = $('#tableUser').DataTable({
                 responsive: true,
                 language: {
                     lengthMenu: 'Tampilkan _MENU_ data per halaman',
@@ -224,7 +252,7 @@ $result = mysqli_query($conn, $query);
                     'pageLength',
                     {
                         extend: 'copy',
-                        title: 'List Perusahaan',
+                        title: 'List User',
                         exportOptions: {
                             columns: ':visible:not(.aksi-column)'
                         }
@@ -236,28 +264,28 @@ $result = mysqli_query($conn, $query);
                     },
                     {
                         extend: 'csv',
-                        title: 'List Perusahaan',
+                        title: 'List User',
                         exportOptions: {
                             columns: ':visible:not(.aksi-column)'
                         }
                     },
                     {
                         extend: 'excel',
-                        title: 'List Perusahaan',
+                        title: 'List User',
                         exportOptions: {
                             columns: ':visible:not(.aksi-column)'
                         }
                     },
                     {
                         extend: 'pdf',
-                        title: 'List Perusahaan',
+                        title: 'List User',
                         exportOptions: {
                             columns: ':visible:not(.aksi-column)'
                         }
                     },
                     {
                         extend: 'print',
-                        title: 'List Perusahaan',
+                        title: 'List User',
                         exportOptions: {
                             columns: ':visible:not(.aksi-column)'
                         }
