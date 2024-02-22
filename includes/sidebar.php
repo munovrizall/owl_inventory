@@ -199,7 +199,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
                                     strpos($_SERVER['REQUEST_URI'], '/owl_inventory/perusahaan/tambah.php') !== false ||
                                     strpos($_SERVER['REQUEST_URI'], '/owl_inventory/perusahaan/edit.php') !== false 
                                         ? 'menu-open' : ''; ?>">
-                    <a href="perusahaan/list.php" class="nav-link <?php
+                    <a href="/owl_inventory/perusahaan/list.php" class="nav-link <?php
                                                                 echo strpos($_SERVER['REQUEST_URI'], '/owl_inventory/perusahaan/list.php') !== false || 
                                                                     strpos($_SERVER['REQUEST_URI'], '/owl_inventory/perusahaan/tambah.php') !== false ||
                                                                     strpos($_SERVER['REQUEST_URI'], '/owl_inventory/perusahaan/edit.php') !== false 

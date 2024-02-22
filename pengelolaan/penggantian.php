@@ -318,13 +318,13 @@ if (isset($_GET["getDropdownOptions"])) {
 
             // Make an AJAX request to fetch dropdown options for Client
             $.ajax({
-                url: 'Penggantian.php?getDropdownOptions=client&selectedClient=' + selectedClient,
+                url: 'penggantian.php?getDropdownOptions=client&selectedClient=' + selectedClient,
                 type: 'GET',
                 success: function(clientDropdownOptions) {
 
                     // Make an AJAX request to fetch dropdown options for OWL
                     $.ajax({
-                        url: 'Penggantian.php?getDropdownOptions=owl',
+                        url: 'penggantian.php?getDropdownOptions=owl',
                         type: 'GET',
                         success: function(owlDropdownOptions) {
 
