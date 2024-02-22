@@ -101,7 +101,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         <div class="col-sm-6">
                             <ol class="breadcrumb float-sm-right">
                                 <li class="breadcrumb-item"><a href="../homepage.php">Home</a></li>
-                                <li class="breadcrumb-item active">Perusahaan</li>
+                                <li class="breadcrumb-item active"><a href="list.php">Perusahaan</a></li>
                                 <li class="breadcrumb-item active">Tambah Perusahaan</li>
                             </ol>
                         </div>
@@ -198,7 +198,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     confirmButtonText: 'OK (enter)'
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        resetForm();
+                        window.location.href = "list.php";
                     }
                 });
             }
@@ -229,7 +229,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
             $.ajax({
                 type: "POST",
-                url: "tambah_perusahaan.php",
+                url: "tambah.php",
                 data: formData,
                 dataType: "json",
                 success: function(response) {
@@ -244,7 +244,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                             confirmButtonText: 'OK'
                         }).then((result) => {
                             if (result.isConfirmed) {
-                                resetForm();
+                                window.location.href = "list.php";
                             }
                         });
                     } else if (response.status === 'error') {
