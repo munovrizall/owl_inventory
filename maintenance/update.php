@@ -22,6 +22,7 @@ $newStockQuantity = "";
 
 if (isset($_POST['quantity'])) {
     $selectedItemId = $_POST['selectedItem'];
+    $submittedQuantity = $_POST['quantity'];
 
     // Fetch the username from the POST data
     $pengguna = isset($_SESSION['username']) ? $_SESSION['username'] : '';
@@ -36,7 +37,6 @@ if (isset($_POST['quantity'])) {
     $stmt->fetch();
     $stmt->close();
 
-    $submittedQuantity = $_POST['quantity'];
     if ($submittedQuantity == "") {
         echo json_encode(array('currentStock' => $stockQuantity, 'newStock' => $newStockQuantity));
         exit();
@@ -59,19 +59,20 @@ if (isset($_POST['quantity'])) {
     $updateStmt->execute();
     $updateStmt->close();
 
-    $selectNamaBahan = "SELECT nama FROM masterbahan WHERE stok_id = ?";
-    $selectStmt = $conn->prepare($selectNamaBahan);
-    $selectStmt->bind_param("i", $selectedItemId);
-    $selectStmt->execute();
-    $selectStmt->bind_result($namaBahan);
-    $selectStmt->fetch();
-    $selectStmt->close();
+    $queryNamaBahan = "SELECT kelompok, nama FROM masterbahan WHERE stok_id = ?";
+    $stmtNamaBahan = $conn->prepare($queryNamaBahan);
+    $stmtNamaBahan->bind_param("i", $selectedItemId);
+    $stmtNamaBahan->execute();
+    $stmtNamaBahan->bind_result($kelompok, $namaBahan);
+    $stmtNamaBahan->fetch();
+    $stmtNamaBahan->close();
 
+    $kelompokNama = $kelompok . ' - ' . $namaBahan;
 
     // Insert a new record into the 'historis' table
     $insertQueryHistoris = "INSERT INTO historis (pengguna, nama_barang, waktu, quantity, activity, deskripsi) VALUES (?, ?, NOW(), ?, 'Maintenance', ?)";
     $insertStmt = $conn->prepare($insertQueryHistoris);
-    $insertStmt->bind_param("ssis", $pengguna, $namaBahan, $submittedQuantity, $_POST['deskripsi']);
+    $insertStmt->bind_param("ssis", $pengguna, $kelompokNama, $submittedQuantity, $_POST['deskripsi']);
 
     $insertStmt->execute();
     $insertStmt->close();
@@ -319,8 +320,19 @@ if (isset($_POST['quantity'])) {
                     // Update the stock message with the fetched quantity
                     document.getElementById("stockMessage").innerText = "Stok Bahan Tersisa: " + response.currentStock;
                 },
-                error: function(error) {
-                    alert("Error, refresh the page!");
+                error: function(xhr, textStatus, errorThrown) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Stok Kurang',
+                        text: 'Barang ini tidak memiliki stok! Silahkan refresh halaman',
+                        showCancelButton: false,
+                        confirmButtonColor: '#3085d6',
+                        confirmButtonText: 'OK (enter)'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            resetForm();
+                        }
+                    });
                 }
             });
         }
