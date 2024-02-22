@@ -67,6 +67,19 @@ if (isset($_GET['id'])) {
 
 $username = $_SESSION['username'];
 
+// Fetching the image link from the database
+$tanda_tangan_query = "SELECT tanda_tangan FROM user_account WHERE nama_lengkap = ?";
+$tanda_tangan_stmt = $conn->prepare($tanda_tangan_query);
+$tanda_tangan_stmt->bind_param("s", $username);
+$tanda_tangan_stmt->execute();
+$tanda_tangan_result = $tanda_tangan_stmt->get_result();
+
+if ($tanda_tangan_row = $tanda_tangan_result->fetch_assoc()) {
+    $tanda_tangan_link = $tanda_tangan_row['tanda_tangan'];
+} else {
+    $tanda_tangan_link = '';
+}
+
 class PDF extends FPDF
 {
     function WrapAndPrintAddress($alamat_perusahaan)
@@ -82,6 +95,17 @@ class PDF extends FPDF
             }
         }
     }
+
+    function AddSignatureImage($tanda_tangan_link)
+    {
+        if (!empty($tanda_tangan_link)) {
+            // Set the position for the signature image
+            $this->SetXY(25, $this->GetY());
+            // Add the signature image to the PDF
+            $this->Image($tanda_tangan_link, $this->GetX(), $this->GetY(), 30, 30);
+        }
+    }
+
     function WrapAndPrintRow($row)
     {
         $this->Cell(10, 10, $row['counter'], 1, 0, 'C');
@@ -197,7 +221,8 @@ $pdf->Cell(0,10,"Yang Menerima :",0,1, 'R');
 //Beri Underline
 $pdf->SetFont("Times","U",12);
 //Beri Jarak TTD
-$pdf->Cell(0,20,"",0,1,);
+$pdf->AddSignatureImage($tanda_tangan_link);
+$pdf->Cell(0,30,"",0,1,);
 
 $pdf->Cell(0,10,"$username",0,0, 'L');
 $pdf->Cell(0,10,"$nama_korespondensi",0,1, 'R');
