@@ -1,45 +1,39 @@
 <?php
 
-include "../connection.php";
-include "../admin_privilege.php";
+include "../../connection.php";
+include "../../admin_privilege.php";
 
-$response = array();
 
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // Check which fields are provided
-    $namaPerusahaan = isset($_POST["namaPerusahaan"]) ? $_POST["namaPerusahaan"] : null;
+if (isset($_GET['id'])) {
+    $client_id = $_GET['id'];
+
+    // Selecting data from client table based on client_id
+    $query = "SELECT * FROM client WHERE client_id = ?";
+    $stmt = $conn->prepare($query);
+    $stmt->bind_param("i", $client_id);
+    $stmt->execute();
+
+    $result = $stmt->get_result();
+} else {
+    echo "ID not provided.";
+}
+
+
+if ($_SERVER["REQUEST_METHOD"] === "POST") {
+    $client_id = isset($_POST["client_id"]) ? $_POST["client_id"] : null;
+    $namaClient = isset($_POST["namaPerusahaan"]) ? $_POST["namaPerusahaan"] : null;
     $namaKorespondensi = isset($_POST["namaKorespondensi"]) ? $_POST["namaKorespondensi"] : null;
     $alamatPerusahaan = isset($_POST["alamatPerusahaan"]) ? $_POST["alamatPerusahaan"] : null;
     $username = isset($_POST["username"]) ? $_POST["username"] : null;
     $password = isset($_POST["password"]) ? $_POST["password"] : null;
 
-    if ($namaPerusahaan !== null) {
-        $checkQuery = "SELECT COUNT(*) FROM client WHERE nama_client = ?";
-        $checkStmt = $conn->prepare($checkQuery);
-        $checkStmt->bind_param("s", $namaPerusahaan);
-        $checkStmt->execute();
-        $checkStmt->bind_result($count);
-        $checkStmt->fetch();
-        $checkStmt->close();
+    $updateQuery = "UPDATE client SET nama_client = ?, nama_korespondensi = ?, alamat_perusahaan = ?, username = ?, password = ? WHERE client_id=?";
+    $updateStmt = $conn->prepare($updateQuery);
+    $updateStmt->bind_param("sssssi", $namaClient, $namaKorespondensi, $alamatPerusahaan, $username, $password, $client_id);
+    $updateStmt->execute();
+    $updateStmt->close();
 
-        // If the material name already exists, display an error
-        if ($count > 0) {
-            $response['status'] = 'error';
-            $response['message'] = "'$namaPerusahaan' sudah ada di database!";
-        } else {
-            $insertQuery = "INSERT INTO client (nama_client, nama_korespondensi, alamat_perusahaan, username, password) VALUES (?, ?, ?, ?, ?)";
-            $insertStmt = $conn->prepare($insertQuery);
-            $insertStmt->bind_param("sssss", $namaPerusahaan, $namaKorespondensi, $alamatPerusahaan, $username, $password);
-            $insertStmt->execute();
-            $insertStmt->close();
-
-            $response['status'] = 'success';
-            $response['message'] = 'Perusahaan berhasil ditambahkan!';
-        }
-    }
-
-    header('Content-Type: application/json');
-    echo json_encode($response);
+    header("Location: list.php");
     exit();
 }
 
@@ -50,7 +44,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Tambah Perusahaan</title>
+    <title>Edit Perusahaan</title>
 
     <link rel="icon" href="../assets/adminlte/dist/img/OWLlogo.png" type="image/x-icon">
     <!-- Google Font: Source Sans Pro -->
@@ -97,13 +91,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <div class="container-fluid">
                     <div class="row mb-2">
                         <div class="col-sm-6">
-                            <h1>Tambah Perusahaan</h1>
+                            <h1>Edit Perusahaan</h1>
                         </div>
                         <div class="col-sm-6">
                             <ol class="breadcrumb float-sm-right">
                                 <li class="breadcrumb-item"><a href="../homepage.php">Home</a></li>
-                                <li class="breadcrumb-item active">Perusahaan</li>
-                                <li class="breadcrumb-item active">Tambah Perusahaan</li>
+                                <li class="breadcrumb-item active"><a href="list.php">Perusahaan</a></li>
+                                <li class="breadcrumb-item active">Edit</li>
                             </ol>
                         </div>
                     </div>
@@ -117,38 +111,42 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     <!-- general form elements -->
                     <div class="card card-primary">
                         <div class="card-header">
-                            <h3 class="card-title">Menambah Data Perusahaan yang Bekerjasama dengan OWL</h3>
+                            <h3 class="card-title">Edit Perusahaan </h3>
                         </div>
                         <!-- /.card-header -->
+                        <?php
+                        $row = mysqli_fetch_assoc($result);
+                        ?>
                         <!-- form start -->
-                        <form id="perusahaanForm">
+                        <form id="perusahaanForm" method="post"> <!-- Added method="post" -->
+                            <input type="hidden" name="client_id" value="<?php echo $client_id; ?>"> <!-- Hidden input to pass client_id -->
                             <div class="card-body">
                                 <div class="form-group">
                                     <div>
                                         <label for="namaPerusahaan">Nama Perusahaan <span style="color: red;">*</span></label>
-                                        <input type="text" class="form-control form-control-border border-width-2" id="namaPerusahaan" name="namaPerusahaan" placeholder="Masukkan nama perusahaan">
+                                        <input type="text" class="form-control form-control-border border-width-2" id="namaPerusahaan" name="namaPerusahaan" placeholder="Masukkan nama perusahaan" value="<?php echo $row['nama_client']; ?>">
                                     </div>
                                 </div>
                                 <div class="form-group">
                                     <div>
                                         <label for="namaKorespondensi">Nama Korespondensi <span style="color: red;">*</span></label>
-                                        <input type="text" class="form-control form-control-border border-width-2" id="namaKorespondensi" name="namaKorespondensi" placeholder="Masukkan nama korespondensi perusahaan">
+                                        <input type="text" class="form-control form-control-border border-width-2" id="namaKorespondensi" name="namaKorespondensi" placeholder="Masukkan nama korespondensi perusahaan" value="<?php echo $row['nama_korespondensi']; ?>">
                                     </div>
                                 </div>
                                 <div class="form-group">
                                     <label for="alamatPerusahaan">Alamat Perusahaan <span style="color: red;">*</span></label>
-                                    <textarea class="form-control" id="alamatPerusahaan" name="alamatPerusahaan" rows="3" placeholder="Masukkan alamat perusahaan ..."></textarea>
+                                    <textarea class="form-control" id="alamatPerusahaan" name="alamatPerusahaan" rows="3"><?php echo $row['alamat_perusahaan']; ?></textarea>
                                 </div>
                                 <div class="form-group">
                                     <div>
                                         <label for="username">Username Login</label>
-                                        <input type="text" class="form-control form-control-border border-width-2" id="username" name="username" placeholder="Masukkan username untuk perusahaan tersebut">
+                                        <input type="text" class="form-control form-control-border border-width-2" id="username" name="username" placeholder="Masukkan username untuk perusahaan tersebut" value="<?php echo $row['username']; ?>">
                                     </div>
                                 </div>
                                 <div class="form-group">
                                     <div>
                                         <label for="password">Password Login</label>
-                                        <input type="text" class="form-control form-control-border border-width-2" id="password" name="password" placeholder="Masukkan password untuk perusahaan tersebut">
+                                        <input type="text" class="form-control form-control-border border-width-2" id="password" name="password" placeholder="Masukkan password untuk perusahaan tersebut" value="<?php echo $row['password']; ?>">
                                     </div>
                                 </div>
                             </div>
@@ -193,13 +191,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 validateSuccess();
                 Swal.fire({
                     icon: 'success',
-                    title: 'Perusahaan Berhasil Ditambahkan!',
+                    title: 'Keterangan perusahaan berhasil diupdate!',
                     showCancelButton: false,
                     confirmButtonColor: '#3085d6',
                     confirmButtonText: 'OK (enter)'
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        resetForm();
+                        window.location.href = "list.php";
                     }
                 });
             }
@@ -209,6 +207,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             var namaPerusahaan = document.getElementById("namaPerusahaan").value;
             var namaKorespondensi = document.getElementById("namaKorespondensi").value;
             var alamatPerusahaan = document.getElementById("alamatPerusahaan").value;
+            var password = document.getElementById("password").value;
 
             if (namaPerusahaan === "" || namaKorespondensi === "" || alamatPerusahaan === "") {
                 Swal.fire({
@@ -230,36 +229,31 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
             $.ajax({
                 type: "POST",
-                url: "tambah_perusahaan.php",
+                url: "edit.php",
                 data: formData,
-                dataType: "json",
                 success: function(response) {
-                    if (response.status === 'success') {
-                        // Handle success response
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Success',
-                            text: response.message,
-                            showCancelButton: false,
-                            confirmButtonColor: '#3085d6',
-                            confirmButtonText: 'OK'
-                        }).then((result) => {
-                            if (result.isConfirmed) {
-                                resetForm();
-                            }
-                        });
-                    } else if (response.status === 'error') {
-                        // Handle error response
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Error',
-                            text: response.message,
-                            showCancelButton: false,
-                            confirmButtonColor: '#3085d6',
-                            confirmButtonText: 'OK'
-                        });
-                    }
+                    // Handle success response
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Keterangan perusahaan berhasil diupdate!',
+                        showCancelButton: false,
+                        confirmButtonColor: '#3085d6',
+                        confirmButtonText: 'OK'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            window.location.href = "list.php";
+                        }
+                    });
                 },
+                error: function(xhr, status, error) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error di suatu tempat!',
+                        showCancelButton: false,
+                        confirmButtonColor: '#3085d6',
+                        confirmButtonText: 'OK'
+                    });
+                }
             });
         }
 
@@ -275,8 +269,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             }
         });
 
-        var passwordInput = document.getElementById('password');
-        passwordInput.addEventListener('keydown', function(event) {
+        var password = document.getElementById('password');
+        password.addEventListener('keydown', function(event) {
             if (event.keyCode === 13) {
                 event.preventDefault();
                 submitForm();
