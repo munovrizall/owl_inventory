@@ -31,7 +31,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $updateStmt->execute();
     $updateStmt->close();
 
-    header("Location: ../list_perusahaan.php");
+    header("Location: list.php");
     exit();
 }
 
@@ -239,14 +239,14 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                         confirmButtonText: 'OK'
                     }).then((result) => {
                         if (result.isConfirmed) {
-                            window.location.href = "../list_perusahaan.php";
+                            window.location.href = "list.php";
                         }
                     });
                 },
                 error: function(xhr, status, error) {
                     Swal.fire({
                         icon: 'error',
-                        title: 'Perusahaan telah terdaftar!',
+                        title: 'Error di suatu tempat!',
                         showCancelButton: false,
                         confirmButtonColor: '#3085d6',
                         confirmButtonText: 'OK'
