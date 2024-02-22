@@ -268,15 +268,10 @@ if (isset($_GET['id'])) {
     <script src="../../../assets/adminlte/dist/js/adminlte.min.js"></script>
     <!-- Page specific script -->
     <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            var backButton = document.getElementById("Button");
-            
-            backButton.addEventListener("click", function() {
-                goBack();
-            });
-        });
+
         function goBack() {
-            window.history.back();
+            event.preventDefault();
+            window.location.href = '../monitoring.php';
         }
     </script>
 
