@@ -36,6 +36,7 @@ if(isset($_POST['sn'], $_POST['produk'], $_POST['firmware'], $_POST['bat'], $_PO
                 // Set headers for force download
                 header("Content-Type: application/octet-stream");
                 header("Content-Disposition: attachment; filename=\"$file_name\"");
+                header("Content-Length: " . filesize($file_path));
                 readfile($file_path);
                 exit;
             } else {
