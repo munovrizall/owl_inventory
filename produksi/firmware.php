@@ -17,11 +17,13 @@ if(isset($_POST['sn'], $_POST['produk'], $_POST['firmware'], $_POST['bat'], $_PO
     $bat = $_POST['bat'];
     $temperature = $_POST['temperature'];
     $hardware = $_POST['hardware'];
-
+    $ip_address = $_POST['ip_address'];
+    $lat = $_POST['lat'];
+    $lng = $_POST['lng'];
     // Check the validity of the parameters (you should replace this with your validation logic)
     if(validateParameters($sn, $produk, $firmware, $bat, $temperature, $hardware)) {
         // Update the table inventaris_produk with new parameters
-        updateInventarisProduk($conn, $sn, $produk, $firmware, $bat, $temperature, $hardware);
+        updateInventarisProduk($conn, $sn, $produk, $firmware, $bat, $temperature, $hardware, $ip_address, );
 
         // Check if the combination of parameters exists in firmware_setup
         if(checkFirmwareSetup($conn, $produk, $hardware)) {
@@ -65,12 +67,12 @@ function validateParameters($sn, $produk, $firmware, $bat, $temperature, $hardwa
 }
 
 // Function to update the table inventaris_produk with new parameters
-function updateInventarisProduk($conn, $sn, $produk, $firmware, $bat, $temperature, $hardware) {
+function updateInventarisProduk($conn, $sn, $produk, $firmware, $bat, $temperature, $hardware,$ip_address) {
     // Add your database update logic here
     // Make sure to use proper database connection and sanitize input to prevent SQL injection
     $currentDateTime = date('Y-m-d H:i:s');
     // Replace the placeholders and update the table
-    $sql = "UPDATE inventaris_produk SET produk = '$produk', firmware_version = '$firmware', bat = '$bat', temperature = '$temperature', hardware_version = '$hardware', last_online = '$currentDateTime' WHERE no_sn = '$sn'";
+    $sql = "UPDATE inventaris_produk SET produk = '$produk', firmware_version = '$firmware', bat = '$bat', ip_address = '$ip_address', temperature = '$temperature', hardware_version = '$hardware', last_online = '$currentDateTime' WHERE no_sn = '$sn'";
     // Execute the update query using your database connection
     $conn->query($sql);
 }
