@@ -62,6 +62,11 @@ $result = mysqli_query($conn, $query);
         .card-padding {
             padding: 10px 20px;
         }
+
+        .align-center {
+            display: flex;
+            align-items: center;
+        }
     </style>
 </head>
 
@@ -87,7 +92,6 @@ $result = mysqli_query($conn, $query);
                             <ol class="breadcrumb float-sm-right">
                                 <li class="breadcrumb-item"><a href="../homepage.php">Home</a></li>
                                 <li class="breadcrumb-item active">Perusahaan</li>
-                                <li class="breadcrumb-item active">List Perusahaan</li>
                             </ol>
                         </div>
                     </div>
@@ -101,8 +105,12 @@ $result = mysqli_query($conn, $query);
                     <section class="content">
 
                         <div class="card">
-                            <div class="card-header">
-                                <h3 class="card-title"><b>List Perusahaan</b></h3>
+                            <div class="card-header align-center">
+                                <a href="tambah.php">
+                                    <button type="button" class="btn btn-primary btn-block" style="max-width: 200px;">
+                                        <i class="fas fa-plus" style="margin-right: 8px;"></i>Tambah Perusahaan
+                                    </button>
+                                </a>
                             </div>
                             <!-- /.card-header -->
                             <div class="card-body p-0">
@@ -136,7 +144,7 @@ $result = mysqli_query($conn, $query);
                                                     <td><?php echo $row["password"]; ?></td>
                                                     <td class="text-center">
                                                         <div class="col">
-                                                            <a href='edit/edit.php?id=<?php echo $row["client_id"]; ?>' class="btn btn-info btn-block">Edit</a>
+                                                            <a href='edit.php?id=<?php echo $row["client_id"]; ?>' class="btn btn-info btn-block">Edit</a>
                                                         </div>
                                                     </td>
                                                 </tr>
@@ -258,7 +266,7 @@ $result = mysqli_query($conn, $query);
                 var idToEdit = 123;
 
                 // Lakukan redirect dengan menyertakan ID sebagai parameter
-                window.location.href = 'edit/edit.php?id=' + idToEdit;
+                window.location.href = 'edit.php?id=' + idToEdit;
             });
 
         });
