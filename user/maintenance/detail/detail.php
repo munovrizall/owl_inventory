@@ -23,32 +23,6 @@ if (isset($_GET['id'])) {
     echo "ID not provided.";
 }
 
-$updateQuery = "UPDATE detail_maintenance SET kedatangan=?, cek_barang=?, berita_as=?, administrasi=?, pengiriman=?, no_resi=? WHERE detail_id=?";
-$updateStmt = $conn->prepare($updateQuery);
-
-if ($_SERVER["REQUEST_METHOD"] === "POST") {
-    // Check if the form is submitted
-    if (isset($_POST['submitForm'])) {
-        // Loop through the submitted data and update the database
-        foreach ($_POST['checkboxBarangDatang'] as $key => $value) {
-            $detail_id = intval($key); // Convert to integer for security
-            $checkboxBarangDatang = isset($_POST['checkboxBarangDatang'][$detail_id]) ? 1 : 0;
-            $checkboxCekMasalah = isset($_POST['checkboxCekMasalah'][$detail_id]) ? 1 : 0;
-            $checkboxBeritaAcara = isset($_POST['checkboxBeritaAcara'][$detail_id]) ? 1 : 0;
-            $checkboxAdministrasi = isset($_POST['checkboxAdministrasi'][$detail_id]) ? 1 : 0;
-            $checkboxPengiriman = isset($_POST['checkboxPengiriman'][$detail_id]) ? 1 : 0;
-            $noResi = isset($_POST['no_resi'][$detail_id]) ? $_POST['no_resi'][$detail_id] : null;
-
-            // Update the database with the new values for each row
-            $updateStmt->bind_param("iiiiisi", $checkboxBarangDatang, $checkboxCekMasalah, $checkboxBeritaAcara, $checkboxAdministrasi, $checkboxPengiriman, $noResi, $detail_id);
-            $updateStmt->execute();
-        }
-        header("Location: ../monitoring.php");
-        // exit();
-    }
-}
-
-
 ?>
 
 <!DOCTYPE html>
@@ -112,6 +86,11 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             width: 20px;
             height: 20px;
         }
+
+        .disabled-checkbox {
+            pointer-events: none;
+            opacity: 1;
+        }
     </style>
 </head>
 
@@ -134,9 +113,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                             if (isset($_GET['id'])) {
                                 $transaksi_id = $_GET['id'];
                                 echo "<h1>Monitoring Transaksi #{$transaksi_id}</h1>";
-                            } else {
-                                echo "<h1>Monitoring Transaksi</h1>";
-                                echo "ID not provided.";
                             }
                             ?>
                         </div>
@@ -145,7 +121,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                                 <li class="breadcrumb-item"><a href="../../homepage.php">Home</a></li>
                                 <li class="breadcrumb-item active">Maintenance</li>
                                 <li class="breadcrumb-item active"><a href="../monitoring.php">Monitoring</a></li>
-                                <li class="breadcrumb-item active">Edit</li>
+                                <li class="breadcrumb-item active">Detail</li>
                             </ol>
                         </div>
                     </div>
@@ -166,9 +142,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                                 $row = mysqli_fetch_assoc($transaksiResult);
                                 $nama_client = $row["nama_client"];
                                 echo "<h3 class='card-title'>Monitoring Transaksi {$nama_client} </h3>";
-                            } else {
-                                echo "<h3 class='card-title'>Monitoring Transaksi PT. Origin Wiracipta Lestari</h3>";
-                                echo "ID not provided.";
                             }
                             ?>
                         </div>
@@ -216,83 +189,40 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                                                 </thead>
                                                 <tbody id="transaksiTable">
                                                     <?php
-                                                    $tanggal_terima = $row['tanggal_terima'];
-
                                                     while ($row = mysqli_fetch_assoc($result)) {
-                                                        $no_sn = $row['no_sn'];
-                                                        $garansiQuery = "SELECT garansi_void, garansi_akhir, produk FROM inventaris_produk WHERE no_sn = ?";
-                                                        $garansiStmt = $conn->prepare($garansiQuery);
-                                                        $garansiStmt->bind_param("s", $no_sn);
-                                                        $garansiStmt->execute();
-                                                        $garansiResult = $garansiStmt->get_result();
-
-                                                        $produk = $garansi_void = $garansi_akhir = null; // Initialize variables
-                                                        list($garansi_void, $garansi_akhir, $produk) = $garansiResult->fetch_row();
                                                     ?>
                                                         <tr>
                                                             <td><?php echo $row["detail_id"]; ?></td>
-                                                            <td>
-                                                                <?php
-
-                                                                $updateProdukQuery = "UPDATE detail_maintenance SET produk_mt = ? WHERE detail_id = ?";
-                                                                $updateProdukStmt = $conn->prepare($updateProdukQuery);
-                                                                $updateProdukStmt->bind_param("si", $produk, $row["detail_id"]);
-                                                                $updateProdukStmt->execute();
-
-                                                                echo $produk;
-
-                                                                ?>
-                                                            </td>
-                                                            <td><?php echo $no_sn; ?></td>
-                                                            <td>
-                                                                <?php
-
-                                                                $garansi = ($garansi_void || $garansi_akhir < $tanggal_terima) ? 0 : 1;
-
-                                                                $updateGaransiQuery = "UPDATE detail_maintenance SET garansi = ? WHERE detail_id = ?";
-                                                                $updateGaransiStmt = $conn->prepare($updateGaransiQuery);
-                                                                $updateGaransiStmt->bind_param("ii", $garansi, $row["detail_id"]);
-                                                                $updateGaransiStmt->execute();
-
-                                                                // Check if any of the warranty conditions are met
-                                                                if ($garansi == 0) {
-                                                                    echo 'Tidak'; // Warranty void or expired
-                                                                } else {
-                                                                    echo 'Ya'; // Warranty valid
-                                                                }
-                                                                ?>
-                                                            </td>
+                                                            <td><?php echo $row["produk_mt"]; ?></td>
+                                                            <td><?php echo $row["no_sn"]; ?></td>
+                                                            <td><?php echo $row["garansi"] == 1 ? 'Ya' : 'Tidak'; ?></td>
                                                             <td><?php echo $row["keterangan"]; ?></td>
                                                             <td style="text-align: center;">
                                                                 <div class="form-check">
-                                                                    <input class="form-check-input larger-checkbox" type="checkbox" value="1" name="checkboxBarangDatang[<?php echo $row['detail_id']; ?>]" <?php echo $row["kedatangan"] == 1 ? 'checked' : ''; ?>>
+                                                                    <input class="form-check-input larger-checkbox disabled-checkbox" type="checkbox" value="1" name="checkboxBarangDatang[<?php echo $row['detail_id']; ?>]" <?php echo $row["kedatangan"] == 1 ? 'checked' : ''; ?>>
                                                                 </div>
                                                             </td>
                                                             <td style="text-align: center;">
                                                                 <div class="form-check">
-                                                                    <input class="form-check-input larger-checkbox" type="checkbox" value="1" name="checkboxCekMasalah[<?php echo $row['detail_id']; ?>]" <?php echo $row["cek_barang"] == 1 ? 'checked' : ''; ?>>
+                                                                    <input class="form-check-input larger-checkbox disabled-checkbox" type="checkbox" value="1" name="checkboxCekMasalah[<?php echo $row['detail_id']; ?>]" <?php echo $row["cek_barang"] == 1 ? 'checked' : ''; ?>>
                                                                 </div>
                                                             </td>
                                                             <td style="text-align: center;">
                                                                 <div class="form-check">
-                                                                    <input class="form-check-input larger-checkbox" type="checkbox" value="1" name="checkboxBeritaAcara[<?php echo $row['detail_id']; ?>]" <?php echo $row["berita_as"] == 1 ? 'checked' : ''; ?>>
+                                                                    <input class="form-check-input larger-checkbox disabled-checkbox" type="checkbox" value="1" name="checkboxBeritaAcara[<?php echo $row['detail_id']; ?>]" <?php echo $row["berita_as"] == 1 ? 'checked' : ''; ?>>
                                                                 </div>
                                                             </td>
                                                             <td style="text-align: center;">
                                                                 <div class="form-check">
-                                                                    <input class="form-check-input larger-checkbox" type="checkbox" value="1" name="checkboxAdministrasi[<?php echo $row['detail_id']; ?>]" <?php echo $row["administrasi"] == 1 ? 'checked' : ''; ?>>
+                                                                    <input class="form-check-input larger-checkbox disabled-checkbox" type="checkbox" value="1" name="checkboxAdministrasi[<?php echo $row['detail_id']; ?>]" <?php echo $row["administrasi"] == 1 ? 'checked' : ''; ?>>
                                                                 </div>
                                                             </td>
                                                             <td style="text-align: center;">
                                                                 <div class="form-check">
-                                                                    <input class="form-check-input larger-checkbox" type="checkbox" value="1" name="checkboxPengiriman[<?php echo $row['detail_id']; ?>]" <?php echo $row["pengiriman"] == 1 ? 'checked' : ''; ?>>
+                                                                    <input class="form-check-input larger-checkbox disabled-checkbox" type="checkbox" value="1" name="checkboxPengiriman[<?php echo $row['detail_id']; ?>]" <?php echo $row["pengiriman"] == 1 ? 'checked' : ''; ?>>
                                                                 </div>
                                                             </td>
-                                                            <td>
-                                                                <div class="input-group">
-                                                                    <input type="text" class="form-control" id="no_resi" name="no_resi[<?php echo $row['detail_id']; ?>]" min="0" value="<?php echo $row["no_resi"]; ?>">
-                                                                </div>
-                                                            </td>
+                                                            <td><?php echo $row["no_resi"]; ?></td>
                                                         </tr>
                                                     <?php
                                                     }
@@ -306,7 +236,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                             </div>
                             <!-- /.card-body -->
                             <div class="card-footer d-flex justify-content-end">
-                                <button type="submit" class="btn btn-primary" name="submitForm">Submit</button>
+                                <button id="Button" class="btn btn-info" onclick="goBack()"><i class="fas fa-arrow-left" style="padding-right: 8px"></i>Kembali</button>
                             </div>
                         </form>
 
@@ -338,15 +268,16 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     <script src="../../../assets/adminlte/dist/js/adminlte.min.js"></script>
     <!-- Page specific script -->
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            var checkboxes = document.querySelectorAll('.form-check-input');
-
-            checkboxes.forEach(function(checkbox) {
-                checkbox.addEventListener('change', function() {
-                    this.value = this.checked ? 1 : 0;
-                });
+        document.addEventListener("DOMContentLoaded", function() {
+            var backButton = document.getElementById("Button");
+            
+            backButton.addEventListener("click", function() {
+                goBack();
             });
         });
+        function goBack() {
+            window.history.back();
+        }
     </script>
 
 </body>

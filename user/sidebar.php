@@ -70,7 +70,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
                         <li class="nav-item">
                             <a href="/owl_inventory/user/maintenance/monitoring.php" class="nav-link <?php
                                                                                                 echo (strpos($current_page, 'monitoring.php') !== false) ||
-                                                                                                    strpos($_SERVER['REQUEST_URI'], '/owl_inventory/user/maintenance/edit/edit.php') !== false
+                                                                                                    strpos($_SERVER['REQUEST_URI'], '/owl_inventory/user/maintenance/detail/detail.php') !== false
                                                                                                     ? 'active' : ''; ?>">
                                 <i class="far fa-circle nav-icon"></i>
                                 <p>Monitoring</p>
@@ -79,6 +79,14 @@ $current_page = basename($_SERVER['PHP_SELF']);
                     </ul>
                 </li>
                 <li class="nav-header">PELAPORAN</li>
+                <li class="nav-item">
+                    <a href="/owl_inventory/user/status_device.php" class="nav-link <?php echo (strpos($current_page, 'status Device.php') !== false) ? 'active' : ''; ?>">
+                        <i class="nav-icon fas fa-walkie-talkie"></i>
+                        <p>
+                            Status Device
+                        </p>
+                    </a>
+                </li>
                 <li class="nav-item">
                     <a href="/owl_inventory/user/stok_bahan.php" class="nav-link <?php echo (strpos($current_page, 'stok_bahan.php') !== false) ? 'active' : ''; ?>">
                         <i class="nav-icon ion ion-pie-graph"></i>

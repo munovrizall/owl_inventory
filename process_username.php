@@ -22,7 +22,7 @@ if(isset($_POST['username'])) {
     }
 
     // Prepare and execute the query to fetch the full name based on the username
-    $queryNama = "SELECT nama_lengkap, role FROM account WHERE username = ?";
+    $queryNama = "SELECT nama_lengkap, role FROM user_account WHERE username = ?";
     $stmt = $conn->prepare($queryNama);
     $stmt->bind_param("s", $username);
     $stmt->execute();

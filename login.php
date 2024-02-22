@@ -14,7 +14,7 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-$queryAccount = "SELECT * FROM account";
+$queryAccount = "SELECT * FROM user_account";
 $result = $conn->query($queryAccount);
 
 // Cek apakah hasil query kosong
@@ -36,7 +36,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $username = $_POST['username'];
     $password = $_POST['password'];
 
-    $queryAccount = "SELECT * FROM account WHERE username = ? AND password = ?";
+    $queryAccount = "SELECT * FROM user_account WHERE username = ? AND password = ?";
     $stmt = $conn->prepare($queryAccount);
     $stmt->bind_param("ss", $username, $password);
     $stmt->execute();

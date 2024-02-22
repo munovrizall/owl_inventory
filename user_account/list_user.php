@@ -1,8 +1,9 @@
 <?php
 
-include "../../connection.php";
+include "../connection.php";
+include "../admin_privilege.php";
 
-$query = "SELECT * FROM transaksi_maintenance ORDER BY tanggal_terima";
+$query = "SELECT * FROM user_account";
 $result = mysqli_query($conn, $query);
 
 ?>
@@ -13,15 +14,15 @@ $result = mysqli_query($conn, $query);
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Monitoring Maintenance</title>
+    <title>List User</title>
 
-    <link rel="icon" href="../../assets/adminlte/dist/img/OWLlogo.png" type="image/x-icon">
+    <link rel="icon" href="../assets/adminlte/dist/img/OWLlogo.png" type="image/x-icon">
     <!-- Google Font: Source Sans Pro -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <!-- Theme style -->
-    <link rel="stylesheet" href="../../assets/adminlte/dist/css/adminlte.min.css">
+    <link rel="stylesheet" href="../assets/adminlte/dist/css/adminlte.min.css">
     <!-- Ionicons -->
     <link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
     <!-- Table with search -->
@@ -32,23 +33,15 @@ $result = mysqli_query($conn, $query);
 
     <style>
         .lebar-kolom1 {
-            width: 15%;
+            width: 5%;
         }
 
         .lebar-kolom2 {
-            width: 15%;
+            width: 80%;
         }
 
         .lebar-kolom3 {
-            width: 38%;
-        }
-
-        .lebar-kolom4 {
-            width: 10%;
-        }
-
-        .lebar-kolom5 {
-            width: 22%;
+            width: 15%;
         }
 
         .card-padding {
@@ -60,9 +53,10 @@ $result = mysqli_query($conn, $query);
 <body class="hold-transition sidebar-mini layout-fixed">
     <div class="wrapper">
 
-    <?php
-        include "../navbar.php";
-        include "../sidebar.php";
+        <?php
+        $rootPath = $_SERVER['DOCUMENT_ROOT'];
+        include $rootPath . "/owl_inventory/includes/navbar.php";
+        include $rootPath . "/owl_inventory/includes/sidebar.php";
         ?>
 
         <!-- Content Wrapper. Contains page content -->
@@ -72,13 +66,13 @@ $result = mysqli_query($conn, $query);
                 <div class="container-fluid">
                     <div class="row mb-2">
                         <div class="col-sm-6">
-                            <h1>Monitoring Transaksi Maintenance</h1>
+                            <h1>List User</h1>
                         </div>
                         <div class="col-sm-6">
                             <ol class="breadcrumb float-sm-right">
                                 <li class="breadcrumb-item"><a href="../homepage.php">Home</a></li>
-                                <li class="breadcrumb-item active">Maintenance</li>
-                                <li class="breadcrumb-item active">Monitoring</li>
+                                <li class="breadcrumb-item active">User Account</li>
+                                <li class="breadcrumb-item active">List User</li>
                             </ol>
                         </div>
                     </div>
@@ -93,69 +87,29 @@ $result = mysqli_query($conn, $query);
 
                         <div class="card">
                             <div class="card-header">
-                                <h3 class="card-title"><b>List Transaksi</b></h3>
+                                <h3 class="card-title"><b>List User</b></h3>
                             </div>
                             <!-- /.card-header -->
                             <div class="card-body p-0">
                                 <div class="table-responsive card-padding">
-                                    <table id="tableTransaksi" class="table table order-list table-striped table-bordered">
+                                    <table id="tablePerusahaan" class="table table order-list table-striped table-bordered">
                                         <thead>
                                             <tr>
-                                                <th class="text-center lebar-kolom1">ID Transaksi</th>
-                                                <th class="text-center lebar-kolom2">Tanggal</th>
-                                                <th class="text-center lebar-kolom3" style="min-width: 80px">Nama PT</th>
-                                                <th class="text-center lebar-kolom4">Status</th>
-                                                <th class="text-center lebar-kolom5 aksi-column" style="min-width: 120px">Aksi</th>
+                                                <th class="text-center lebar-kolom1">ID</th>
+                                                <th class="text-center lebar-kolom2">Nama Lengkap</th>
+                                                <th class="text-center lebar-kolom3 aksi-column">Aksi</th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             <?php
                                             while ($row = mysqli_fetch_assoc($result)) {
-                                                // Format date
-                                                $tanggal = date('d-m-Y', strtotime($row["tanggal_terima"]));
-                                                // Fetch detail_maintenance data based on transaksi_id
-                                                $transaksiId = $row["transaksi_id"];
-                                                $detailQuery = "SELECT * FROM detail_maintenance WHERE transaksi_id = $transaksiId";
-                                                $detailResult = mysqli_query($conn, $detailQuery);
-                                                $statusClass = 'bg-danger'; // Default class
-                                                $statusText = 'Belum'; // Default text
-
-                                                // Check conditions for bg-success
-                                                $allConditionsMet = true;
-                                                while ($detailRow = mysqli_fetch_assoc($detailResult)) {
-                                                    if (
-                                                        $detailRow['kedatangan'] != 1 ||
-                                                        $detailRow['cek_barang'] != 1 ||
-                                                        $detailRow['berita_as'] != 1 ||
-                                                        $detailRow['administrasi'] != 1 ||
-                                                        $detailRow['pengiriman'] != 1 ||
-                                                        $detailRow['no_resi'] == 0
-                                                    ) {
-                                                        $allConditionsMet = false;
-                                                        break;
-                                                    }
-                                                }
-
-                                                if ($allConditionsMet) {
-                                                    $statusClass = 'bg-success';
-                                                    $statusText = 'Selesai';
-                                                }
-
-                                                // Output table row with appropriate status class and text
                                             ?>
                                                 <tr>
-                                                    <td><?php echo $row["transaksi_id"]; ?></td>
-                                                    <td><?php echo $tanggal ?></td>
-                                                    <td><?php echo $row["nama_client"]; ?></td>
-                                                    <td class="text-center"><span class="badge <?php echo $statusClass; ?>"><?php echo $statusText; ?></span></td>
+                                                    <td><?php echo $row["account_id"]; ?></td>
+                                                    <td><?php echo $row["nama_lengkap"]; ?></td>
                                                     <td class="text-center">
-                                                        <div class="row">
-                                                            <div class="col">
-                                                                <a href='detail/detail.php?id=<?php echo $row["transaksi_id"]; ?>' class="btn btn-info btn-block">Detail</a>
-                                                            </div>
-                                                            <div class="col">
-                                                                <a href='generate_pdf/pdf.php?id=<?php echo $row["transaksi_id"]; ?>' class="btn btn-block btn-outline-danger"><i class="fas fa-file-pdf"></i></a>
-                                                            </div>
+                                                        <div class="col">
+                                                            <a href='edit/edit.php?id=<?php echo $row["account_id"]; ?>' class="btn btn-info btn-block">Edit</a>
                                                         </div>
                                                     </td>
                                                 </tr>
@@ -190,13 +144,13 @@ $result = mysqli_query($conn, $query);
     <!-- ./wrapper -->
 
     <!-- jQuery -->
-    <script src="../../assets/adminlte/plugins/jquery/jquery.min.js"></script>
+    <script src="../assets/adminlte/plugins/jquery/jquery.min.js"></script>
     <!-- Bootstrap 4 -->
-    <script src="../../assets/adminlte/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="../assets/adminlte/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
     <!-- bs-custom-file-input -->
-    <script src="../../assets/adminlte/plugins/bs-custom-file-input/bs-custom-file-input.min.js"></script>
+    <script src="../assets/adminlte/plugins/bs-custom-file-input/bs-custom-file-input.min.js"></script>
     <!-- AdminLTE App -->
-    <script src="../../assets/adminlte/dist/js/adminlte.min.js"></script>
+    <script src="../assets/adminlte/dist/js/adminlte.min.js"></script>
     <!-- Datatables -->
     <script src="https://cdn.datatables.net/v/bs4/dt-1.13.8/b-2.4.2/b-colvis-2.4.2/b-print-2.4.2/fh-3.4.0/r-2.5.0/rg-1.4.1/sb-1.6.0/sp-2.2.0/datatables.min.js"></script>
     <script src="https:////code.jquery.com/jquery-3.7.0.js"></script>
@@ -212,7 +166,7 @@ $result = mysqli_query($conn, $query);
     <!-- Page specific script -->
     <script>
         $(document).ready(function() {
-            var table = $('#tableTransaksi').DataTable({
+            var table = $('#tablePerusahaan').DataTable({
                 responsive: true,
                 language: {
                     lengthMenu: 'Tampilkan _MENU_ data per halaman',
@@ -228,7 +182,7 @@ $result = mysqli_query($conn, $query);
                     'pageLength',
                     {
                         extend: 'copy',
-                        title: 'Monitoring Transaksi Maintenance',
+                        title: 'List Perusahaan',
                         exportOptions: {
                             columns: ':visible:not(.aksi-column)'
                         }
@@ -240,44 +194,44 @@ $result = mysqli_query($conn, $query);
                     },
                     {
                         extend: 'csv',
-                        title: 'Monitoring Transaksi Maintenance',
+                        title: 'List Perusahaan',
                         exportOptions: {
                             columns: ':visible:not(.aksi-column)'
                         }
                     },
                     {
                         extend: 'excel',
-                        title: 'Monitoring Transaksi Maintenance',
+                        title: 'List Perusahaan',
                         exportOptions: {
                             columns: ':visible:not(.aksi-column)'
                         }
                     },
                     {
                         extend: 'pdf',
-                        title: 'Monitoring Transaksi Maintenance',
+                        title: 'List Perusahaan',
                         exportOptions: {
                             columns: ':visible:not(.aksi-column)'
                         }
                     },
                     {
                         extend: 'print',
-                        title: 'Monitoring Transaksi Maintenance',
+                        title: 'List Perusahaan',
                         exportOptions: {
                             columns: ':visible:not(.aksi-column)'
                         }
                     },
                 ],
-                order: [0, 'desc'],
+                order: [0, 'asc'],
             });
 
             table.buttons().container()
                 .appendTo('wrapper .col-md-6:eq(0)');
 
-            $("table.order-list").on("click", ".ibtnDetail", function(event) {
-                var idToDetail = 123;
+            $("table.order-list").on("click", ".ibtnEdit", function(event) {
+                var idToEdit = 123;
 
                 // Lakukan redirect dengan menyertakan ID sebagai parameter
-                window.location.href = 'detail/detail.php?id=' + idToDetail;
+                window.location.href = 'edit/edit.php?id=' + idToEdit;
             });
 
         });
