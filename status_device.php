@@ -9,7 +9,7 @@ if (isset($_POST['pilihClient'])) {
     $selectedClient = $_POST['pilihClient'];
 
     // Milih bahan untuk produksi
-    $query = "SELECT i.id, i.nama_client, i.produk, i.no_sn, i.firmware_version, i.hardware_version, i.temperature, i.last_online, i.bat, i.pt, i.unit, i.status_error, p.gambar_produk
+    $query = "SELECT i.id, i.nama_client, i.produk, i.no_sn, i.firmware_version, i.hardware_version, i.temperature, i.last_online, i.bat, i.pt, i.unit, i.status_error, i.ip_address, p.gambar_produk
     FROM inventaris_produk i
     JOIN produk p ON i.produk = p.nama_produk
     WHERE i.nama_client = ? AND
@@ -47,7 +47,7 @@ if (isset($_POST['pilihClient'])) {
     $stmt = $conn->prepare($query);
     $stmt->bind_param("s", $selectedClient);
     $stmt->execute();
-    $stmt->bind_result($id, $namaClient, $produk, $noSN, $firmwareVersion, $hardwareVersion, $temperature, $lastOnline, $battery, $pt, $unit, $statusError, $gambarProduk);
+    $stmt->bind_result($id, $namaClient, $produk, $noSN, $firmwareVersion, $hardwareVersion, $temperature, $lastOnline, $battery, $pt, $unit, $statusError, $ipAddress, $gambarProduk);
     $resultDevices = array();
     while ($stmt->fetch()) {
         $resultDevices[] = array(
@@ -63,6 +63,7 @@ if (isset($_POST['pilihClient'])) {
             'pt' => $pt,
             'unit' => $unit,
             'statusError' => $statusError,
+            'ipAddress' => $ipAddress,
             'gambarProduk' => $gambarProduk,
         );
     }
@@ -287,10 +288,15 @@ if (isset($_POST['pilihClient'])) {
                         var hardware = document.createElement("p");
                         hardware.className = "version-text";
                         hardware.textContent = "Hardware: v" + device.hardwareVersion; // Use the relevant property from the response
+                        
+                        var ipAddress = document.createElement("p");
+                        ipAddress.className = "version-text";
+                        ipAddress.textContent = device.ipAddress; // Use the relevant property from the response
 
                         titleContainer.appendChild(snNumber);
                         titleContainer.appendChild(firmware);
                         titleContainer.appendChild(hardware);
+                        titleContainer.appendChild(ipAddress);
 
                         var productDetailsContainer = document.createElement("div");
                         productDetailsContainer.className = "mt-5";
