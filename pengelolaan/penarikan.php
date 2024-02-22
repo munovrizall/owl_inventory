@@ -1,6 +1,7 @@
 <?php
 
 include "../connection.php";
+include "../admin_privilege.php";
 
 $queryClient = "SELECT * FROM client WHERE nama_client != 'OWL' ORDER BY nama_client";
 $resultClient = $conn->query($queryClient);

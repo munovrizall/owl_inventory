@@ -1,6 +1,7 @@
 <?php
 
 include "../connection.php";
+include "../admin_privilege.php";
 
 $response = array();
 

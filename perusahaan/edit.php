@@ -1,6 +1,8 @@
 <?php
 
 include "../connection.php";
+include "../admin_privilege.php";
+
 
 if (isset($_GET['id'])) {
     $client_id = $_GET['id'];

@@ -1,5 +1,6 @@
 <?php
 include "../../connection.php";
+include "../../admin_privilege.php";
 
 $queryClient = "SELECT * FROM client ORDER BY nama_client";
 $resultClient = $conn->query($queryClient);

@@ -1,6 +1,7 @@
 <?php
 
 include "../connection.php";
+include "../admin_privilege.php";
 
 $query = "SELECT * FROM client";
 $result = mysqli_query($conn, $query);
@@ -29,6 +30,8 @@ $result = mysqli_query($conn, $query);
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/jquery.dataTables.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.dataTables.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap4.min.css">
+    <!-- Sweetalert2 -->
+    <link rel="stylesheet" href="../assets/adminlte/plugins/sweetalert2-theme-bootstrap-4/bootstrap-4.min.css">
 
     <style>
         .lebar-kolom1 {
@@ -40,11 +43,11 @@ $result = mysqli_query($conn, $query);
         }
 
         .lebar-kolom3 {
-            width: 15%;
+            width: 20%;
         }
 
         .lebar-kolom4 {
-            width: 40%;
+            width: 30%;
         }
 
         .lebar-kolom5 {
@@ -56,7 +59,7 @@ $result = mysqli_query($conn, $query);
         }
 
         .lebar-kolom7 {
-            width: 10%;
+            width: 15%;
         }
 
         .card-padding {
@@ -143,9 +146,10 @@ $result = mysqli_query($conn, $query);
                                                     <td><?php echo $row["username"]; ?></td>
                                                     <td><?php echo $row["password"]; ?></td>
                                                     <td class="text-center">
-                                                        <div class="col">
-                                                            <a href='edit.php?id=<?php echo $row["client_id"]; ?>' class="btn btn-info btn-block">Edit</a>
+                                                        <div style="display: inline-block;">
+                                                            <a href='edit.php?id=<?php echo $row["client_id"]; ?>' class="btn btn-info"><i class="fas fa-pencil"></i></a>
                                                         </div>
+                                                        <a href='#' class='btn btn-danger delete-btn' data-id='<?php echo $row["client_id"]; ?>'><i class="fas fa-trash"></i></a>
                                                     </td>
                                                 </tr>
                                             <?php
@@ -197,10 +201,34 @@ $result = mysqli_query($conn, $query);
     <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.html5.min.js"></script>
     <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.print.min.js"></script>
     <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.bootstrap4.min.js"></script>
+    <!-- SweetAlert2 Toast -->
+    <script src="../assets/adminlte/plugins/sweetalert2/sweetalert2.min.js"></script>
 
     <!-- Page specific script -->
     <script>
         $(document).ready(function() {
+            $('#tablePerusahaan').on('click', '.delete-btn', function(e) {
+                e.preventDefault();
+                var userId = $(this).data('id');
+
+                // Tampilkan konfirmasi SweetAlert
+                Swal.fire({
+                    title: 'Apakah Anda yakin?',
+                    text: 'Data pengguna ini akan dihapus!',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Ya, hapus!',
+                    cancelButtonText: 'Batal'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // Jika dikonfirmasi, lakukan penghapusan
+                        window.location.href = 'delete.php?id=' + userId;
+                    }
+                });
+            });
+
             var table = $('#tablePerusahaan').DataTable({
                 responsive: true,
                 language: {

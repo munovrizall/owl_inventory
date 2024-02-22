@@ -1,6 +1,7 @@
 <?php
 
 include "connection.php";
+include "admin_privilege.php";
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Check which fields are provided
