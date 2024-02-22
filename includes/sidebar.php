@@ -59,7 +59,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="/owl_inventory/produksi/inventaris_device.php" class="nav-link <?php echo (strpos($current_page, 'inventaris_device.php') !== false || strpos($_SERVER['REQUEST_URI'], '/owl_inventory/produksi/detail/detail.php') !== false) ? 'active' : ''; ?>">
+                            <a href="/owl_inventory/produksi/inventaris_device.php" class="nav-link <?php echo (strpos($current_page, 'inventaris_device.php') !== false || (strpos($_SERVER['REQUEST_URI'], '/owl_inventory/produksi/detail/detail.php') !== false)) ? 'active' : ''; ?>">
                                 <i class="far fa-circle nav-icon"></i>
                                 <p>Inventaris Device</p>
                             </a>
@@ -207,6 +207,22 @@ $current_page = basename($_SERVER['PHP_SELF']);
                         <i class="nav-icon fas fa-industry"></i>
                         <p>
                             Perusahaan
+                        </p>
+                    </a>
+                </li>
+                <li class="nav-item <?php
+                                    echo strpos($_SERVER['REQUEST_URI'], '/owl_inventory/user_account/list.php') !== false ||
+                                        strpos($_SERVER['REQUEST_URI'], '/owl_inventory/user_account/tambah.php') !== false ||
+                                        strpos($_SERVER['REQUEST_URI'], '/owl_inventory/user_account/edit.php') !== false
+                                        ? 'menu-open' : ''; ?>">
+                    <a href="/owl_inventory/user_account/list.php" class="nav-link <?php
+                                                                    echo strpos($_SERVER['REQUEST_URI'], '/owl_inventory/user_account/list.php') !== false ||
+                                                                        strpos($_SERVER['REQUEST_URI'], '/owl_inventory/user_account/tambah.php') !== false ||
+                                                                        strpos($_SERVER['REQUEST_URI'], '/owl_inventory/user_account/edit.php') !== false
+                                                                        ? 'active' : ''; ?>">
+                        <i class="nav-icon fas fa-user"></i>
+                        <p>
+                            User
                         </p>
                     </a>
                 </li>

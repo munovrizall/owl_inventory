@@ -1,6 +1,7 @@
 <?php
 
 include "../connection.php";
+include "../admin_privilege.php";
 
 $queryTransaksiId = "SELECT MAX(transaksi_id) AS last_transaksi_id FROM transaksi_maintenance";
 $resultTransaksiId = $conn->query($queryTransaksiId);

@@ -1,6 +1,7 @@
 <?php
 
 include "../connection.php";
+include "../admin_privilege.php";
 
 $query = "SELECT * FROM inventaris_produk ORDER BY id";
 $result = mysqli_query($conn, $query);
