@@ -1,7 +1,7 @@
 <?php
 
-include "../../connection.php";
-include "../../admin_privilege.php";
+include "../connection.php";
+include "../admin_privilege.php";
 
 if (isset($_GET['id'])) {
     $account_id = $_GET['id'];
@@ -32,7 +32,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $updateStmt->execute();
     $updateStmt->close();
 
-    header("Location: ../list_user.php");
+    header("Location: list.php");
     exit();
 }
 
@@ -45,20 +45,20 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Edit User</title>
 
-    <link rel="icon" href="../../assets/adminlte/dist/img/OWLlogo.png" type="image/x-icon">
+    <link rel="icon" href="../assets/adminlte/dist/img/OWLlogo.png" type="image/x-icon">
     <!-- Google Font: Source Sans Pro -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <!-- Theme style -->
-    <link rel="stylesheet" href="../../assets/adminlte/dist/css/adminlte.min.css">
+    <link rel="stylesheet" href="../assets/adminlte/dist/css/adminlte.min.css">
     <!-- Sweetalert2 -->
-    <link rel="stylesheet" href="../../assets/adminlte/plugins/sweetalert2-theme-bootstrap-4/bootstrap-4.min.css">
+    <link rel="stylesheet" href="../assets/adminlte/plugins/sweetalert2-theme-bootstrap-4/bootstrap-4.min.css">
     <!-- Ionicons -->
     <link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
     <!-- Select2 -->
-    <link rel="stylesheet" href="../../assets/adminlte/plugins/select2/css/select2.min.css">
-    <link rel="stylesheet" href="../../assets/adminlte/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css">
+    <link rel="stylesheet" href="../assets/adminlte/plugins/select2/css/select2.min.css">
+    <link rel="stylesheet" href="../assets/adminlte/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css">
 
     <style>
         #successMessage {
@@ -82,7 +82,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         include $rootPath . "/owl_inventory/includes/navbar.php";
         include $rootPath . "/owl_inventory/includes/sidebar.php";
         ?>
-        
+
         <!-- Content Wrapper. Contains page content -->
         <div class="content-wrapper">
             <!-- Content Header (Page header) -->
@@ -94,9 +94,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                         </div>
                         <div class="col-sm-6">
                             <ol class="breadcrumb float-sm-right">
-                                <li class="breadcrumb-item"><a href="../../homepage.php">Home</a></li>
-                                <li class="breadcrumb-item active">User Account</li>
-                                <li class="breadcrumb-item active"><a href="../list_user.php">List User</a></li>
+                                <li class="breadcrumb-item"><a href="../homepage.php">Home</a></li>
+                                <li class="breadcrumb-item active"><a href="list.php">List</a></li>
                                 <li class="breadcrumb-item active">Edit</li>
                             </ol>
                         </div>
@@ -127,33 +126,16 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                                         <input type="text" class="form-control form-control-border border-width-2" id="namaLengkap" name="namaLengkap" placeholder="Masukkan nama lengkap user" value="<?php echo $row['nama_lengkap']; ?>">
                                     </div>
                                 </div>
+                                <label for="user">Role User <span style="color: red;">*</span></label>
                                 <div class="form-group">
-                                    <label for="picture">Gambar TTD <span class="gray-italic-text"> (opsional)</span></label>
-                                    <div class="input-group mb-3">
-                                        <div class="input-group-prepend">
-                                            <button onclick="window.open('https://img.doerig.dev/', '_blank')" class="btn btn-primary">
-                                                <i class="fas fa-upload"></i> Upload
-                                            </button>
-                                        </div>
-                                        <input type="text" class="form-control" id="tandaTangan" name="tandaTangan" placeholder="Copy dan paste disini link imgur yang telah dibuat" value="<?php echo $row['tanda_tangan']; ?>">
+                                    <div class="btn-group btn-group-toggle" data-toggle="buttons">
+                                        <label class="btn btn-outline-primary <?php echo ($row['role'] == 'user') ? 'active' : ''; ?>">
+                                            <input type="radio" name="role" id="user" value="user" <?php echo ($row['role'] == 'user') ? 'checked' : ''; ?>> User
+                                        </label>
+                                        <label class="btn btn-outline-primary <?php echo ($row['role'] == 'admin') ? 'active' : ''; ?>">
+                                            <input type="radio" name="role" id="admin" value="admin" <?php echo ($row['role'] == 'admin') ? 'checked' : ''; ?>> Admin
+                                        </label>
                                     </div>
-                                </div>
-                                <div class="form-group">
-                                    <label for="role">Role</label>
-                                    <select class="form-control select2" id="role" name="role">
-                                        <option value="" disabled>--- Pilih Role ---</option>
-                                        <?php
-                                        $roles = ['user', 'admin'];
-                                        foreach ($roles as $role) {
-                                            $selected = ($row['role'] == $role) ? 'selected' : '';
-                                            echo '<option value="' . $role . '" ' . $selected . '>' . ucfirst($role) . '</option>';
-                                        }
-                                        while ($roleRow = $result->fetch_assoc()) {
-                                            $selected = ($row['role'] == $roleRow['role']) ? 'selected' : '';
-                                            echo '<option value="' . $roleRow['role'] . '" ' . $selected . '>' . $roleRow['role'] . '</option>';
-                                        }
-                                        ?>
-                                    </select>
                                 </div>
                                 <div class="form-group">
                                     <div>
@@ -167,11 +149,22 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                                         <input type="text" class="form-control form-control-border border-width-2" id="password" name="password" placeholder="Masukkan password user" value="<?php echo $row['password']; ?>">
                                     </div>
                                 </div>
+                                <div class="form-group">
+                                    <label for="tandaTangan">Gambar TTD <span class="gray-italic-text"> (opsional)</span></label>
+                                    <div class="input-group mb-3">
+                                        <div class="input-group-prepend">
+                                            <button type="button" onclick="openUploadPage()" class="btn btn-primary">
+                                                <i class="fas fa-upload"></i> Upload
+                                            </button>
+                                        </div>
+                                        <input type="text" class="form-control" id="tandaTangan" name="tandaTangan" placeholder="Copy dan paste disini link imgur yang telah dibuat">
+                                    </div>
+                                </div>
                             </div>
                             <!-- /.card-body -->
                         </form>
                         <div class="card-footer d-flex justify-content-end">
-                            <button type="submit" id="submitButton" class="btn btn-primary" onclick="submitForm()">Submit</button>
+                            <button type="button" id="submitButton" class="btn btn-primary" onclick="submitForm()">Submit</button>
                         </div>
                     </div>
                     <!-- general form elements -->
@@ -192,18 +185,19 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     <!-- ./wrapper -->
 
     <!-- jQuery -->
-    <script src="../../assets/adminlte/plugins/jquery/jquery.min.js"></script>
+    <script src="../assets/adminlte/plugins/jquery/jquery.min.js"></script>
     <!-- Bootstrap 4 -->
-    <script src="../../assets/adminlte/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="../assets/adminlte/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
     <!-- bs-custom-file-input -->
-    <script src="../../assets/adminlte/plugins/bs-custom-file-input/bs-custom-file-input.min.js"></script>
+    <script src="../assets/adminlte/plugins/bs-custom-file-input/bs-custom-file-input.min.js"></script>
     <!-- AdminLTE App -->
-    <script src="../../assets/adminlte/dist/js/adminlte.min.js"></script>
+    <script src="../assets/adminlte/dist/js/adminlte.min.js"></script>
     <!-- SweetAlert2 Toast -->
-    <script src="../../assets/adminlte/plugins/sweetalert2/sweetalert2.min.js"></script>
+    <script src="../assets/adminlte/plugins/sweetalert2/sweetalert2.min.js"></script>
     <!-- Page specific script -->
     <script>
         function submitForm() {
+            event.preventDefault();
             if (validateForm()) {
                 validateSuccess();
                 Swal.fire({
@@ -222,7 +216,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
         function validateForm() {
             var namaLengkap = document.getElementById("namaLengkap").value;
-            var role = document.getElementById("role").value;
+            var role = document.querySelector('input[name="role"]:checked').value;
             var password = document.getElementById("password").value;
             var username = document.getElementById("username").value;
 
@@ -258,7 +252,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                         confirmButtonText: 'OK'
                     }).then((result) => {
                         if (result.isConfirmed) {
-                            window.location.href = "../list_user.php";
+                            window.location.href = "list.php";
                         }
                     });
                 },
@@ -285,6 +279,12 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 submitForm();
             }
         });
+
+        function openUploadPage() {
+            var newTab = window.open('https://img.doerig.dev/', '_blank');
+            newTab.blur();
+            window.focus();
+        }
     </script>
 </body>
 

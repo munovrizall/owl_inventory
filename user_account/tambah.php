@@ -12,7 +12,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $password = $_POST["password"];
     $role = $_POST["role"];
     $tandaTangan = isset($_POST["tandaTangan"]) ? $_POST["tandaTangan"] : null;
-    
+
     $checkUsername = "SELECT COUNT(*) FROM user_account WHERE username = ?";
     $stmtUsername = $conn->prepare($checkUsername);
     $stmtUsername->bind_param("s", $username);
@@ -21,7 +21,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $stmtUsername->fetch();
     $stmtUsername->close();
 
-    if ($countUsername > 0){
+    if ($countUsername > 0) {
         $response['status'] = 'error';
         $response['message'] = "'$username' sudah ada di database!";
     } else {
@@ -87,7 +87,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         include $rootPath . "/owl_inventory/includes/navbar.php";
         include $rootPath . "/owl_inventory/includes/sidebar.php";
         ?>
-        
+
         <!-- Content Wrapper. Contains page content -->
         <div class="content-wrapper">
             <!-- Content Header (Page header) -->
@@ -100,8 +100,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         <div class="col-sm-6">
                             <ol class="breadcrumb float-sm-right">
                                 <li class="breadcrumb-item"><a href="../homepage.php">Home</a></li>
-                                <li class="breadcrumb-item active">User Account</li>
-                                <li class="breadcrumb-item active">Tambah Akun</li>
+                                <li class="breadcrumb-item active"><a href="list.php">User</a></li>
+                                <li class="breadcrumb-item active">Tambah User</li>
                             </ol>
                         </div>
                     </div>
@@ -127,25 +127,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                         <input type="text" class="form-control form-control-border border-width-2" id="namaLengkap" name="namaLengkap" placeholder="Masukkan nama lengkap user">
                                     </div>
                                 </div>
+                                <label for="user">Role User <span style="color: red;">*</span></label>
                                 <div class="form-group">
-                                    <label for="tandaTangan">Gambar TTD <span class="gray-italic-text"> (opsional)</span></label>
-                                    <div class="input-group mb-3">
-                                        <div class="input-group-prepend">
-                                            <button onclick="window.open('https://img.doerig.dev/', '_blank')" class="btn btn-primary">
-                                                <i class="fas fa-upload"></i> Upload
-                                            </button>
-                                        </div>
-                                        <input type="text" class="form-control" id="tandaTangan" name="tandaTangan" placeholder="Copy dan paste disini link imgur yang telah dibuat">
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <div>
-                                        <label for="role">Role <span style="color: red;">*</span></label>
-                                        <select class="form-control select2" id="role" name="role">
-                                            <option value="">--- Pilih Role ---</option>
-                                            <option value="user">User</option>
-                                            <option value="admin">Admin</option>
-                                        </select>
+                                    <div class="btn-group btn-group-toggle" data-toggle="buttons">
+                                        <label class="btn btn-outline-primary active">
+                                            <input type="radio" name="role" id="user" value="user" checked> User
+                                        </label>
+                                        <label class="btn btn-outline-primary">
+                                            <input type="radio" name="role" id="admin" value="admin"> Admin
+                                        </label>
                                     </div>
                                 </div>
                                 <div class="form-group">
@@ -160,12 +150,23 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                         <input type="text" class="form-control form-control-border border-width-2" id="password" name="password" placeholder="Masukkan password user">
                                     </div>
                                 </div>
+                                <div class="form-group">
+                                    <label for="tandaTangan">Gambar TTD <span class="gray-italic-text"> (opsional)</span></label>
+                                    <div class="input-group mb-3">
+                                        <div class="input-group-prepend">
+                                            <button type="button" onclick="openUploadPage()" class="btn btn-primary">
+                                                <i class="fas fa-upload"></i> Upload
+                                            </button>
+                                        </div>
+                                        <input type="text" class="form-control" id="tandaTangan" name="tandaTangan" placeholder="Copy dan paste disini link imgur yang telah dibuat">
+                                    </div>
+                                </div>
                             </div>
 
                             <!-- /.card-body -->
                         </form>
                         <div class="card-footer d-flex justify-content-end">
-                            <button type="submit" id="submitButton" class="btn btn-primary" onclick="submitForm()">Submit</button>
+                            <button type="button" id="submitButton" class="btn btn-primary" onclick="submitForm()">Submit</button>
                         </div>
                     </div>
                     <!-- general form elements -->
@@ -198,6 +199,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <!-- Page specific script -->
     <script>
         function submitForm() {
+            event.preventDefault();
             if (validateForm()) {
                 validateSuccess();
                 Swal.fire({
@@ -218,7 +220,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             var namaLengkap = document.getElementById("namaLengkap").value;
             var username = document.getElementById("username").value;
             var password = document.getElementById("password").value;
-            var role = document.getElementById("role").value;
+            var role = document.querySelector('input[name="role"]:checked').value;
 
             if (namaLengkap === "" || username === "" || password === "" || role === "") {
                 Swal.fire({
@@ -240,7 +242,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
             $.ajax({
                 type: "POST",
-                url: "tambah_user.php",
+                url: "tambah.php",
                 data: formData,
                 dataType: "json",
                 success: function(response) {
@@ -255,7 +257,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                             confirmButtonText: 'OK'
                         }).then((result) => {
                             if (result.isConfirmed) {
-                                resetForm();
+                                window.location.href = 'list.php';
                             }
                         });
                     } else if (response.status === 'error') {
@@ -275,6 +277,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         function resetForm() {
             document.getElementById("userForm").reset();
+        }
+
+        function openUploadPage() {
+            var newTab = window.open('https://img.doerig.dev/', '_blank');
+            newTab.blur();
+            window.focus();
         }
 
         var passwordInput = document.getElementById('password');

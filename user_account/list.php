@@ -37,15 +37,36 @@ $result = mysqli_query($conn, $query);
         }
 
         .lebar-kolom2 {
-            width: 80%;
+            width: 45%;
         }
 
         .lebar-kolom3 {
-            width: 15%;
+            width: 10%;
+        }
+
+        .lebar-kolom4 {
+            width: 10%;
+        }
+
+        .lebar-kolom5 {
+            width: 10%;
+        }
+
+        .lebar-kolom6 {
+            width: 10%;
+        }
+
+        .lebar-kolom7 {
+            width: 10%;
         }
 
         .card-padding {
             padding: 10px 20px;
+        }
+
+        .align-center {
+            display: flex;
+            align-items: center;
         }
     </style>
 </head>
@@ -71,8 +92,7 @@ $result = mysqli_query($conn, $query);
                         <div class="col-sm-6">
                             <ol class="breadcrumb float-sm-right">
                                 <li class="breadcrumb-item"><a href="../homepage.php">Home</a></li>
-                                <li class="breadcrumb-item active">User Account</li>
-                                <li class="breadcrumb-item active">List User</li>
+                                <li class="breadcrumb-item active">User</li>
                             </ol>
                         </div>
                     </div>
@@ -86,8 +106,12 @@ $result = mysqli_query($conn, $query);
                     <section class="content">
 
                         <div class="card">
-                            <div class="card-header">
-                                <h3 class="card-title"><b>List User</b></h3>
+                            <div class="card-header align-center">
+                                <a href="tambah.php">
+                                    <button type="button" class="btn btn-primary btn-block" style="max-width: 200px;">
+                                        <i class="fas fa-plus" style="margin-right: 8px;"></i>Tambah User
+                                    </button>
+                                </a>
                             </div>
                             <!-- /.card-header -->
                             <div class="card-body p-0">
@@ -97,7 +121,11 @@ $result = mysqli_query($conn, $query);
                                             <tr>
                                                 <th class="text-center lebar-kolom1">ID</th>
                                                 <th class="text-center lebar-kolom2">Nama Lengkap</th>
-                                                <th class="text-center lebar-kolom3 aksi-column">Aksi</th>
+                                                <th class="text-center lebar-kolom3">Username</th>
+                                                <th class="text-center lebar-kolom4">Password</th>
+                                                <th class="text-center lebar-kolom5">Role</th>
+                                                <th class="text-center lebar-kolom6 aksi-column">TTD</th>
+                                                <th class="text-center lebar-kolom7 aksi-column">Aksi</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -107,9 +135,23 @@ $result = mysqli_query($conn, $query);
                                                 <tr>
                                                     <td><?php echo $row["account_id"]; ?></td>
                                                     <td><?php echo $row["nama_lengkap"]; ?></td>
+                                                    <td><?php echo $row["username"]; ?></td>
+                                                    <td><?php echo $row["password"]; ?></td>
+                                                    <td><?php echo $row["role"]; ?></td>
+                                                    <td>
+                                                        <?php
+                                                        if ($row["tanda_tangan"] !== "") {
+                                                            // Tampilkan gambar jika tanda_tangan tidak null
+                                                            echo '<img src="' . $row["tanda_tangan"] . '" height="40">';
+                                                        } else {
+                                                            // Tampilkan "-" jika tanda_tangan null
+                                                            echo '-';
+                                                        }
+                                                        ?>
+                                                    </td>
                                                     <td class="text-center">
                                                         <div class="col">
-                                                            <a href='edit/edit.php?id=<?php echo $row["account_id"]; ?>' class="btn btn-info btn-block">Edit</a>
+                                                            <a href='edit.php?id=<?php echo $row["account_id"]; ?>' class="btn btn-info btn-block">Edit</a>
                                                         </div>
                                                     </td>
                                                 </tr>

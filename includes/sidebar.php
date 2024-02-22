@@ -229,38 +229,20 @@ $current_page = basename($_SERVER['PHP_SELF']);
                     </ul>
                 </li>
                 <li class="nav-item <?php
-                                    echo (strpos($current_page, 'tambah_user.php') !== false ||
-                                        strpos($current_page, 'list_user.php') !== false) ||
-                                        strpos($_SERVER['REQUEST_URI'], '/owl_inventory/user_account/edit/edit.php') !== false
+                                    echo strpos($_SERVER['REQUEST_URI'], '/owl_inventory/user_account/list.php') !== false ||
+                                        strpos($_SERVER['REQUEST_URI'], '/owl_inventory/user_account/tambah.php') !== false ||
+                                        strpos($_SERVER['REQUEST_URI'], '/owl_inventory/user_account/edit.php') !== false
                                         ? 'menu-open' : ''; ?>">
-                    <a href="user_account.php" class="nav-link <?php
-                                                                echo (strpos($current_page, 'tambah_perusahaan.php') !== false ||
-                                                                    strpos($current_page, 'list_perusahaan.php') !== false) ||
-                                                                    strpos($_SERVER['REQUEST_URI'], '/owl_inventory/user_account/edit/edit.php') !== false
-                                                                    ? 'active' : ''; ?>">
-                        <i class="nav-icon fas fa-industry"></i>
+                    <a href="/owl_inventory/user_account/list.php" class="nav-link <?php
+                                                                    echo strpos($_SERVER['REQUEST_URI'], '/owl_inventory/user_account/list.php') !== false ||
+                                                                        strpos($_SERVER['REQUEST_URI'], '/owl_inventory/user_account/tambah.php') !== false ||
+                                                                        strpos($_SERVER['REQUEST_URI'], '/owl_inventory/user_account/edit.php') !== false
+                                                                        ? 'active' : ''; ?>">
+                        <i class="nav-icon fas fa-user"></i>
                         <p>
-                            User Account
-                            <i class="right fas fa-angle-left"></i>
+                            User
                         </p>
                     </a>
-                    <ul class="nav nav-treeview">
-                        <li class="nav-item">
-                            <a href="/owl_inventory/user_account/tambah_user.php" class="nav-link <?php echo (strpos($current_page, 'tambah_user.php') !== false) ? 'active' : ''; ?>">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Tambah User</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="/owl_inventory/user_account/list_user.php" class="nav-link <?php
-                                                                                                    echo (strpos($current_page, 'list_user.php') !== false) ||
-                                                                                                        strpos($_SERVER['REQUEST_URI'], '/owl_inventory/user_account/edit/edit.php') !== false
-                                                                                                        ? 'active' : ''; ?>">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>List User</p>
-                            </a>
-                        </li>
-                    </ul>
                 </li>
                 <li class="nav-header">PELAPORAN</li>
                 <li class="nav-item">
