@@ -1,6 +1,7 @@
 <?php
 
 include "../connection.php";
+include "../admin_privilege.php";
 
 $query = "SELECT * FROM transaksi_maintenance ORDER BY tanggal_terima";
 $result = mysqli_query($conn, $query);
