@@ -43,7 +43,7 @@ if (!$result) {
         }
 
         .lebar-kolom3 {
-            width: 18%;
+            width: 25%;
         }
 
         .lebar-kolom4 {
@@ -55,14 +55,14 @@ if (!$result) {
         }
 
         .lebar-kolom6 {
-            width: 32%;
+            width: 30%;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
         }
 
         .lebar-kolom7 {
-            width: 20%;
+            width: 15%;
         }
 
         .card-padding {
@@ -119,7 +119,7 @@ if (!$result) {
                                             <tr>
                                                 <th class="text-center lebar-kolom1">ID</th>
                                                 <th class="text-center lebar-kolom2">User</th>
-                                                <th class="text-center lebar-kolom3">Nama Barang</th>
+                                                <th class="text-center lebar-kolom3" style="min-width: 120px">Nama Barang</th>
                                                 <th class="text-center lebar-kolom4">Kuantitas</th>
                                                 <th class="text-center lebar-kolom5">Aktivitas</th>
                                                 <th class="text-center lebar-kolom6">Deskripsi</th>
