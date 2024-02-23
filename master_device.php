@@ -195,7 +195,7 @@ if (isset($_GET["getDropdownOptions"])) {
                                     <label for="picture">Gambar Device <span class="gray-italic-text"> (opsional)</span></label>
                                     <div class="input-group mb-3">
                                         <div class="input-group-prepend">
-                                            <button onclick="window.open('https://img.doerig.dev/', '_blank')" class="btn btn-primary">
+                                            <button type="button" onclick="window.open('https://img.doerig.dev/', '_blank')" class="btn btn-primary">
                                                 <i class="fas fa-upload"></i> Upload
                                             </button>
                                         </div>
