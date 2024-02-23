@@ -93,33 +93,53 @@ if (isset($_POST['selectedDevice'])) {
         $newProductStock = $currentProductStock + $submittedQuantity;
 
         if (isset($_POST['submitForm'])) {
-            // Update the masterbahan table
+            
             $updateQueryStock = "UPDATE masterbahan SET quantity = ? WHERE nama = ?";
             $updateStmt = $conn->prepare($updateQueryStock);
-
+            
             foreach ($updatedStockQuantities as $updatedStock) {
                 $newStock = $updatedStock['newStock'];
                 $namaBahan = $updatedStock['namaBahan'];
-
+                
                 $updateStmt->bind_param("is", $newStock, $namaBahan);
                 $updateStmt->execute();
             }
-
-            $insertQueryHistorisMinus = "INSERT INTO historis (pengguna, nama_barang, waktu, quantity, activity, deskripsi) VALUES (?, ?, NOW(), ?, 'Produksi', ?)";
-            $insertStmtMinus = $conn->prepare($insertQueryHistorisMinus);
-
+            
+            $queryKelompok = "SELECT kelompok FROM masterbahan WHERE nama = ?";
+            $stmtKelompok = $conn->prepare($queryKelompok);
+            
             foreach ($resultProduksi as $row) {
                 $namaBahan = $row['namaBahan'];
+                $stmtKelompok->bind_param("s", $namaBahan);
+                $stmtKelompok->execute();
+                $stmtKelompok->bind_result($namaKelompok);
+                $kelompok = array();
+                while ($stmtKelompok->fetch()) {
+                    $kelompok[] = array('namaKelompok' => $namaKelompok);
+                }
+            
+                $insertQueryHistorisMinus = "INSERT INTO historis (pengguna, nama_barang, waktu, quantity, activity, deskripsi) VALUES (?, ?, NOW(), ?, 'Produksi', ?)";
+                $insertStmtMinus = $conn->prepare($insertQueryHistorisMinus);
+            
                 $stokDibutuhkan = $row['stokDibutuhkan'];
                 $minusBahan = -1 * ($submittedQuantity * $stokDibutuhkan);
-
-                $insertStmtMinus->bind_param("ssis", $pengguna, $namaBahan, $minusBahan, $_POST['deskripsi']);
+            
+                $namaKelompok = '';
+            
+                foreach ($kelompok as $item) {
+                    $namaKelompok = $item['namaKelompok'];
+                }
+            
+                $kelompokNama = $namaKelompok . ' - ' . $namaBahan;
+            
+                $insertStmtMinus->bind_param("ssis", $pengguna, $kelompokNama, $minusBahan, $_POST['deskripsi']);
                 if (!$insertStmtMinus->execute()) {
                     // Log or display the error
                     echo "Error in insertStmtMinus execution: " . $insertStmtMinus->error;
                 }
-            }
-
+            }            
+            
+            $stmtKelompok->close();
             $insertStmtMinus->close();
 
             // Insert into historis
