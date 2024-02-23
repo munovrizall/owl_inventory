@@ -41,15 +41,19 @@ $result = mysqli_query($conn, $query);
         }
 
         .lebar-kolom3 {
-            width: 38%;
+            width: 25%;
         }
 
         .lebar-kolom4 {
-            width: 10%;
+            width: 15%;
         }
 
         .lebar-kolom5 {
-            width: 22%;
+            width: 10%;
+        }
+
+        .lebar-kolom6 {
+            width: 20%;
         }
 
         .card-padding {
@@ -106,8 +110,9 @@ $result = mysqli_query($conn, $query);
                                                 <th class="text-center lebar-kolom1">ID Transaksi</th>
                                                 <th class="text-center lebar-kolom2">Tanggal</th>
                                                 <th class="text-center lebar-kolom3" style="min-width: 80px">Nama PT</th>
-                                                <th class="text-center lebar-kolom4">Status</th>
-                                                <th class="text-center lebar-kolom5 aksi-column" style="min-width: 120px">Aksi</th>
+                                                <th class="text-center lebar-kolom4">Last Edit</th>
+                                                <th class="text-center lebar-kolom5">Status</th>
+                                                <th class="text-center lebar-kolom6 aksi-column" style="min-width: 120px">Aksi</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -149,6 +154,7 @@ $result = mysqli_query($conn, $query);
                                                     <td><?php echo $row["transaksi_id"]; ?></td>
                                                     <td><?php echo $tanggal ?></td>
                                                     <td><?php echo $row["nama_client"]; ?></td>
+                                                    <td><?php echo $row["last_edit"]; ?></td>
                                                     <td class="text-center"><span class="badge <?php echo $statusClass; ?>"><?php echo $statusText; ?></span></td>
                                                     <td class="text-center">
                                                         <div class="row">
