@@ -213,7 +213,7 @@ $result = mysqli_query($conn, $query);
                                                                 <a href='detail/detail.php?id=<?php echo $row["id"]; ?>' class="btn btn-info btn-block" ">Detail</a>
                                                             </div>
                                                             <div class="col">
-                                                                <button class="btn btn-block btn-outline-info" data-id="<?php echo $row['id']; ?>" id="downloadBarcode" >
+                                                                <button class="btn btn-block btn-outline-info" data-id="<?php echo $row['id']; ?>" data-no-sn="<?php echo $row['no_sn']; ?>" id="downloadBarcode" >
                                                                     <i class="fas fa-barcode"></i>
                                                                 </button>
                                                             </div>
@@ -344,6 +344,7 @@ $result = mysqli_query($conn, $query);
             $('#tableInventaris').on('click', '#downloadBarcode', function() {
                 // Get the data-id attribute value from the clicked button
                 var rowId = $(this).data('id');
+                var no_sn = $(this).data('no-sn'); 
 
                 var xhr = new XMLHttpRequest();
                 xhr.open("GET", "generate_barcode/barcode.php?id=" + rowId);
@@ -354,7 +355,7 @@ $result = mysqli_query($conn, $query);
                         var url = window.URL.createObjectURL(xhr.response);
                         var link = document.createElement("a");
                         link.href = url;
-                        link.download = "combined_barcodes.png";
+                        link.download = no_sn + ".png";
                         document.body.appendChild(link);
                         link.click();
                         window.URL.revokeObjectURL(url);

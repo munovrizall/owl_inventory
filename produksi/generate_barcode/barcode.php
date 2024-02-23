@@ -52,9 +52,10 @@ function generateBarcodeImage($data, $generator)
         $y += $barcodeHeight + $textHeight;
     }
 
+    $filename = $data['no_sn'] . ".png";
     // Output combined barcode image directly to the browser
     header('Content-Type: image/png');
-    header("Content-Disposition: attachment; filename=\"combined_barcodes.png\"");
+    header("Content-Disposition: attachment; filename=\"$filename\"");
     imagepng($combinedBarcodeImage);
     imagedestroy($combinedBarcodeImage);
 
