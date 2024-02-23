@@ -14,7 +14,7 @@ if (isset($_POST['selectedItem'])) {
     $newHargaBahan = $_POST['price'];
 
     // Fetch the username from the POST data
-    $pengguna = isset($_SESSION['username']) ? $_SESSION['username'] : '';
+    $pengguna = isset($_SESSION['namaLengkap']) ? $_SESSION['namaLengkap'] : '';
 
 
     // Fetch the stock harga_bahan from the database based on the selected item

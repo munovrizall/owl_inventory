@@ -1,7 +1,7 @@
 <?php
 include "../connection.php";
 
-$username = $_SESSION['username'];
+$namaLengkap = $_SESSION['namaLengkap'];
 
 $query = "SELECT * FROM historis ORDER BY historis.ID DESC LIMIT 20";
 $result = mysqli_query($conn, $query);
@@ -79,7 +79,7 @@ if (!$result) {
         <div class="container-fluid">
           <div class="row mb-2">
             <div class="col-sm-6">
-              <h1 class="m-0">Halo <?php echo $username ?>!</h1>
+              <h1 class="m-0">Halo <?php echo $namaLengkap ?>!</h1>
             </div><!-- /.col -->
             <div class="col-sm-6">
               <ol class="breadcrumb float-sm-right">
