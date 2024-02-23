@@ -32,9 +32,12 @@ if(isset($_POST['sn'], $_POST['produk'], $_POST['firmware'], $_POST['bat'], $_PO
 
             // Check if posted firmware is different from selected values
             if($firmware != $selectedFirmware['firmware']) {
-                $file_path = $selectedFirmware['path'];
+                $file_path = "/var/www/html/bin/".$selectedFirmware['produk']."/".$selectedFirmware['hardware']."/".$selectedFirmware['firmware']."/firmware.bin";
                 $file_name = basename($file_path);
-
+                if(filesize($file_path)==0){
+                    http_response_code(409); // Conflict
+                    echo "no file found";    
+                }
                 // Set headers for force download
                 header("Content-Type: application/octet-stream");
                 header("Content-Disposition: attachment; filename=\"$file_name\"");
@@ -93,7 +96,7 @@ function selectActiveFirmware($conn, $produk, $hardware) {
     // Add your database select logic here
     // Make sure to use proper database connection and sanitize input to prevent SQL injection
     // Return the selected row as an associative array.
-    $sql = "SELECT * FROM firmware_setup WHERE produk = '$produk' AND hardware = '$hardware' AND flag_active = 1";
+    $sql = "SELECT * FROM firmware_setup WHERE produk = '$produk' AND hardware = '$hardware' AND flag_active = 1 LIMIT 1";
     $result = $conn->query($sql);
     return $result->fetch_assoc();
 }
