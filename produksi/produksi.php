@@ -15,7 +15,7 @@ $resultProdukPilihan = $conn->query($queryProdukPilihan);
 
 if (isset($_POST['selectedDevice'])) {
     $selectedDeviceName = $_POST['selectedDevice'];
-    $pengguna = isset($_SESSION['username']) ? $_SESSION['username'] : '';
+    $pengguna = isset($_SESSION['namaLengkap']) ? $_SESSION['namaLengkap'] : '';
 
     // Milih bahan untuk produksi
     $query = "SELECT nama_bahan, quantity, harga_bahan FROM bahan_produksi WHERE produk = ?";

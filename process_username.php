@@ -32,12 +32,14 @@ if(isset($_POST['username'])) {
 
     if ($nama) {
         // Save the full name in a session variable
-        $_SESSION['username'] = $nama;
+        $_SESSION['username'] = $username;
+        $_SESSION['namaLengkap'] = $nama;
         $_SESSION['role'] = $role;
 
         $userData = array(
             'username' => $username,
-            'role' => $role
+            'namaLengkap' => $nama,
+            'role' => $role,
         );
     
         // Return the user data as JSON

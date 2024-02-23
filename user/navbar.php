@@ -1,5 +1,5 @@
 <?php
-$username = $_SESSION['username'];
+$namaLengkap = $_SESSION['namaLengkap'];
 ?>
 
 <nav class="main-header navbar navbar-expand navbar-dark navbar-dark">
@@ -14,7 +14,7 @@ $username = $_SESSION['username'];
       <ul class="navbar-nav ml-auto">
         <li class="nav-item">
           <a class="nav-link">
-            <i class="fas fa-user" style="margin-right: 4px"></i> <?php echo $username?>
+            <i class="fas fa-user" style="margin-right: 4px"></i> <?php echo $namaLengkap?>
           </a>
         </li>
         <li class="nav-item">

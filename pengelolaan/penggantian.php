@@ -40,7 +40,7 @@ if (isset($_GET["getDropdownOptions"])) {
     exit();
 } elseif ($_SERVER["REQUEST_METHOD"] == "POST") {
     
-    $pengguna = isset($_SESSION['username']) ? $_SESSION['username'] : '';
+    $pengguna = isset($_SESSION['namaLengkap']) ? $_SESSION['namaLengkap'] : '';
     $pilihClient = $_POST["pilihClient"];
 
     if (isset($_POST["pilihProdukClient"]) &&  isset($_POST["pilihProdukOWL"])) {

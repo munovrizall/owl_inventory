@@ -2,6 +2,8 @@
 include("../../connection.php");
 include "../../admin_privilege.php";
 
+$username = $_SESSION['username'];
+
 if (isset($_GET['id'])) {
     $transaksi_id = $_GET['id'];
 
@@ -44,6 +46,11 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             $updateStmt->bind_param("iiiiisi", $checkboxBarangDatang, $checkboxCekMasalah, $checkboxBeritaAcara, $checkboxAdministrasi, $checkboxPengiriman, $noResi, $detail_id);
             $updateStmt->execute();
         }
+        $updateLastEdit = "UPDATE transaksi_maintenance SET last_edit = ? WHERE transaksi_id = ?";
+        $updateStmtLastEdit = $conn->prepare($updateLastEdit);
+        $updateStmtLastEdit->bind_param("si", $username, $transaksi_id);
+        $updateStmtLastEdit->execute();
+
         header("Location: ../monitoring.php");
         // exit();
     }

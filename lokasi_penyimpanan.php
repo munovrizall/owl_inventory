@@ -14,7 +14,7 @@ if (isset($_POST['selectedItem'])) {
     $newLokasiPenyimpanan = $_POST['lokasiPenyimpanan'];
 
     // Fetch the username from the POST data
-    $pengguna = isset($_SESSION['username']) ? $_SESSION['username'] : '';
+    $pengguna = isset($_SESSION['namaLengkap']) ? $_SESSION['namaLengkap'] : '';
 
 
     // Fetch the stock lokasi_penyimpanan from the database based on the selected item

@@ -26,7 +26,7 @@ if (isset($_POST['quantity'])) {
     $submittedQuantity = $_POST['quantity'];
 
     // Fetch the username from the POST data
-    $pengguna = isset($_SESSION['username']) ? $_SESSION['username'] : '';
+    $pengguna = isset($_SESSION['namaLengkap']) ? $_SESSION['namaLengkap'] : '';
 
 
     // Fetch the stock quantity from the database based on the selected item
