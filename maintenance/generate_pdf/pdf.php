@@ -41,12 +41,21 @@ if (isset($_GET['id'])) {
         $nama_client = $transaksiRow['nama_client'];
         $last_edit = $transaksiRow['last_edit'];
 
-        // Continue with fetching data from the user_account table based on username
-        $userQuery = "SELECT nama_lengkap FROM user_account WHERE username = ?";
-        $userStmt = $conn->prepare($userQuery);
-        $userStmt->bind_param("s", $last_edit);
-        $userStmt->execute();
+        // Check if $last_edit is null
+        if ($last_edit === null) {
+            // If last_edit is null, use the current session username
+            $current_session_username = $_SESSION['username'];
+            $userQuery = "SELECT nama_lengkap FROM user_account WHERE username = ?";
+            $userStmt = $conn->prepare($userQuery);
+            $userStmt->bind_param("s", $current_session_username);
+        } else {
+            // Otherwise, continue with fetching data from the user_account table based on $last_edit
+            $userQuery = "SELECT nama_lengkap FROM user_account WHERE username = ?";
+            $userStmt = $conn->prepare($userQuery);
+            $userStmt->bind_param("s", $last_edit);
+        }
 
+        $userStmt->execute();
         $userResult = $userStmt->get_result();
         $userRow = $userResult->fetch_assoc();
         $namaLengkap = $userRow["nama_lengkap"];
