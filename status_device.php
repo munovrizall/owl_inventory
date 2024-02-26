@@ -69,7 +69,11 @@ if (isset($_POST['pilihClient'])) {
     }
 
     $stmt->close();
-    echo json_encode($resultDevices);
+    if (empty($resultDevices)) {
+        echo json_encode(null);
+    } else {
+        echo json_encode($resultDevices);
+    }
     exit();
 }
 ?>
@@ -99,6 +103,8 @@ if (isset($_POST['pilihClient'])) {
     <!-- Select2 -->
     <link rel="stylesheet" href="assets/adminlte/plugins/select2/css/select2.min.css">
     <link rel="stylesheet" href="assets/adminlte/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css">
+    <!-- Sweetalert2 -->
+    <link rel="stylesheet" href="assets/adminlte/plugins/sweetalert2-theme-bootstrap-4/bootstrap-4.min.css">
 
     <style>
         .card-container {
@@ -228,6 +234,9 @@ if (isset($_POST['pilihClient'])) {
     <!-- Moment js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.30.1/moment.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.30.1/locale/id.min.js"></script>
+    <!-- SweetAlert2 Toast -->
+    <script src="assets/adminlte/plugins/sweetalert2/sweetalert2.min.js"></script>
+
     <!-- Page specific script -->
     <script>
         $(document).ready(function() {
@@ -262,6 +271,15 @@ if (isset($_POST['pilihClient'])) {
                 },
                 dataType: "json",
                 success: function(response) {
+
+                    if (response == null) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Data tidak ditemukan',
+                            text: 'PT tersebut tidak memiliki device!',
+                        });
+                    }
+
                     var cardsContainer = document.getElementById("cardsContainer");
                     cardsContainer.innerHTML = ""; // Clear existing cards
 
@@ -288,7 +306,7 @@ if (isset($_POST['pilihClient'])) {
                         var hardware = document.createElement("p");
                         hardware.className = "version-text";
                         hardware.textContent = "Hardware: v" + device.hardwareVersion; // Use the relevant property from the response
-                        
+
                         var ipAddress = document.createElement("p");
                         ipAddress.className = "version-text";
                         ipAddress.textContent = device.ipAddress; // Use the relevant property from the response
@@ -312,7 +330,7 @@ if (isset($_POST['pilihClient'])) {
                         var image = document.createElement("img");
 
                         if (device.gambarProduk != null) {
-                            image.src = device.gambarProduk; 
+                            image.src = device.gambarProduk;
                         } else {
                             image.src = "assets/adminlte/dist/img/owl.png"
                         }
