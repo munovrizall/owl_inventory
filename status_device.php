@@ -236,7 +236,7 @@ if (isset($_POST['pilihClient'])) {
                                         <option value="device">Semua Device</option>
                                         <?php
                                         while ($rowDevice = $resultDevice->fetch_assoc()) {
-                                            echo '<option value="' . $rowDevice['nama_produk'] . '">' . $rowDevice['nama_produk'] . '</option>';
+                                            echo '<option value="' . $rowDevice['nama_produk'] . '" data-image="' . $rowDevice['gambar_produk'] . '">' . $rowDevice['nama_produk'] . '</option>';
                                         }
                                         ?>
                                     </select>
