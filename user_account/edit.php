@@ -13,10 +13,10 @@ if (isset($_GET['id'])) {
     $stmt->execute();
 
     $result = $stmt->get_result();
+    $row = $result->fetch_assoc();
 } else {
     echo "ID not provided.";
 }
-
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $account_id = isset($_POST["account_id"]) ? $_POST["account_id"] : null;
@@ -24,16 +24,50 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $tandaTangan = isset($_POST["tandaTangan"]) ? $_POST["tandaTangan"] : null;
     $role = $_POST["role"];
     $username = $_POST["username"];
-    $password = $_POST["password"];
 
-    $updateQuery = "UPDATE user_account SET nama_lengkap = ?, tanda_tangan = ?, username = ?, password = ?, role = ? WHERE account_id=?";
-    $updateStmt = $conn->prepare($updateQuery);
-    $updateStmt->bind_param("sssssi", $namaLengkap, $tandaTangan, $username, $password, $role, $account_id);
-    $updateStmt->execute();
-    $updateStmt->close();
+    $currentPassword = isset($_POST["currentPassword"]) ? $_POST["currentPassword"] : null;
+    $newPassword = isset($_POST["newPassword"]) ? $_POST["newPassword"] : null;
+    $confirmNewPassword = isset($_POST["confirmNewPassword"]) ? $_POST["confirmNewPassword"] : null;
 
-    header("Location: list.php");
-    exit();
+    $preAppend = "p4l1s4d3";
+    $append = "h0nd4nsx90";
+
+    if ($currentPassword !== null) {
+        //Cek currentPassword benar atau tidak
+        $saltedCurrentPassword = $preAppend . $currentPassword . $append;
+        $hashedPassword = hash('sha256', $saltedCurrentPassword);
+
+        if ($hashedPassword == $row['password']){
+            if ($newPassword == $confirmNewPassword) {
+                //Salt dan hash password baru
+                $saltedNewPassword = $preAppend . $newPassword . $append;
+                $hashedNewPassword = hash('sha256', $saltedNewPassword);
+
+                $updatePassword = "UPDATE user_account SET password = ? WHERE account_id = ?";
+                $updateStmt = $conn->prepare($updatePassword);
+                $updateStmt->bind_param("si", $hashedNewPassword, $account_id);
+                $updateStmt->execute();
+                $updateStmt->close();
+                exit();
+            } else {
+                echo json_encode("Error: Konfirmasi Password Baru Salah");
+                exit();
+            }
+        } else {
+            echo json_encode("Error: Password salah");
+            exit();
+        }
+
+    } else {
+        $updateQuery = "UPDATE user_account SET nama_lengkap = ?, tanda_tangan = ?, username = ?, role = ? WHERE account_id = ?";
+        $updateStmt = $conn->prepare($updateQuery);
+        $updateStmt->bind_param("ssssi", $namaLengkap, $tandaTangan, $username, $role, $account_id);
+        $updateStmt->execute();
+        $updateStmt->close();
+    
+        header("Location: list.php");
+        exit();
+    }
 }
 
 ?>
@@ -113,9 +147,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                             <h3 class="card-title">Edit User </h3>
                         </div>
                         <!-- /.card-header -->
-                        <?php
-                        $row = mysqli_fetch_assoc($result);
-                        ?>
                         <!-- form start -->
                         <form id="userForm" method="post"> <!-- Added method="post" -->
                             <input type="hidden" name="account_id" value="<?php echo $account_id; ?>"> <!-- Hidden input to pass account_id -->
@@ -145,9 +176,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                                 </div>
                                 <div class="form-group">
                                     <div>
-                                        <label for="password">Password Login <span style="color: red;">*</span></label>
-                                        <input type="text" class="form-control form-control-border border-width-2" id="password" name="password" placeholder="Masukkan password user" value="<?php echo $row['password']; ?>">
+                                        <label for="password">Password</label>
                                     </div>
+                                    <button type="button" class="btn btn-outline-info btn-block" data-toggle="modal" data-target="#modalUbahPassword" style="margin-top: 10px; max-width: 140px;"><i style="margin-right: 8px;"></i>Ubah Password</button>
                                 </div>
                                 <div class="form-group">
                                     <label for="tandaTangan">Gambar TTD <span class="gray-italic-text"> (opsional)</span></label>
@@ -181,6 +212,42 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             <!-- Control sidebar content goes here -->
         </aside>
         <!-- /.control-sidebar -->
+        <form id="ubahPasswordForm">
+            <div class="modal fade" id="modalUbahPassword" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalCenterTitle">Ubah Password</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="form-group">
+                                <label for="currentPassword">Password Saat Ini <span style="color: red;">*</span></label>
+                                <input type="text" class="form-control form-control-border border-width-2" id="currentPassword" name="currentPassword" placeholder="Masukkan password saat ini">
+                            </div>
+                        </div>
+                        <div class="modal-body">
+                            <div class="form-group">
+                                <label for="newPassword">Password Baru <span style="color: red;">*</span></label>
+                                <input type="password" class="form-control form-control-border border-width-2" id="newPassword" name="newPassword" placeholder="Masukkan password baru">
+                            </div>
+                        </div>
+                        <div class="modal-body">
+                            <div class="form-group">
+                                <label for="confirmNewPassword">Konfirmasi Password Baru <span style="color: red;">*</span></label>
+                                <input type="password" class="form-control form-control-border border-width-2" id="confirmNewPassword" name="confirmNewPassword" placeholder="Masukkan password baru">
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-primary" onclick="if(validateFormNP()) { validateSuccessNP(); resetForm(); }">Submit</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
     </div>
     <!-- ./wrapper -->
 
@@ -217,10 +284,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         function validateForm() {
             var namaLengkap = document.getElementById("namaLengkap").value;
             var role = document.querySelector('input[name="role"]:checked').value;
-            var password = document.getElementById("password").value;
             var username = document.getElementById("username").value;
 
-            if (namaLengkap === "" || role === "" || username === "" || password === "") {
+            if (namaLengkap === "" || role === "" || username === "") {
                 Swal.fire({
                     icon: 'error',
                     title: 'Oops...',
@@ -268,17 +334,69 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             });
         }
 
-        function resetForm() {
-            document.getElementById("userForm").reset();
+        function validateFormNP() {
+            var currentPassword = document.getElementById("currentPassword").value;
+            var newPassword = document.getElementById("newPassword").value;
+            var CNPassword = document.getElementById("confirmNewPassword").value;
+
+            if (currentPassword === "" || newPassword === "" || CNPassword === "") {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: 'Harap lengkapi semua formulir!',
+                });
+                return false;
+            } else if (newPassword !== CNPassword) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: 'Password baru berbeda dengan konfirmasi!',
+                });
+                return false;
+            }
+
+            return true;
+        }
+        
+        function validateSuccessNP() {
+            // Get the form data
+            var formDataKB = $("#ubahPasswordForm").serialize();
+
+            $.ajax({
+                type: "POST",
+                url: "edit.php",
+                data: formDataKB,
+                success: function(response) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Password berhasil diubah!',
+                        showCancelButton: false,
+                        confirmButtonColor: '#3085d6',
+                        confirmButtonText: 'OK'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            location.reload();
+                        }
+                    });
+                },
+                error: function(error) {
+                    alert("Error mengubah password.");
+                }
+            });
         }
 
-        var password = document.getElementById('password');
-        password.addEventListener('keydown', function(event) {
-            if (event.keyCode === 13) {
-                event.preventDefault();
-                submitForm();
-            }
-        });
+        function resetForm() {
+            document.getElementById("userForm").reset();
+            document.getElementById("ubahPasswordForm").reset();
+        }
+
+        // var password = document.getElementById('password');
+        // password.addEventListener('keydown', function(event) {
+        //     if (event.keyCode === 13) {
+        //         event.preventDefault();
+        //         submitForm();
+        //     }
+        // });
 
         function openUploadPage() {
             var newTab = window.open('https://img.doerig.dev/', '_blank');

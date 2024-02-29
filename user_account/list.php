@@ -46,10 +46,6 @@ $result = mysqli_query($conn, $query);
             width: 10%;
         }
 
-        .lebar-kolom4 {
-            width: 10%;
-        }
-
         .lebar-kolom5 {
             width: 10%;
         }
@@ -124,7 +120,6 @@ $result = mysqli_query($conn, $query);
                                                 <th class="text-center lebar-kolom1">ID</th>
                                                 <th class="text-center lebar-kolom2">Nama Lengkap</th>
                                                 <th class="text-center lebar-kolom3">Username</th>
-                                                <th class="text-center lebar-kolom4">Password</th>
                                                 <th class="text-center lebar-kolom5">Role</th>
                                                 <th class="text-center lebar-kolom6 aksi-column">TTD</th>
                                                 <th class="text-center lebar-kolom7 aksi-column">Aksi</th>
@@ -138,7 +133,6 @@ $result = mysqli_query($conn, $query);
                                                     <td><?php echo $row["account_id"]; ?></td>
                                                     <td><?php echo $row["nama_lengkap"]; ?></td>
                                                     <td><?php echo $row["username"]; ?></td>
-                                                    <td><?php echo $row["password"]; ?></td>
                                                     <td><?php echo $row["role"]; ?></td>
                                                     <td>
                                                         <?php

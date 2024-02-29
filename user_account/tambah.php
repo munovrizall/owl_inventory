@@ -13,6 +13,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $role = $_POST["role"];
     $tandaTangan = isset($_POST["tandaTangan"]) ? $_POST["tandaTangan"] : null;
 
+    // Add salt to the password
+    $preAppend = "p4l1s4d3";
+    $append = "h0nd4nsx90";
+    $saltedPassword = $preAppend . $password . $append;
+
+    // Hash the salted password using SHA-256
+    $hashedPassword = hash('sha256', $saltedPassword);
+
     $checkUsername = "SELECT COUNT(*) FROM user_account WHERE username = ?";
     $stmtUsername = $conn->prepare($checkUsername);
     $stmtUsername->bind_param("s", $username);
@@ -27,7 +35,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     } else {
         $insertQuery = "INSERT INTO user_account (nama_lengkap, username, password, role, tanda_tangan) VALUES (?, ?, ?, ?, ?)";
         $insertStmt = $conn->prepare($insertQuery);
-        $insertStmt->bind_param("sssss", $namaLengkap, $username, $password, $role, $tandaTangan);
+        $insertStmt->bind_param("sssss", $namaLengkap, $username, $hashedPassword, $role, $tandaTangan);
         $insertStmt->execute();
         $insertStmt->close();
 
@@ -42,6 +50,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 }
 
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 
