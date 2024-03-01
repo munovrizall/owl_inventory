@@ -11,21 +11,39 @@ $resultProduk = $conn->query($queryProduk);
 $valid_extensions = array('bin'); // valid extensions
 $path = 'uploads/';
 
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $selectedItem = isset($_POST['selectedItem']) ? $_POST['selectedItem'] : null;
-    $firmware = isset($_POST['firmware']) ? $_POST['firmware'] : null;
-    $hardware = isset($_POST['hardware']) ? $_POST['hardware'] : null;
 
-    $sql = "INSERT INTO firmware_setup (produk, firmware, hardware, flag_active) VALUES (?, ?, ?, 1)";
-    $stmt = $conn->prepare($sql);
-    $stmt->bind_param("sss", $selectedItem, $firmware, $hardware);
+if (isset($_FILES['fileFirmware'])) {
+    $produk = $_POST['selectedItem'];
+    $firmware = $_POST['firmware'];
+    $hardware = $_POST['hardware'];
 
-    if ($stmt->execute()) {
-        echo json_encode("Data berhasil disimpan.");
-    } else {
-        echo "Error: " . $sql . "<br>" . $stmt->error;
+    // Proses upload file firmware
+    $uploadPath = "/var/www/html/bin/$produk/$hardware/$firmware/"; // Sesuaikan dengan direktori upload Anda
+
+    $fileFirmware = $_FILES['fileFirmware'];
+    $fileName = "firmware.bin";
+    $uploadFile = $uploadPath . basename($fileName);
+
+    if (!is_dir($uploadPath)) {
+        mkdir($uploadPath, 0777, true);
     }
-    $stmt->close();
+
+    if (move_uploaded_file($fileFirmware['tmp_name'], $uploadFile)) {
+        $queryFlag = "UPDATE firmware_setup SET flag_active = 0 WHERE produk = ?";
+        $stmt = $conn->prepare($queryFlag);
+        $stmt->bind_param("s", $produk);
+        $stmt->execute();
+        // Simpan data ke dalam database
+        $sql = "INSERT INTO firmware_setup (produk, firmware, hardware, path, flag_active) VALUES ('$produk', '$firmware', '$hardware', '$uploadFile', 1)";
+
+        if ($conn->query($sql) === TRUE) {
+            echo json_encode("Data berhasil disimpan!");
+        } else {
+            echo "Error: " . $sql . "<br>" . $conn->error;
+        }
+    } else {
+        echo json_encode("Gagal mengupload file firmware.");
+    }
     exit();
 }
 ?>
@@ -105,7 +123,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         </div>
                         <!-- /.card-header -->
                         <!-- form start -->
-                        <form id="firmwareForm" enctype="multipart/form-data">
+                        <form id="firmwareForm" enctype="multipart/form-data" action="upload_firmware.php" method="post">
                             <div class="card-body">
                                 <div class="form-group">
                                     <label for="pilihProduk">Pilih Produk <span style="color: red;">*</span></label>
@@ -119,28 +137,28 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                     </select>
                                 </div>
                                 <div class="form-group">
-                                    <label for="firmware">Versi Firmware <span style="color: red;">*</span></label>
-                                    <input type="text" class="form-control form-control-border border-width-2" id="firmware" name="firmware" placeholder="Masukkan versi firmware yang diupload">
-                                </div>
-                                <div class="form-group">
                                     <label for="hardware">Versi Hardware <span style="color: red;">*</span></label>
                                     <input type="text" class="form-control form-control-border border-width-2" id="hardware" name="hardware" placeholder="Masukkan versi hardware yang diupload">
+                                </div>
+                                <div class="form-group">
+                                    <label for="firmware">Versi Firmware <span style="color: red;">*</span></label>
+                                    <input type="text" class="form-control form-control-border border-width-2" id="firmware" name="firmware" placeholder="Masukkan versi firmware yang diupload">
                                 </div>
                                 <div class="form-group">
                                     <label for="fileFirmware">Upload File Firmware <span style="color: red;">*</span></label>
                                     <div class="input-group">
                                         <div class="custom-file">
-                                            <input type="file" class="custom-file-input" id="fileFirmware">
+                                            <input type="file" class="custom-file-input" id="fileFirmware" name="fileFirmware">
                                             <label class="custom-file-label" for="fileFirmware">Pilih File</label>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                             <!-- /.card-body -->
+                            <div class="card-footer d-flex justify-content-end">
+                                <button type="submit" id="submitButton" class="btn btn-primary">Submit</button>
+                            </div>
                         </form>
-                        <div class="card-footer d-flex justify-content-end">
-                            <button type="submit" id="submitButton" class="btn btn-primary" onclick="if(validateForm()) {validateSuccess();}">Submit</button>
-                        </div>
                     </div>
                     <!-- general form elements -->
                     <!-- /.card -->
@@ -187,6 +205,49 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             });
 
             $('#fileFirmware').on('change', handleFileChange);
+
+            $("#firmwareForm").submit(function(e) {
+                event.preventDefault();
+                if (validateForm()) {
+                    e.preventDefault(); 
+                    var formData = new FormData(this);
+
+                    $.ajax({
+                        url: "upload_firmware.php", 
+                        type: "POST",
+                        data: formData,
+                        contentType: false,
+                        processData: false,
+                        success: function(response) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Firmware berhasil diupload!',
+                                showCancelButton: false,
+                                confirmButtonColor: '#3085d6',
+                                confirmButtonText: 'OK (enter)'
+                            }).then((result) => {
+                                if (result.isConfirmed) {
+                                    window.location.reload();
+                                }
+                            });
+                        },
+                        error: function(xhr, status, error) {
+                            console.error(xhr.responseText);
+
+
+                        }
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops...',
+                        text: 'Harap lengkapi semua formulir!',
+                        showCancelButton: false,
+                        confirmButtonColor: '#3085d6',
+                        confirmButtonText: 'OK (enter)'
+                    });
+                }
+            });
         });
 
         function handleFileChange() {
