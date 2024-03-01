@@ -220,9 +220,17 @@ $current_page = basename($_SERVER['PHP_SELF']);
                                                                         strpos($_SERVER['REQUEST_URI'], '/owl_inventory/user_account/tambah.php') !== false ||
                                                                         strpos($_SERVER['REQUEST_URI'], '/owl_inventory/user_account/edit.php') !== false
                                                                         ? 'active' : ''; ?>">
-                        <i class="nav-icon fas fa-user"></i>
+                        <i class="nav-icon fas fa-user-gear"></i>
                         <p>
-                            User
+                            User Management
+                        </p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/owl_inventory/upload_firmware.php" class="nav-link <?php echo (strpos($current_page, 'upload_firmware.php') !== false) ? 'active' : ''; ?>">
+                        <i class="nav-icon fas fa-upload"></i>
+                        <p>
+                            Upload Firmware
                         </p>
                     </a>
                 </li>
