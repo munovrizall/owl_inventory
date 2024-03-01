@@ -7,11 +7,6 @@ include "admin_privilege.php";
 $queryProduk = "SELECT nama_produk FROM produk";
 $resultProduk = $conn->query($queryProduk);
 
-
-$valid_extensions = array('bin'); // valid extensions
-$path = 'uploads/';
-
-
 if (isset($_FILES['fileFirmware'])) {
     $produk = $_POST['selectedItem'];
     $firmware = $_POST['firmware'];
