@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Feb 09, 2024 at 08:37 AM
+-- Generation Time: Mar 03, 2024 at 04:57 PM
 -- Server version: 10.4.32-MariaDB-log
 -- PHP Version: 8.0.3
 
@@ -52,6 +52,13 @@ CREATE TABLE `client` (
   `password` varchar(40) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `client`
+--
+
+INSERT INTO `client` (`client_id`, `nama_client`, `nama_korespondensi`, `alamat_perusahaan`, `username`, `password`) VALUES
+(1, 'OWL', 'admin', '...', '', ''),
+
 -- --------------------------------------------------------
 
 --
@@ -76,13 +83,27 @@ CREATE TABLE `detail_maintenance` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `firmware_setup`
+--
+
+CREATE TABLE `firmware_setup` (
+  `produk` varchar(20) NOT NULL,
+  `firmware` varchar(10) NOT NULL,
+  `hardware` varchar(10) NOT NULL,
+  `path` varchar(200) DEFAULT NULL,
+  `flag_active` tinyint(1) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `historis`
 --
 
 CREATE TABLE `historis` (
   `ID` int(6) NOT NULL,
   `pengguna` varchar(40) NOT NULL,
-  `nama_barang` varchar(20) NOT NULL,
+  `nama_barang` varchar(200) NOT NULL,
   `waktu` datetime(6) NOT NULL,
   `quantity` int(6) NOT NULL,
   `activity` varchar(20) NOT NULL,
@@ -124,7 +145,11 @@ CREATE TABLE `inventaris_produk` (
   `status_qc_sensor_3` varchar(255) DEFAULT NULL,
   `status_qc_sensor_4` varchar(255) DEFAULT NULL,
   `status_qc_sensor_5` varchar(255) DEFAULT NULL,
-  `status_qc_sensor_6` varchar(255) DEFAULT NULL
+  `status_qc_sensor_6` varchar(255) DEFAULT NULL,
+  `last_online` datetime DEFAULT NULL,
+  `bat` int(5) DEFAULT NULL,
+  `pt` varchar(10) DEFAULT NULL,
+  `unit` varchar(10) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -139,6 +164,7 @@ CREATE TABLE `masterbahan` (
   `nama` varchar(255) NOT NULL,
   `quantity` int(12) NOT NULL,
   `harga_bahan` int(10) DEFAULT NULL,
+  `lokasi_penyimpanan` varchar(50) DEFAULT NULL,
   `deskripsi` varchar(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -163,7 +189,8 @@ CREATE TABLE `produk` (
   `produk_id` int(6) NOT NULL,
   `nama_produk` varchar(20) NOT NULL,
   `quantity` int(6) NOT NULL,
-  `hpp_produk` int(10) DEFAULT NULL
+  `hpp_produk` int(10) DEFAULT NULL,
+  `gambar_produk` varchar(50) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -175,12 +202,32 @@ CREATE TABLE `produk` (
 CREATE TABLE `transaksi_maintenance` (
   `transaksi_id` int(11) NOT NULL,
   `tanggal_terima` date NOT NULL,
-  `nama_client` varchar(255) DEFAULT NULL
+  `nama_client` varchar(255) DEFAULT NULL,
+  `last_edit` varchar(20) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `user_account`
+--
+
+CREATE TABLE `user_account` (
+  `account_id` int(6) NOT NULL,
+  `nama_lengkap` varchar(100) NOT NULL,
+  `username` varchar(20) NOT NULL,
+  `password` varchar(100) NOT NULL,
+  `role` varchar(10) NOT NULL,
+  `tanda_tangan` varchar(50) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Indexes for dumped tables
+-- Dumping data for table `user_account`
 --
+
+INSERT INTO `user_account` (`account_id`, `nama_lengkap`, `username`, `password`, `role`, `tanda_tangan`) VALUES
+(1, 'admin', 'admin', 'admin', 'admin', ''),
+COMMIT;
 
 --
 -- Indexes for table `bahan_produksi`
@@ -251,6 +298,13 @@ ALTER TABLE `transaksi_maintenance`
   ADD KEY `nama_client` (`nama_client`);
 
 --
+-- Indexes for table `user_account`
+--
+ALTER TABLE `user_account`
+  ADD PRIMARY KEY (`account_id`),
+  ADD UNIQUE KEY `username` (`username`);
+
+--
 -- AUTO_INCREMENT for dumped tables
 --
 
@@ -264,7 +318,7 @@ ALTER TABLE `bahan_produksi`
 -- AUTO_INCREMENT for table `client`
 --
 ALTER TABLE `client`
-  MODIFY `client_id` int(6) NOT NULL AUTO_INCREMENT;
+  MODIFY `client_id` int(6) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- AUTO_INCREMENT for table `detail_maintenance`
@@ -307,6 +361,12 @@ ALTER TABLE `produk`
 --
 ALTER TABLE `transaksi_maintenance`
   MODIFY `transaksi_id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `user_account`
+--
+ALTER TABLE `user_account`
+  MODIFY `account_id` int(6) NOT NULL AUTO_INCREMENT;
 
 --
 -- Constraints for dumped tables
