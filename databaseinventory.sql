@@ -56,9 +56,7 @@ CREATE TABLE `client` (
 -- Dumping data for table `client`
 --
 
-INSERT INTO `client` (`client_id`, `nama_client`, `nama_korespondensi`, `alamat_perusahaan`, `username`, `password`) VALUES
-(1, 'OWL', 'admin', '...', '', ''),
-
+INSERT INTO `client` (`client_id`, `nama_client`, `nama_korespondensi`, `alamat_perusahaan`, `username`, `password`) VALUES ('1', 'OWL', 'riki', '...', 'admin', 'admin');
 -- --------------------------------------------------------
 
 --
@@ -225,9 +223,7 @@ CREATE TABLE `user_account` (
 -- Dumping data for table `user_account`
 --
 
-INSERT INTO `user_account` (`account_id`, `nama_lengkap`, `username`, `password`, `role`, `tanda_tangan`) VALUES
-(1, 'admin', 'admin', 'admin', 'admin', ''),
-COMMIT;
+INSERT INTO `user_account` (`account_id`, `nama_lengkap`, `username`, `password`, `role`, `tanda_tangan`) VALUES ('1', 'admin', 'admin', 'admin', 'admin', NULL);
 
 --
 -- Indexes for table `bahan_produksi`
