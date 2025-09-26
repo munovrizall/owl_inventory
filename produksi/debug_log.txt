@@ -1,0 +1,73 @@
+[2025-06-26 13:14:19] raw input: {"mac_wifi":"C4:4F:33:39:46:05","mac_bluetooth":"C4:4F:33:39:46:07","chip_id":959665418,"no_sn":24082001,"produk":"FP307S-BW-GPS","firmware_version":"1.3.1","hardware_version":"1.0.0","bat":101,"temperature":33.5,"free_ram":62616,"min_ram":21016,"gps_latitude":-6.277242,"gps_longitude":106.796503,"type_produk":"FPOWL","nama_client":"OWL","ip_address":"0.0.0.0","batt_low":0,"batt_high":0,"status_error":0,"status_qc_sensor_1":"Registrasi Berhasil","status_qc_sensor_2":"Backup Berhasil","status_qc_sensor_3":"Delete Datakar Berhasil","status_qc_sensor_4":"Restore Berhasil","status_qc_sensor_5":"Absen Berhasil","status_qc_sensor_6":"ok","garansi_awal":"","garansi_akhir":"","garansi_void":0,"keterangan_void":"","pt":"","unit":""}
+[2025-06-26 13:14:19] Request data: Array
+(
+    [mac_wifi] => C4:4F:33:39:46:05
+    [mac_bluetooth] => C4:4F:33:39:46:07
+    [chip_id] => 959665418
+    [no_sn] => 24082001
+    [produk] => FP307S-BW-GPS
+    [firmware_version] => 1.3.1
+    [hardware_version] => 1.0.0
+    [bat] => 101
+    [temperature] => 33.5
+    [free_ram] => 62616
+    [min_ram] => 21016
+    [gps_latitude] => -6.277242
+    [gps_longitude] => 106.796503
+    [type_produk] => FPOWL
+    [nama_client] => OWL
+    [ip_address] => 0.0.0.0
+    [batt_low] => 0
+    [batt_high] => 0
+    [status_error] => 0
+    [status_qc_sensor_1] => Registrasi Berhasil
+    [status_qc_sensor_2] => Backup Berhasil
+    [status_qc_sensor_3] => Delete Datakar Berhasil
+    [status_qc_sensor_4] => Restore Berhasil
+    [status_qc_sensor_5] => Absen Berhasil
+    [status_qc_sensor_6] => ok
+    [garansi_awal] => 
+    [garansi_akhir] => 
+    [garansi_void] => 0
+    [keterangan_void] => 
+    [pt] => 
+    [unit] => 
+)
+
+[2025-06-26 13:18:17] raw input: {"mac_wifi":"C4:4F:33:39:46:05","mac_bluetooth":"C4:4F:33:39:46:07","chip_id":959665418,"no_sn":24082001,"produk":"FP307S-BW-GPS","firmware_version":"1.3.1","hardware_version":"1.0.0","bat":101,"temperature":33.5,"free_ram":62616,"min_ram":21016,"gps_latitude":-6.277242,"gps_longitude":106.796503,"type_produk":"FPOWL","nama_client":"OWL","ip_address":"0.0.0.0","batt_low":0,"batt_high":0,"status_error":0,"status_qc_sensor_1":"Registrasi Berhasil","status_qc_sensor_2":"Backup Berhasil","status_qc_sensor_3":"Delete Datakar Berhasil","status_qc_sensor_4":"Restore Berhasil","status_qc_sensor_5":"Absen Berhasil","status_qc_sensor_6":"ok","garansi_awal":"","garansi_akhir":"","garansi_void":0,"keterangan_void":"","pt":"","unit":""}
+[2025-06-26 13:18:17] Request data: Array
+(
+    [mac_wifi] => C4:4F:33:39:46:05
+    [mac_bluetooth] => C4:4F:33:39:46:07
+    [chip_id] => 959665418
+    [no_sn] => 24082001
+    [produk] => FP307S-BW-GPS
+    [firmware_version] => 1.3.1
+    [hardware_version] => 1.0.0
+    [bat] => 101
+    [temperature] => 33.5
+    [free_ram] => 62616
+    [min_ram] => 21016
+    [gps_latitude] => -6.277242
+    [gps_longitude] => 106.796503
+    [type_produk] => FPOWL
+    [nama_client] => OWL
+    [ip_address] => 0.0.0.0
+    [batt_low] => 0
+    [batt_high] => 0
+    [status_error] => 0
+    [status_qc_sensor_1] => Registrasi Berhasil
+    [status_qc_sensor_2] => Backup Berhasil
+    [status_qc_sensor_3] => Delete Datakar Berhasil
+    [status_qc_sensor_4] => Restore Berhasil
+    [status_qc_sensor_5] => Absen Berhasil
+    [status_qc_sensor_6] => ok
+    [garansi_awal] => 
+    [garansi_akhir] => 
+    [garansi_void] => 0
+    [keterangan_void] => 
+    [pt] => 
+    [unit] => 
+)
+
+[2025-06-26 13:18:17] Failed to update data: Incorrect date value: '' for column `devices`.`inventaris_produk`.`garansi_awal` at row 196

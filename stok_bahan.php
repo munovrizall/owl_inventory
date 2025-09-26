@@ -116,9 +116,12 @@ $result = mysqli_query($conn, $query);
                                                 <th class="text-center lebar-kolom2">Kelompok</th>
                                                 <th class="text-center lebar-kolom3">Nama</th>
                                                 <th class="text-center lebar-kolom4">Stok</th>
-                                                <th class="text-center lebar-kolom5">Harga Bahan</th>
+                                                <th class="text-center lebar-kolom5" style="max-width:50px">Harga Bahan</th>
                                                 <th class="text-center lebar-kolom6">Lokasi Penyimpanan</th>
-                                                <th class="text-center lebar-kolom7" style="min-width:140px">Deskripsi</th>
+                                                <th class="text-center lebar-kolom7">Link Foto</th>
+                                                <th class="text-center lebar-kolom8">Link Pembelian</th>
+                                                <th class="text-center lebar-kolom9" style="min-width:140px">Deskripsi</th>
+                                                <th class="text-center lebar-kolom10">Aksi</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -130,9 +133,24 @@ $result = mysqli_query($conn, $query);
                                                     <td><?php echo $row["kelompok"]; ?></td>
                                                     <td><?php echo $row["nama"]; ?></td>
                                                     <td><?php echo $row["quantity"]; ?></td>
-                                                    <td>Rp <?php echo number_format($row["harga_bahan"]); ?></td>
+                                                    <td>Rp <?php echo number_format($row["harga_bahan"] ?? 0); ?></td>
                                                     <td><?php echo $row["lokasi_penyimpanan"]; ?></td>
+                                                    <td class="text-center">
+                                                        <?php if (!empty($row["link_foto"])): ?>
+                                                            <a href="<?php echo $row["link_foto"]; ?>" target="_blank">Lihat Foto</a>
+                                                        <?php endif; ?>
+                                                    </td>
+                                                    <td class="text-center">
+                                                        <?php if (!empty($row["link"])): ?>
+                                                            <a href="<?php echo $row["link"]; ?>" target="_blank">Kunjungi</a>
+                                                        <?php endif; ?>
+                                                    </td>
                                                     <td><?php echo $row["deskripsi"]; ?></td>
+                                                    <td>
+                                                        <div class="col">
+                                                            <a href='editbahan.php?id=<?php echo $row["stok_id"]; ?>' class="btn btn-info btn-block">Edit</a>
+                                                        </div>
+                                                    </td>
                                                 </tr>
                                             <?php
                                             }

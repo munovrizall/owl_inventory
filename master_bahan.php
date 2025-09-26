@@ -10,6 +10,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $quantity = isset($_POST["quantity"]) ? $_POST["quantity"] : null;
     $hargaBahan = isset($_POST["price"]) ? $_POST["price"] : null;
     $lokasiPenyimpanan = isset($_POST["lokasiPenyimpanan"]) ? $_POST["lokasiPenyimpanan"] : null;
+    $linkFoto = isset($_POST["linkFoto"]) ? $_POST["linkFoto"] : null;
+    $linkPembelian = isset($_POST["linkPembelian"]) ? $_POST["linkPembelian"] : null;
     $deskripsi = isset($_POST["deskripsi"]) ? $_POST["deskripsi"] : null;
 
     $namaKelompokBaru = isset($_POST["namaKelompokBaru"]) ? $_POST["namaKelompokBaru"] : null;
@@ -60,9 +62,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $insertStmtKB->close();
     } elseif ($kelompok !== null) {
         // Insert the new record for material
-        $insertQuery = "INSERT INTO masterbahan (kelompok, nama, quantity, harga_bahan, lokasi_penyimpanan, deskripsi) VALUES (?, ?, ?, ?, ?, ?)";
+        $insertQuery = "INSERT INTO masterbahan (kelompok, nama, quantity, harga_bahan, lokasi_penyimpanan, link_foto, link, deskripsi) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         $insertStmt = $conn->prepare($insertQuery);
-        $insertStmt->bind_param("ssiiss", $kelompok, $nama, $quantity, $hargaBahan, $lokasiPenyimpanan, $deskripsi);
+        $insertStmt->bind_param("ssiissss", $kelompok, $nama, $quantity, $hargaBahan, $lokasiPenyimpanan, $linkFoto, $linkPembelian, $deskripsi);
 
         if ($insertStmt->execute()) {
             echo "Data berhasil ditambahkan ke tabel masterbahan.";
@@ -182,7 +184,7 @@ if (!$resultKelompok) {
                                 <div class="form-group">
                                     <label for="quantity">Kuantitas <span style="color: red;">*</span></label>
                                     <div class="input-group">
-                                        <input type="number" class="form-control" id="quantity" name="quantity" min="0" value="" placeholder="Masukkan jumlah stok bahan">
+                                        <input type="number" class="form-control" id="quantity" name="quantity" min="0" value="0" placeholder="Masukkan jumlah stok bahan">
                                     </div>
                                 </div>
                                 <div class="form-group">
@@ -194,6 +196,14 @@ if (!$resultKelompok) {
                                 <div class="form-group">
                                     <label for="lokasiPenyimpanan">Lokasi Penyimpanan <span class="gray-italic-text"> (opsional)</span></label>
                                     <input type="text" class="form-control form-control-border border-width-2" id="lokasiPenyimpanan" name="lokasiPenyimpanan" placeholder="Masukkan lokasi penyimpanan">
+                                </div>
+                                <div class="form-group">
+                                    <label for="linkFoto">Link Foto <span style="color: red;">*</span></label>
+                                    <input type="text" class="form-control form-control-border border-width-2" id="linkFoto" name="linkFoto" placeholder="Masukkan link foto">
+                                </div>
+                                <div class="form-group">
+                                    <label for="linkPembelian">Link Pembelian <span style="color: red;">*</span></label>
+                                    <input type="text" class="form-control form-control-border border-width-2" id="linkPembelian" name="linkPembelian" placeholder="Masukkan link pembelian">
                                 </div>
                                 <div class="form-group">
                                     <label for="deskripsi">Deskripsi <span class="gray-italic-text"> (opsional)</span></label>
@@ -279,8 +289,10 @@ if (!$resultKelompok) {
             var selectedItem = document.getElementById("pilihNamaKelompok").value;
             var nama = document.getElementById("namaBahan").value;
             var quantity = document.getElementById("quantity").value;
+            var linkFoto = document.getElementById("linkFoto").value;
+            var linkPembelian = document.getElementById("linkPembelian").value;
 
-            if (selectedItem === "" || nama === "" || quantity === "" || quantity <= 0) {
+            if (selectedItem === "" || nama === "" || quantity === "" || linkFoto === "" || linkPembelian === "" || quantity < 0) {
                 Swal.fire({
                     icon: 'error',
                     title: 'Oops...',

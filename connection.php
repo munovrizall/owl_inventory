@@ -4,8 +4,8 @@ session_start();
 
 $serverName = "localhost";
 $userNameDb = "root";
-$password = "";
-$dbName = "databaseinventory";
+$password = "Sem4ng4tsukses!";
+$dbName = "devices";
 
 mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
 

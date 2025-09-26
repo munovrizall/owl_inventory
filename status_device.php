@@ -13,105 +13,121 @@ if (isset($_POST['pilihClient'])) {
     $selectedDevice = $_POST['pilihDevice'];
 
     if ($selectedDevice == 'device') {
-        $query = "SELECT i.id, i.nama_client, i.produk, i.no_sn, i.firmware_version, i.hardware_version, i.temperature, i.last_online, i.bat, i.pt, i.unit, i.status_error, i.ip_address, p.gambar_produk
-        FROM inventaris_produk i
-        JOIN produk p ON i.produk = p.nama_produk
-        WHERE i.nama_client = ? AND
-            i.id IS NOT NULL AND 
-            i.type_produk IS NOT NULL AND 
-            i.produk IS NOT NULL AND 
-            i.chip_id IS NOT NULL AND 
-            i.no_sn IS NOT NULL AND 
-            i.nama_client IS NOT NULL AND 
-            i.garansi_awal IS NOT NULL AND 
-            i.garansi_akhir IS NOT NULL AND 
-            i.garansi_void IS NOT NULL AND 
-            i.keterangan_void IS NOT NULL AND 
-            i.ip_address IS NOT NULL AND 
-            i.mac_wifi IS NOT NULL AND 
-            i.mac_bluetooth IS NOT NULL AND 
-            i.firmware_version IS NOT NULL AND 
-            i.hardware_version IS NOT NULL AND 
-            i.free_ram IS NOT NULL AND 
-            i.min_ram IS NOT NULL AND 
-            i.batt_low IS NOT NULL AND 
-            i.batt_high IS NOT NULL AND 
-            i.temperature IS NOT NULL AND 
-            i.status_error IS NOT NULL AND 
-            i.gps_latitude IS NOT NULL AND 
-            i.gps_longitude IS NOT NULL AND 
-            i.status_qc_sensor_1 IS NOT NULL AND 
-            i.status_qc_sensor_2 IS NOT NULL AND 
-            i.status_qc_sensor_3 IS NOT NULL AND 
-            i.status_qc_sensor_4 IS NOT NULL AND 
-            i.status_qc_sensor_5 IS NOT NULL AND 
-            i.status_qc_sensor_6 IS NOT NULL
-        ORDER BY i.last_online DESC";
+    $query = "SELECT i.id, i.chip_id, i.nama_client, i.produk, i.no_sn, 
+                     i.firmware_version, i.hardware_version, i.temperature, 
+                     i.last_online, i.bat, i.pt, i.unit, i.status_error, 
+                     i.ip_address, p.gambar_produk, 
+                     c.client_identifier, c.client_secret
+              FROM inventaris_produk i
+              JOIN produk p ON i.produk = p.nama_produk
+              JOIN client c ON i.nama_client = c.nama_client
+              WHERE i.nama_client = ? AND
+                    i.id IS NOT NULL AND 
+                    i.type_produk IS NOT NULL AND 
+                    i.produk IS NOT NULL AND 
+                    i.chip_id IS NOT NULL AND 
+                    i.no_sn IS NOT NULL AND 
+                    i.nama_client IS NOT NULL AND 
+                    i.garansi_awal IS NOT NULL AND 
+                    i.garansi_akhir IS NOT NULL AND 
+                    i.garansi_void IS NOT NULL AND 
+                    i.keterangan_void IS NOT NULL AND 
+                    i.ip_address IS NOT NULL AND 
+                    i.mac_wifi IS NOT NULL AND 
+                    i.mac_bluetooth IS NOT NULL AND 
+                    i.firmware_version IS NOT NULL AND 
+                    i.hardware_version IS NOT NULL AND 
+                    i.free_ram IS NOT NULL AND 
+                    i.min_ram IS NOT NULL AND 
+                    i.batt_low IS NOT NULL AND 
+                    i.batt_high IS NOT NULL AND 
+                    i.temperature IS NOT NULL AND 
+                    i.status_error IS NOT NULL AND 
+                    i.gps_latitude IS NOT NULL AND 
+                    i.gps_longitude IS NOT NULL AND 
+                    i.status_qc_sensor_1 IS NOT NULL AND 
+                    i.status_qc_sensor_2 IS NOT NULL AND 
+                    i.status_qc_sensor_3 IS NOT NULL AND 
+                    i.status_qc_sensor_4 IS NOT NULL AND 
+                    i.status_qc_sensor_5 IS NOT NULL AND 
+                    i.status_qc_sensor_6 IS NOT NULL
+              ORDER BY i.last_online DESC";
+    $stmt = $conn->prepare($query);
+    $stmt->bind_param("s", $selectedClient);
+    $stmt->execute();
+} else {
+    $query = "SELECT i.id, i.chip_id, i.nama_client, i.produk, i.no_sn, 
+                     i.firmware_version, i.hardware_version, i.temperature, 
+                     i.last_online, i.bat, i.pt, i.unit, i.status_error, 
+                     i.ip_address, p.gambar_produk, 
+                     c.client_identifier, c.client_secret
+              FROM inventaris_produk i
+              JOIN produk p ON i.produk = p.nama_produk
+              JOIN client c ON i.nama_client = c.nama_client
+              WHERE i.nama_client = ? AND i.produk = ? AND
+                    i.id IS NOT NULL AND 
+                    i.type_produk IS NOT NULL AND 
+                    i.produk IS NOT NULL AND 
+                    i.chip_id IS NOT NULL AND 
+                    i.no_sn IS NOT NULL AND 
+                    i.nama_client IS NOT NULL AND 
+                    i.garansi_awal IS NOT NULL AND 
+                    i.garansi_akhir IS NOT NULL AND 
+                    i.garansi_void IS NOT NULL AND 
+                    i.keterangan_void IS NOT NULL AND 
+                    i.ip_address IS NOT NULL AND 
+                    i.mac_wifi IS NOT NULL AND 
+                    i.mac_bluetooth IS NOT NULL AND 
+                    i.firmware_version IS NOT NULL AND 
+                    i.hardware_version IS NOT NULL AND 
+                    i.free_ram IS NOT NULL AND 
+                    i.min_ram IS NOT NULL AND 
+                    i.batt_low IS NOT NULL AND 
+                    i.batt_high IS NOT NULL AND 
+                    i.temperature IS NOT NULL AND 
+                    i.status_error IS NOT NULL AND 
+                    i.gps_latitude IS NOT NULL AND 
+                    i.gps_longitude IS NOT NULL AND 
+                    i.status_qc_sensor_1 IS NOT NULL AND 
+                    i.status_qc_sensor_2 IS NOT NULL AND 
+                    i.status_qc_sensor_3 IS NOT NULL AND 
+                    i.status_qc_sensor_4 IS NOT NULL AND 
+                    i.status_qc_sensor_5 IS NOT NULL AND 
+                    i.status_qc_sensor_6 IS NOT NULL
+              ORDER BY i.last_online DESC";
+    $stmt = $conn->prepare($query);
+    $stmt->bind_param("ss", $selectedClient, $selectedDevice);
+    $stmt->execute();
+}
 
-        $stmt = $conn->prepare($query);
-        $stmt->bind_param("s", $selectedClient);
-        $stmt->execute();
-    } else {
-        $query = "SELECT i.id, i.nama_client, i.produk, i.no_sn, i.firmware_version, i.hardware_version, i.temperature, i.last_online, i.bat, i.pt, i.unit, i.status_error, i.ip_address, p.gambar_produk
-        FROM inventaris_produk i
-        JOIN produk p ON i.produk = p.nama_produk
-        WHERE i.nama_client = ? AND i.produk = ? AND
-        i.id IS NOT NULL AND 
-        i.type_produk IS NOT NULL AND 
-        i.produk IS NOT NULL AND 
-        i.chip_id IS NOT NULL AND 
-        i.no_sn IS NOT NULL AND 
-        i.nama_client IS NOT NULL AND 
-        i.garansi_awal IS NOT NULL AND 
-        i.garansi_akhir IS NOT NULL AND 
-        i.garansi_void IS NOT NULL AND 
-        i.keterangan_void IS NOT NULL AND 
-        i.ip_address IS NOT NULL AND 
-        i.mac_wifi IS NOT NULL AND 
-        i.mac_bluetooth IS NOT NULL AND 
-        i.firmware_version IS NOT NULL AND 
-        i.hardware_version IS NOT NULL AND 
-        i.free_ram IS NOT NULL AND 
-        i.min_ram IS NOT NULL AND 
-        i.batt_low IS NOT NULL AND 
-        i.batt_high IS NOT NULL AND 
-        i.temperature IS NOT NULL AND 
-        i.status_error IS NOT NULL AND 
-        i.gps_latitude IS NOT NULL AND 
-        i.gps_longitude IS NOT NULL AND 
-        i.status_qc_sensor_1 IS NOT NULL AND 
-        i.status_qc_sensor_2 IS NOT NULL AND 
-        i.status_qc_sensor_3 IS NOT NULL AND 
-        i.status_qc_sensor_4 IS NOT NULL AND 
-        i.status_qc_sensor_5 IS NOT NULL AND 
-        i.status_qc_sensor_6 IS NOT NULL
-        ORDER BY i.last_online DESC";
+$stmt->bind_result(
+    $id, $chipId, $namaClient, $produk, $noSN, $firmwareVersion, $hardwareVersion, 
+    $temperature, $lastOnline, $battery, $pt, $unit, $statusError, $ipAddress, 
+    $gambarProduk, $clientIdentifier, $clientSecret
+);
 
-        $stmt = $conn->prepare($query);
-        $stmt->bind_param("ss", $selectedClient, $selectedDevice);
-        $stmt->execute();
-    }
-
-    $stmt->bind_result($id, $namaClient, $produk, $noSN, $firmwareVersion, $hardwareVersion, $temperature, $lastOnline, $battery, $pt, $unit, $statusError, $ipAddress, $gambarProduk);
-    $resultDevices = array();
-    while ($stmt->fetch()) {
-        $resultDevices[] = array(
-            'id' => $id,
-            'namaClient' => $namaClient,
-            'produk' => $produk,
-            'noSN' => $noSN,
-            'firmwareVersion' => $firmwareVersion,
-            'hardwareVersion' => $hardwareVersion,
-            'temperature' => $temperature,
-            'lastOnline' => $lastOnline,
-            'battery' => $battery,
-            'pt' => $pt,
-            'unit' => $unit,
-            'statusError' => $statusError,
-            'ipAddress' => $ipAddress,
-            'gambarProduk' => $gambarProduk,
-        );
-    }
+$resultDevices = array();
+while ($stmt->fetch()) {
+    $resultDevices[] = array(
+        'id' => $id,
+        'chipId' => $chipId,
+        'namaClient' => $namaClient,
+        'produk' => $produk,
+        'noSN' => $noSN,
+        'firmwareVersion' => $firmwareVersion,
+        'hardwareVersion' => $hardwareVersion,
+        'temperature' => $temperature,
+        'lastOnline' => $lastOnline,
+        'battery' => $battery,
+        'pt' => $pt,
+        'unit' => $unit,
+        'statusError' => $statusError,
+        'ipAddress' => $ipAddress,
+        'gambarProduk' => $gambarProduk,
+        'clientIdentifier' => $clientIdentifier,
+        'clientSecret' => $clientSecret
+    );
+}
 
     $stmt->close();
     if (empty($resultDevices)) {
@@ -178,6 +194,25 @@ if (isset($_POST['pilihClient'])) {
 </head>
 
 <body class="hold-transition sidebar-mini layout-fixed">
+    <!-- $client_id = isset($_POST['client_id']) ? $_POST['client_id'] : '';
+$user_name = isset($_POST['user_name']) ? $_POST['user_name'] : '';
+$client_secret = isset($_POST['client_secret']) ? $_POST['client_secret'] : '';
+$chip_id = isset($_POST['chip_id']) ? $_POST['chip_id'] : '';
+$placement = isset($_POST['placement']) ? $_POST['placement'] : '';
+$custom_name = isset($_POST['custom_name']) ? $_POST['custom_name'] : '';
+-->
+
+    <form id="detailForm" action="produksi/detail/odsou.php" method="POST" style="display:none;">
+    <input type="hidden" name="client_id" value="">
+    <input type="hidden" name="user_name" value="">
+    <input type="hidden" name="client_secret" value="">
+    <input type="hidden" name="chip_id" value="">
+    <input type="hidden" name="placement" value="">
+    <input type="hidden" name="custom_name" value="">
+    
+    </form>
+
+
     <div class="wrapper">
 
         <?php
@@ -483,8 +518,29 @@ if (isset($_POST['pilihClient'])) {
                         var detailLink = document.createElement("a");
                         detailLink.className = "btn btn-info";
                         detailLink.textContent = "Detail";
-                        detailLink.href = 'produksi/detail/detail.php?id=' + device.id;
+                        detailLink.href='';
+                        if (device.produk === 'STB2-BW-UVR') {
+                            detailLink.addEventListener("click", function(e) {
+                                e.preventDefault();
+                                //i.id, i.nama_client, i.produk, i.no_sn, i.firmware_version, i.hardware_version, i.temperature, i.last_online, i.bat, i.pt, i.unit, i.status_error, i.ip_address, p.gambar_produk
+                                //device.id+'&sn='+device.noSN+'&pt='+device.pt+'&unit='+device.unit;
+                                let form = document.getElementById('detailForm');
+                                form.querySelector('[name="client_id"]').value = device.clientIdentifier;
+                                form.querySelector('[name="user_name"]').value = "stb "+device.noSN;
+                                form.querySelector('[name="client_secret"]').value = device.clientSecret;
+                                form.querySelector('[name="chip_id"]').value = device.chipId;
+                                form.querySelector('[name="placement"]').value =device.pt;
+                                form.querySelector('[name="custom_name"]').value =device.unit;
+                                form.submit();  // ✅ sekarang hanya jalan saat tombol "Detail" diklik
+                            });
+                        }
 
+                        else if(device.produk=='TP01-BW-UVR'){
+                            detailLink.href = 'produksi/detail/tp01_bw_uvr.php?id=' + device.id+'&sn='+device.noSN+'&pt='+device.pt+'&unit='+device.unit;
+                        }
+                        else{
+                            detailLink.href = 'produksi/detail/detail.php?id=' + device.id+'&sn='+device.noSN+'&pt='+device.pt+'&unit='+device.unit;
+                        }
                         productDetailsContainer.appendChild(mainHeading);
                         headerContainer.appendChild(titleContainer);
                         headerContainer.appendChild(imageContainer.appendChild(image));

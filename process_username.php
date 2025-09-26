@@ -10,8 +10,8 @@ if(isset($_POST['username'])) {
     // Database connection parameters
     $serverName = "localhost";
     $userNameDb = "root";
-    $password = "";
-    $dbName = "databaseinventory";
+    $password = "Sem4ng4tsukses!";
+    $dbName = "devices";
 
     // Create a new database connection
     $conn = new mysqli($serverName, $userNameDb, $password, $dbName);

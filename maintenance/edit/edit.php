@@ -37,8 +37,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             $detail_id = intval($key); // Convert to integer for security
             $checkboxBarangDatang = isset($_POST['checkboxBarangDatang'][$detail_id]) ? 1 : 0;
             $checkboxCekMasalah = isset($_POST['checkboxCekMasalah'][$detail_id]) ? 1 : 0;
-            $checkboxBeritaAcara = isset($_POST['checkboxBeritaAcara'][$detail_id]) ? 1 : 0;
             $checkboxAdministrasi = isset($_POST['checkboxAdministrasi'][$detail_id]) ? 1 : 0;
+            $checkboxBeritaAcara = isset($_POST['checkboxBeritaAcara'][$detail_id]) ? 1 : 0;
             $checkboxPengiriman = isset($_POST['checkboxPengiriman'][$detail_id]) ? 1 : 0;
             $noResi = isset($_POST['no_resi'][$detail_id]) ? $_POST['no_resi'][$detail_id] : null;
 
@@ -206,19 +206,23 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                                                         </th>
                                                         <th class="lebar-kolom5">
                                                             <div class="column-name">CEK</div>
-                                                            <div class="column-description">Buat Berita</div>
+                                                            <div class="column-description">Cek & Quotation</div>
+                                                        </th>
+                                                        <th class="lebar-kolom5">
+                                                            <div class="column-name">SO</div>
+                                                            <div class="column-description">Service Order</div>
                                                         </th>
                                                         <th class="lebar-kolom5">
                                                             <div class="column-name">R</div>
                                                             <div class="column-description">Reparasi Barang</div>
                                                         </th>
                                                         <th class="lebar-kolom5">
-                                                            <div class="column-name">SO/PO</div>
-                                                            <div class="column-description">Proses Administrasi</div>
-                                                        </th>
-                                                        <th class="lebar-kolom5">
                                                             <div class="column-name">P</div>
                                                             <div class="column-description">Pengiriman Barang</div>
+                                                        </th>
+                                                        <th class="lebar-kolom5">
+                                                            <div class="column-name">BA</div>
+                                                            <div class="column-description">Berita Acara</div>
                                                         </th>
                                                         <th class="text-center lebar-kolom10" style="min-width:150px;">No. Resi</th>
                                                     </tr>
@@ -284,17 +288,22 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                                                             </td>
                                                             <td style="text-align: center;">
                                                                 <div class="form-check">
-                                                                    <input class="form-check-input larger-checkbox" type="checkbox" value="1" name="checkboxBeritaAcara[<?php echo $row['detail_id']; ?>]" <?php echo $row["berita_as"] == 1 ? 'checked' : ''; ?>>
-                                                                </div>
-                                                            </td>
-                                                            <td style="text-align: center;">
-                                                                <div class="form-check">
                                                                     <input class="form-check-input larger-checkbox" type="checkbox" value="1" name="checkboxAdministrasi[<?php echo $row['detail_id']; ?>]" <?php echo $row["administrasi"] == 1 ? 'checked' : ''; ?>>
                                                                 </div>
                                                             </td>
                                                             <td style="text-align: center;">
                                                                 <div class="form-check">
+                                                                    <input class="form-check-input larger-checkbox" type="checkbox" value="1" name="checkboxBeritaAcara[<?php echo $row['detail_id']; ?>]" <?php echo $row["berita_as"] == 1 ? 'checked' : ''; ?>>
+                                                                </div>
+                                                            </td>
+                                                            <td style="text-align: center;">
+                                                                <div class="form-check">
                                                                     <input class="form-check-input larger-checkbox" type="checkbox" value="1" name="checkboxPengiriman[<?php echo $row['detail_id']; ?>]" <?php echo $row["pengiriman"] == 1 ? 'checked' : ''; ?>>
+                                                                </div>
+                                                            </td>
+                                                            <td style="text-align: center;">
+                                                                <div class="form-check">
+                                                                    <input class="form-check-input larger-checkbox" type="checkbox" value="1" name="checkboxBA[<?php echo $row['detail_id']; ?>]" <?php echo $row["pengiriman"] == 1 ? 'checked' : ''; ?>>
                                                                 </div>
                                                             </td>
                                                             <td>

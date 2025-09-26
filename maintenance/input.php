@@ -13,99 +13,115 @@ if (isset($_POST['tanggal'])) {
     // Initialize the array to store fetched nama_client values
     $namaClientArray = array();
 
-    // Loop through the arrays and insert records
-    foreach ($_POST["numberSN"] as $key => $no_sn) {
-        // Fetch nama_client based on no_sn from inventaris_produk
-        $queryFetchClient = "SELECT nama_client FROM inventaris_produk WHERE no_sn = ?";
-        $stmtFetchClient = $conn->prepare($queryFetchClient);
-        $stmtFetchClient->bind_param("i", $no_sn);
-        $stmtFetchClient->execute();
-        $stmtFetchClient->bind_result($nama_client_fetched);
+    // Start the transaction
+    $conn->begin_transaction();
 
-        // Fetch the result and ensure all fetched nama_client values are the same
-        $stmtFetchClient->fetch();
-        $stmtFetchClient->close();
+    try {
+        // Loop through the arrays and insert records
+        foreach ($_POST["numberSN"] as $key => $no_sn) {
+            // Fetch nama_client based on no_sn from inventaris_produk
+            $queryFetchClient = "SELECT nama_client FROM inventaris_produk WHERE no_sn = ?";
+            $stmtFetchClient = $conn->prepare($queryFetchClient);
+            $stmtFetchClient->bind_param("i", $no_sn);
+            $stmtFetchClient->execute();
+            $stmtFetchClient->bind_result($nama_client_fetched);
 
-        if ($key === 0) {
-            // Store the first fetched nama_client value
-            $namaClientArray[] = $nama_client_fetched;
-        } else {
-            // Check if the current fetched nama_client matches the stored value
-            if ($nama_client_fetched !== $namaClientArray[0]) {
-                echo "Error: Fetched nama_client values are not the same.";
-                exit; // Exit the script if validation fails
-            }
-        }
-    }
+            // Fetch the result and ensure all fetched nama_client values are the same
+            $stmtFetchClient->fetch();
+            $stmtFetchClient->close();
 
-    // Continue with the transaction maintenance
-    $query = "INSERT INTO transaksi_maintenance (tanggal_terima) VALUES (?)";
-    $stmt = $conn->prepare($query);
-    $stmt->bind_param("s", $tanggal);
-
-    if ($stmt->execute()) {
-        // Get the auto-generated transaksi_id
-        $transaksi_id = $conn->insert_id;
-
-        // Insert successful, continue with the detail maintenance
-        if (isset($_POST["numberSN"]) && isset($_POST["inputKerusakan"])) {
-            $numberSNArray = $_POST["numberSN"];
-            $keteranganArray = $_POST["inputKerusakan"];
-            $pilihGaransiArray = $_POST["pilihGaransi"];
-            $keteranganVoidArray = $_POST["keteranganVoid"];
-
-            foreach ($numberSNArray as $key => $no_sn) {
-                $keterangan = $keteranganArray[$key];
-                $pilihGaransi = $pilihGaransiArray[$key];
-                $keteranganVoid = !empty($keteranganVoidArray[$key]) ? $keteranganVoidArray[$key] : "-";
-
-                // Insert the new record into detail_maintenance table
-                $queryDetail = "INSERT INTO detail_maintenance (transaksi_id, no_sn, 
-                keterangan, kedatangan, cek_barang, berita_as, administrasi, pengiriman, no_resi) VALUES (?, ?, ?, '1', '0','0','0','0', '0')";
-                $stmtDetail = $conn->prepare($queryDetail);
-                $stmtDetail->bind_param("iis", $transaksi_id, $no_sn, $keterangan);
-
-                if ($stmtDetail->execute()) {
-                    $stmtDetail->close();
-
-                    // Update the garansi_void column in inventaris_produk table
-                    $queryUpdateInventaris = "UPDATE inventaris_produk SET garansi_void = ?, keterangan_void = ? WHERE no_sn = ?";
-                    $stmtUpdateInventaris = $conn->prepare($queryUpdateInventaris);
-                    $stmtUpdateInventaris->bind_param("isi", $pilihGaransi, $keteranganVoid, $no_sn);
-
-                    if ($stmtUpdateInventaris->execute()) {
-                        $stmtUpdateInventaris->close();
-                    } else {
-                        echo "Error updating inventaris_produk: " . $stmtUpdateInventaris->error;
-                    }
-                } else {
-                    echo "Error inserting record into detail_maintenance: " . $stmtDetail->error;
-                }
-            }
-            // Validate and update transaksi_maintenance table
-            if (count($namaClientArray) > 0) {
-                $nama_client = $namaClientArray[0];
-
-                $queryUpdateClient = "UPDATE transaksi_maintenance SET nama_client = ? WHERE transaksi_id = ?";
-                $stmtUpdateClient = $conn->prepare($queryUpdateClient);
-                $stmtUpdateClient->bind_param("si", $nama_client, $transaksi_id);
-
-                if (!$stmtUpdateClient->execute()) {
-                    echo "Error updating transaksi_maintenance: " . $stmtUpdateClient->error;
-                }
-
-                $stmtUpdateClient->close();
+            if ($key === 0) {
+                // Store the first fetched nama_client value
+                $namaClientArray[] = $nama_client_fetched;
             } else {
-                echo "Error: No nama_client values fetched.";
+                // Check if the current fetched nama_client matches the stored value
+                if ($nama_client_fetched !== $namaClientArray[0]) {
+                    // echo "Error: Fetched nama_client values are not the same.";
+                    throw new Exception("Error inserting record into detail_maintenance: " . $stmtDetail->error);
+                    exit; // Exit the script if validation fails
+                }
+            }
+        }
+
+        // Continue with the transaction maintenance
+        $query = "INSERT INTO transaksi_maintenance (tanggal_terima) VALUES (?)";
+        $stmt = $conn->prepare($query);
+        $stmt->bind_param("s", $tanggal);
+
+        if ($stmt->execute()) {
+            // Get the auto-generated transaksi_id
+            $transaksi_id = $conn->insert_id;
+
+            // Insert successful, continue with the detail maintenance
+            if (isset($_POST["numberSN"]) && isset($_POST["inputKerusakan"])) {
+                $numberSNArray = $_POST["numberSN"];
+                $keteranganArray = $_POST["inputKerusakan"];
+                $pilihGaransiArray = $_POST["pilihGaransi"];
+                $keteranganVoidArray = $_POST["keteranganVoid"];
+
+                foreach ($numberSNArray as $key => $no_sn) {
+                    $keterangan = $keteranganArray[$key];
+                    $pilihGaransi = $pilihGaransiArray[$key];
+                    $keteranganVoid = !empty($keteranganVoidArray[$key]) ? $keteranganVoidArray[$key] : "-";
+
+                    // Insert the new record into detail_maintenance table
+                    $queryDetail = "INSERT INTO detail_maintenance (transaksi_id, no_sn, 
+                    keterangan, kedatangan, cek_barang, administrasi, berita_as, pengiriman, no_resi) VALUES (?, ?, ?, '1', '0','0','0','0', '0')";
+                    $stmtDetail = $conn->prepare($queryDetail);
+                    $stmtDetail->bind_param("iis", $transaksi_id, $no_sn, $keterangan);
+
+                    if ($stmtDetail->execute()) {
+                        // Update the garansi_void column in inventaris_produk table
+                        $queryUpdateInventaris = "UPDATE inventaris_produk SET garansi_void = ?, keterangan_void = ? WHERE no_sn = ?";
+                        $stmtUpdateInventaris = $conn->prepare($queryUpdateInventaris);
+                        $stmtUpdateInventaris->bind_param("isi", $pilihGaransi, $keteranganVoid, $no_sn);
+
+                        if (!$stmtUpdateInventaris->execute()) {
+                            throw new Exception("Error updating inventaris_produk: " . $stmtUpdateInventaris->error);
+                        }
+                    } else {
+                        throw new Exception("Error inserting record into detail_maintenance: " . $stmtDetail->error);
+                    }
+                }
+
+                // Validate and update transaksi_maintenance table
+                if (count($namaClientArray) > 0) {
+                    $nama_client = $namaClientArray[0];
+
+                    $queryUpdateClient = "UPDATE transaksi_maintenance SET nama_client = ? WHERE transaksi_id = ?";
+                    $stmtUpdateClient = $conn->prepare($queryUpdateClient);
+                    $stmtUpdateClient->bind_param("si", $nama_client, $transaksi_id);
+
+                    if (!$stmtUpdateClient->execute()) {
+                        throw new Exception("Error updating transaksi_maintenance: " . $stmtUpdateClient->error);
+                    }
+
+                    $stmtUpdateClient->close();
+                } else {
+                    throw new Exception("Error: No nama_client values fetched.");
+                }
+            } else {
+                throw new Exception("Error: Products and other arrays are not set.");
             }
         } else {
-            echo "Error: Products and other arrays are not set.";
+            throw new Exception("Error adding transaction maintenance: " . $stmt->error);
         }
-    } else {
-        echo "Error adding transaction maintenance: " . $stmt->error;
-    }
 
-    $stmt->close();
+        // Commit the transaction if all queries succeed
+        $conn->commit();
+    } catch (Exception $e) {
+        // Rollback the transaction if an error occurs
+        $conn->rollback();
+        http_response_code(500);
+        echo "Transaction failed: " . $e->getMessage();
+        exit;
+    } finally {
+        // Close all prepared statements
+        if (isset($stmt)) $stmt->close();
+        if (isset($stmtDetail)) $stmtDetail->close();
+        if (isset($stmtUpdateInventaris)) $stmtUpdateInventaris->close();
+        if (isset($stmtUpdateClient)) $stmtUpdateClient->close();
+    }
 }
 
 ?>
@@ -270,7 +286,7 @@ if (isset($_POST['tanggal'])) {
                             <!-- /.card-body -->
                         </form>
                         <div class="card-footer d-flex justify-content-end">
-                            <button type="button" class="btn btn-primary" onclick="if(validateForm()) { validateSuccess(); resetForm(); }">Submit</button>
+                            <button type="button" class="btn btn-primary" onclick="if(validateForm()) { validateSuccess();}">Submit</button>
                         </div>
                     </div>
                     <!-- general form elements -->

@@ -1,0 +1,5 @@
+[19-Feb-2025 17:57:28 Asia/Jakarta] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 'project' in 'field list' in /var/www/html/owl_inventory/pengajuan/edit_pengajuan.php:35
+Stack trace:
+#0 /var/www/html/owl_inventory/pengajuan/edit_pengajuan.php(35): mysqli->prepare()
+#1 {main}
+  thrown in /var/www/html/owl_inventory/pengajuan/edit_pengajuan.php on line 35

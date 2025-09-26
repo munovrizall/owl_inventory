@@ -32,14 +32,6 @@ if (isset($_POST['selectedDevice'])) {
     if (isset($_POST['quantity'])) {
         $submittedQuantity = $_POST['quantity'];
 
-        if ($submittedQuantity == "") {
-            echo json_encode(array('error' => 'Quantity is required.'));
-            exit();
-        } elseif ($submittedQuantity <= 0) {
-            echo json_encode(array('error' => 'Quantity must be greater than 0.'));
-            exit();
-        }
-
         // Initialize the array to store updated stock quantities
         $updatedStockQuantities = array();
 
@@ -93,6 +85,14 @@ if (isset($_POST['selectedDevice'])) {
         $newProductStock = $currentProductStock + $submittedQuantity;
 
         if (isset($_POST['submitForm'])) {
+
+            if ($submittedQuantity == "") {
+                echo json_encode(array('error' => 'Quantity is required.'));
+                exit();
+            } elseif ($submittedQuantity <= 0) {
+                echo json_encode(array('error' => 'Quantity must be greater than 0.'));
+                exit();
+            }
             
             $updateQueryStock = "UPDATE masterbahan SET quantity = ? WHERE nama = ?";
             $updateStmt = $conn->prepare($updateQueryStock);
@@ -179,6 +179,8 @@ if (isset($_POST['selectedDevice'])) {
             echo json_encode($responseArray);
             exit();
         }
+
+        header('Location: ' . $_SERVER['PHP_SELF']);
     }
 }
 
@@ -303,7 +305,7 @@ if (isset($_POST['selectedDevice'])) {
                                         <!-- Input untuk kuantitas -->
                                         <input type="number" class="form-control" id="quantity" name="quantity" min="0" value="">
                                     </div>
-                                    <button type="button" class="btn btn-outline-info btn-block" id="cekButton" name="cekButton" style="margin-top: 10px; max-width: 180px;"><i class="fas fa-sync-alt" style="margin-right: 8px;" onclick="cekProduksi()"></i>Cek</button>
+                                    <!-- <button type="button" class="btn btn-outline-info btn-block" id="cekButton" name="cekButton" style="margin-top: 10px; max-width: 180px;"><i class="fas fa-sync-alt" style="margin-right: 8px;" onclick="cekProduksi()"></i>Cek</button> -->
                                 </div>
                                 <div class="card">
                                     <div class="card-header">
@@ -402,32 +404,10 @@ if (isset($_POST['selectedDevice'])) {
             var selectedDevice = document.getElementById("pilihProduksiDevice").value;
             var quantity = document.getElementById("quantity").value;
 
-            // Check if a device is selected
-            if (selectedDevice === "") {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Oops...',
-                    text: 'Pilih produk terlebih dahulu',
-                    confirmButtonText: 'OK (enter)'
-                });
-                return;
-            }
-            // Check if quantity is provided
-            if (quantity === "") {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Oops...',
-                    text: 'Masukkan jumlah produksi device!',
-                    showCancelButton: false,
-                    confirmButtonColor: '#3085d6',
-                    confirmButtonText: 'OK (enter)'
-                });
-                return;
-            }
             // Fetch and update the table
             $.ajax({
                 type: "POST",
-                url: "produksi.php",
+                url: "produksi_device.php",
                 data: {
                     selectedDevice: selectedDevice,
                     quantity: quantity
@@ -493,6 +473,11 @@ if (isset($_POST['selectedDevice'])) {
             const quantityInput = document.getElementById("quantity");
             quantityInput.placeholder = "Masukkan jumlah produksi device";
             quantityInput.disabled = false;
+            cekProduksi();
+        });
+
+        $('#quantity').on('input', function() {
+            cekProduksi();
         });
 
         function submitForm() {
@@ -557,8 +542,6 @@ if (isset($_POST['selectedDevice'])) {
                 }
             }
             // Add more validation as needed...
-            alert('Produksi berhasil!\nKlik ok atau enter');
-
             return true; // If all validations pass
         }
 
